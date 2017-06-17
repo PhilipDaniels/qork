@@ -6,27 +6,8 @@
 #                                 and: https://git.kernel.org/pub/scm/git/git.git/plain/config.mak.uname
 
 include build/os_detection.mak
+include build/pre_requisites.mak
 
-
-
-# Define V = 1 for a more verbose build
-V = 0
-
-# Pre-requisites that we require to be installed in order to build. The Makefile
-# will check these and print a nice error message if any is missing.
-CP = cp
-LS = ls
-FIND = find
-RM = rm
-GIT = git
-PYTHON = python3
-PYINSTALLER = pyinstaller
-PRE_REQUISITES = $(CP) $(LS) $(FIND) $(RM) $(GIT) $(PYTHON) $(PYINSTALLER)
-
-$(info Checking that all required pre-requisites are installed on this computer...)
-$(foreach exe,$(PRE_REQUISITES),\
-		$(if $(shell which $(exe)),$(info Found $(exe)...),$(error No $(exe) in PATH. Please install it.)))
-$(info Pre-requisite check completed.)
 
 # Determine what the name of the final program should be. We need to append
 # '.exe' when building on Windows.
@@ -36,8 +17,13 @@ EXE_SUFFIX =
 ifeq ($(uname_S),Windows)
 	EXE_SUFFIX = .exe
 endif
+
+# This is just 'qork' or 'qork.exe' on Windows.
 EXE = qork$(EXE_SUFFIX)
+
+# This is qork in the folder to which pyinstaller will write the bundled qork progam.
 BUNDLED_QORK_EXE = $(PYTHON_SRC_DIR)/dist/qork/$(EXE)
+
 
 # The default target of this Makefile is
 all: dump $(BUNDLED_QORK_EXE)
@@ -59,7 +45,7 @@ dump:
 	@echo -n "Dumping variables.\n\
 	    uname_S is $(uname_S), uname_M is $(uname_M), uname_O is $(uname_O) and uname_P is $(uname_P)\n\
 	    PYTHON_SRC_DIR is $(PYTHON_SRC_DIR) and RUST_SRC_DIR is $(RUST_SRC_DIR)\n\
-	    EXE_SUFFIX is $(EXE_SUFFIX), EXE is $(EXE), and PROGRAM is $(PROGRAM)\n"
+	    EXE_SUFFIX is $(EXE_SUFFIX), EXE is $(EXE), and BUNDLED_QORK_EXE is $(BUNDLED_QORK_EXE)\n"
 
 
 # This tells make that these targets are "not real", in the sense that there
