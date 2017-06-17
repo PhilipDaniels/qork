@@ -37,24 +37,20 @@ ifeq ($(uname_S),Windows)
 	EXE_SUFFIX = .exe
 endif
 EXE = qork$(EXE_SUFFIX)
-PROGRAM = $(PYTHON_SRC_DIR)/$(EXE)
+BUNDLED_QORK_EXE = $(PYTHON_SRC_DIR)/dist/qork/$(EXE)
 
 # The default target of this Makefile is
-all: dump $(PROGRAM)
+all: dump $(BUNDLED_QORK_EXE)
 
 
-$(PROGRAM): $(PYTHON_SRC_DIR)/$(EXE).py
+$(BUNDLED_QORK_EXE): $(PYTHON_SRC_DIR)/$(EXE).py
 	cd $(PYTHON_SRC_DIR) && \
-		$(PYINSTALLER) --clean -F --log-level INFO $(EXE).py && \
-		echo "Copying exe from dist folder into python folder..." && \
-		$(CP) -fv dist/$(EXE) . && \
-		echo "Next line should show the resultant exe file:" && \
-		$(LS) -Fl $(EXE)
+		$(PYINSTALLER) --clean -y --log-level INFO $(EXE).py
 
 clean:
 	$(RM) -rf $(PYTHON_SRC_DIR)/build $(PYTHON_SRC_DIR)/dist \
 		$(PYTHON_SRC_DIR)/__pycache__ $(PYTHON_SRC_DIR)/qork.spec \
-		$(PROGRAM)
+		$(BUNDLED_QORK_EXE)
 
 
 # Dump all variables. For several alternative techniques, see
