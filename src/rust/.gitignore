@@ -1,2 +1,5 @@
 # Target folders are produced by cargo.
 target/
+**/*.rs.bk
+
+# Cargo.lock should be ignored for libraries but tracked for binaries.
