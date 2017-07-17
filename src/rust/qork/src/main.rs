@@ -18,9 +18,3 @@ fn main() {
 	error!(log, "hello world");
 	crit!(log, "hello world");
 }
-
-/*
- * fn main() {
-    println!("Hello, worlds!");
-}
-*/
