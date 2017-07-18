@@ -3,34 +3,11 @@ extern crate slog;
 extern crate slog_term;
 extern crate slog_async;
 
-use std::time::{Duration, Instant};
-use std::thread;
 use slog::Drain;
 use slog::Logger;
 
-struct LogTimer<'a> {
-	start_time: Instant,
-	name: &'a str,
-	logger: &'a Logger
-}
-
-impl<'a> LogTimer<'a> {
-	pub fn new(logger: &'a Logger, name: &'a str) -> LogTimer<'a> {
-		LogTimer {
-			start_time: Instant::now(),
-			logger: logger,
-			name: name
-		}
-	}
-}
-
-impl<'a> Drop for LogTimer<'a> {
-	fn drop(&mut self) {
-		let elapsed = self.start_time.elapsed();
-        let secs = (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0);
-		debug!(self.logger, "Execution Completed"; "Seconds" => secs, "Name" => self.name);
-	}
-}
+mod log_timer;
+use log_timer::LogTimer;
 
 fn main() {
 	let decorator = slog_term::TermDecorator::new().build();
@@ -49,10 +26,26 @@ fn main() {
 	other(&log);
 
 	let s = "another".to_string();
-	thread::sleep(Duration::from_millis(400));
 	let _lt2 = LogTimer::new(&log, &s);
 }
 
 fn other(log: &Logger) {
 	let _lt = LogTimer::new(log, "other");
+
+	{
+		let _lt2 = LogTimer::new(log, "other2");
+		sleep(200);
+	}
+
+	{
+		let _lt3 = LogTimer::new2(log, "other3");
+		sleep(300);
+	}
+}
+
+
+fn sleep(msec: u64) {
+	use std::thread;
+	use std::time::Duration;
+	thread::sleep(Duration::from_millis(msec));
 }
