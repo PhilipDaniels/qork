@@ -3,23 +3,32 @@ extern crate slog;
 extern crate slog_term;
 extern crate slog_async;
 
+use std::time::{Duration, Instant};
+use std::thread;
 use slog::Drain;
 use slog::Logger;
 
-struct LogTimer {
-	name: String,
-	log: &Logger
+struct LogTimer<'a> {
+	start_time: Instant,
+	name: &'a str,
+	logger: &'a Logger
 }
 
-impl LogTimer {
-	pub fn new(logger: &Logger, name: &str) -> LogTimer {
-		LogTimer { log: logger, name: String::from(name) }
+impl<'a> LogTimer<'a> {
+	pub fn new(logger: &'a Logger, name: &'a str) -> LogTimer<'a> {
+		LogTimer {
+			start_time: Instant::now(),
+			logger: logger,
+			name: name
+		}
 	}
 }
 
-impl Drop for LogTimer {
+impl<'a> Drop for LogTimer<'a> {
 	fn drop(&mut self) {
-		debug!(self.log, "Dropping {}", self.name);
+		let elapsed = self.start_time.elapsed();
+        let secs = (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0);
+		debug!(self.logger, "Execution Completed"; "Seconds" => secs, "Name" => self.name);
 	}
 }
 
@@ -36,11 +45,14 @@ fn main() {
 	//error!(log, "hello world");
 	//crit!(log, "hello world");
 
-	let t = LogTimer::new(&log, "Main");
+	let _lt1 = LogTimer::new(&log, "main");
 	other(&log);
 
+	let s = "another".to_string();
+	thread::sleep(Duration::from_millis(400));
+	let _lt2 = LogTimer::new(&log, &s);
 }
 
 fn other(log: &Logger) {
-	let t2 = LogTimer::new(log, "Other");
+	let _lt = LogTimer::new(log, "other");
 }
