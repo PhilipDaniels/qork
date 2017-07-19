@@ -6,10 +6,22 @@ extern crate slog_async;
 use slog::Logger;
 mod execution_timer;
 use execution_timer::ExecutionTimer;
+mod context;
+use context::Context;
 
 fn main() {
     let logger = create_root_logger();
     let _timer = ExecutionTimer::new(&logger, "Main.Start");
+    let context = create_context(&logger);
+}
+
+fn create_context(logger: &Logger) -> Context {
+    let context = Context::new();
+    info!(logger, "Created Context"; "exe_path" => context.exe_path.to_str(),
+                                     "exe_bytes" => context.exe_meta_data.len(),
+                                     "exe_modified" => context.exe_meta_data.modified()
+    );
+    context
 }
 
 fn create_root_logger() -> Logger {
