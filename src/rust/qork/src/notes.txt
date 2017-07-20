@@ -1,0 +1,6 @@
+Rust Learning
+=============
+Formatting of SystemTime is really difficult! Need to bring in chrono
+and then Google for the special magic function to convert a SystemTime
+into a DateTime.
+

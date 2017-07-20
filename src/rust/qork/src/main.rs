@@ -2,6 +2,7 @@
 extern crate slog;
 extern crate slog_term;
 extern crate slog_async;
+extern crate chrono;
 
 use slog::Logger;
 mod execution_timer;
@@ -11,17 +12,9 @@ use context::Context;
 
 fn main() {
     let logger = create_root_logger();
-    let _timer = ExecutionTimer::new(&logger, "Main.Start");
-    let context = create_context(&logger);
-}
-
-fn create_context(logger: &Logger) -> Context {
-    let context = Context::new();
-    info!(logger, "Created Context"; "exe_path" => context.exe_path.to_str(),
-                                     "exe_bytes" => context.exe_meta_data.len(),
-                                     "exe_modified" => context.exe_meta_data.modified()
-    );
-    context
+    let context = Context::new(logger);
+    let _timer = ExecutionTimer::new(&context.logger, "Main.Start");
+    context.log_created_message();
 }
 
 fn create_root_logger() -> Logger {
@@ -36,8 +29,11 @@ fn create_root_logger() -> Logger {
     slog::Logger::root(drain, o!())
 }
 
+
+/*
 fn sleep(msec: u64) {
     use std::thread;
     use std::time::Duration;
     thread::sleep(Duration::from_millis(msec));
 }
+*/
