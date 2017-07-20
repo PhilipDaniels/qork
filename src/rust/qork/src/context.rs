@@ -2,13 +2,15 @@ use std;
 use slog::Logger;
 use std::time::{SystemTime, UNIX_EPOCH};
 use chrono::{Utc, TimeZone, DateTime};
+use hostname;
 
 // The complete execution context of Qork.
 pub struct Context {
     pub logger: Logger,
     pub args: Vec<String>,
     pub exe_path: Option<std::path::PathBuf>,
-    pub exe_meta_data: Option<std::fs::Metadata>
+    pub exe_meta_data: Option<std::fs::Metadata>,
+    pub hostname: Option<String>
 }
 
 fn system_time_to_date_time(t: SystemTime) -> DateTime<Utc> {
@@ -36,7 +38,8 @@ impl Context {
             logger: logger,
             args: std::env::args().collect(),
             exe_path: exe,
-            exe_meta_data: md
+            exe_meta_data: md,
+            hostname: hostname::get_hostname()
         }
     }
 
@@ -56,6 +59,7 @@ impl Context {
             .unwrap_or("unknown".to_string());
 
         info!(self.logger, "Created Context";
+               "hostname" => &self.hostname,
                "exe_modified" => mdate,
                "exe_bytes" => bytes,
                "exe_path" => p

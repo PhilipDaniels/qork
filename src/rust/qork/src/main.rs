@@ -3,6 +3,7 @@ extern crate slog;
 extern crate slog_term;
 extern crate slog_async;
 extern crate chrono;
+extern crate hostname;
 
 use slog::Logger;
 mod execution_timer;
