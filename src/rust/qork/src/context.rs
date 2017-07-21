@@ -39,8 +39,12 @@ impl Context {
             args: std::env::args().collect(),
             exe_path: exe,
             exe_meta_data: md,
-            hostname: hostname::get_hostname()
+            hostname: hostname::get_hostname(),
         }
+    }
+
+    pub fn version(&self) -> &'static str {
+        "0.1.0"
     }
 
     pub fn log_created_message(&self) -> () {
@@ -59,6 +63,7 @@ impl Context {
             .unwrap_or("unknown".to_string());
 
         info!(self.logger, "Created Context";
+               "version" => self.version(),
                "hostname" => &self.hostname,
                "exe_modified" => mdate,
                "exe_bytes" => bytes,
