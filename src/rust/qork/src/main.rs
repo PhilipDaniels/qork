@@ -37,12 +37,3 @@ fn create_root_logger() -> Logger {
     // TODO: We want dynamic configuration here.
     slog::Logger::root(drain, o!())
 }
-
-
-/*
-fn sleep(msec: u64) {
-    use std::thread;
-    use std::time::Duration;
-    thread::sleep(Duration::from_millis(msec));
-}
-*/
