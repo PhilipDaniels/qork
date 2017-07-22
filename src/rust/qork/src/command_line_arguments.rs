@@ -1,7 +1,7 @@
 use clap::{Arg, App};
 
 pub struct CommandLineArguments {
-    _config_dir: Option<String>
+    config_dir: Option<String>
 }
 
 impl CommandLineArguments {
@@ -19,11 +19,11 @@ impl CommandLineArguments {
                         .get_matches();
 
         CommandLineArguments {
-            _config_dir: matches.value_of("config-dir").map(|s| s.to_string())
+            config_dir: matches.value_of("config-dir").map(|s| s.to_string())
         }
     }
 
     pub fn config_dir(&self) -> &Option<String> {
-        &self._config_dir
+        &self.config_dir
     }
 }

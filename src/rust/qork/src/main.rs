@@ -14,6 +14,11 @@ use context::Context;
 mod command_line_arguments;
 use command_line_arguments::CommandLineArguments;
 
+// TODO
+// * Why has my app ballooned to 18MB in size? How can I tell how large a crate is?
+// * Move version to a 'constants' file.
+// * Tidy up the context: make fields private.
+
 fn main() {
     let throw_away_logger = create_root_logger();
     let _timer = ExecutionTimer::new(&throw_away_logger, "Main.Start");

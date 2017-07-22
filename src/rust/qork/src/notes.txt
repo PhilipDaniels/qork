@@ -4,3 +4,10 @@ Formatting of SystemTime is really difficult! Need to bring in chrono
 and then Google for the special magic function to convert a SystemTime
 into a DateTime.
 
+C# to Rust
+==========
+To make a struct with private immutable data, just declare a field, then a pub fn with the
+same name which returns a reference to that data. Methods should take a reference otherwise
+you will get confusing compiler errors about lifetimes (because you moved an object).
+
+
