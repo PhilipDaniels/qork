@@ -1,5 +1,3 @@
-extern crate slog;
-
 use std::time::Instant;
 use slog::Logger;
 
@@ -12,8 +10,6 @@ pub struct ExecutionTimer<'a> {
 }
 
 impl<'a> ExecutionTimer<'a> {
-	// Construct a new ExecutionTimer, silently.
-	#[allow(dead_code)]
 	pub fn new(logger: &'a Logger, name: &'a str) -> ExecutionTimer<'a> {
 		ExecutionTimer {
 			start_time: Instant::now(),
