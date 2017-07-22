@@ -1,9 +1,8 @@
 use std;
 use std::env;
 use std::path::PathBuf;
-use std::time::{SystemTime, UNIX_EPOCH};
-use chrono::{Utc, TimeZone, DateTime};
 use command_line_arguments::CommandLineArguments;
+use datetime::system_time_to_date_time;
 use hostname;
 use qork;
 use slog::Logger;
@@ -17,22 +16,6 @@ pub struct Context {
     pub hostname: Option<String>,
     pub config_directory: PathBuf,
     pub command_line_arguments: CommandLineArguments
-}
-
-fn system_time_to_date_time(t: SystemTime) -> DateTime<Utc> {
-    let (sec, nsec) = match t.duration_since(UNIX_EPOCH) {
-        Ok(dur) => (dur.as_secs() as i64, dur.subsec_nanos()),
-        Err(e) => { // unlikely but should be handled
-            let dur = e.duration();
-            let (sec, nsec) = (dur.as_secs() as i64, dur.subsec_nanos());
-            if nsec == 0 {
-                (-sec, 0)
-            } else {
-                (-sec - 1, 1_000_000_000 - nsec)
-            }
-        },
-    };
-    Utc.timestamp(sec, nsec)
 }
 
 fn get_config_directory(logger: &Logger, args: &CommandLineArguments) -> PathBuf {

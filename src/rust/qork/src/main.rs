@@ -8,6 +8,7 @@ extern crate slog_async;
 
 mod command_line_arguments;
 mod context;
+mod datetime;
 mod execution_timer;
 mod qork;
 
