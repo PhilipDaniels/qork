@@ -4,17 +4,23 @@ extern crate slog_term;
 extern crate slog_async;
 extern crate chrono;
 extern crate hostname;
+extern crate clap;
 
 use slog::Logger;
 mod execution_timer;
 use execution_timer::ExecutionTimer;
 mod context;
 use context::Context;
+mod command_line_arguments;
+use command_line_arguments::CommandLineArguments;
 
 fn main() {
-    let logger = create_root_logger();
-    let context = Context::new(logger);
-    let _timer = ExecutionTimer::new(&context.logger, "Main.Start");
+    let throw_away_logger = create_root_logger();
+    let _timer = ExecutionTimer::new(&throw_away_logger, "Main.Start");
+
+    let args = CommandLineArguments::new();
+    let main_logger = create_root_logger();
+    let context = Context::new(main_logger, args);
     context.log_created_message();
 }
 

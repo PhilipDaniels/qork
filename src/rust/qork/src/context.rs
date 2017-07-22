@@ -5,6 +5,7 @@ use chrono::{Utc, TimeZone, DateTime};
 use hostname;
 use std::path::PathBuf;
 use std::env;
+use command_line_arguments::CommandLineArguments;
 
 // The complete execution context of Qork.
 pub struct Context {
@@ -13,7 +14,8 @@ pub struct Context {
     pub exe_path: Option<std::path::PathBuf>,
     pub exe_meta_data: Option<std::fs::Metadata>,
     pub hostname: Option<String>,
-    pub config_directory: PathBuf
+    pub config_directory: PathBuf,
+    pub command_line_arguments: CommandLineArguments
 }
 
 fn system_time_to_date_time(t: SystemTime) -> DateTime<Utc> {
@@ -32,12 +34,15 @@ fn system_time_to_date_time(t: SystemTime) -> DateTime<Utc> {
     Utc.timestamp(sec, nsec)
 }
 
-fn get_config_directory(logger: &Logger) -> PathBuf {
+fn get_config_directory(logger: &Logger, args: &CommandLineArguments) -> PathBuf {
     const CONFIG_DIR_KEY : &'static str = "config_dir";
     const CONFIG_DIR : &'static str = ".qork.d";
 
     // Command line has highest priority.
-    // let msg = "Configuration Directory determined from command line arguments.";
+    if let &Some(ref cd) = args.config_dir() {
+        info!(logger, "Configuration Directory set from command line argument"; CONFIG_DIR_KEY => &cd);
+        return PathBuf::from(&cd);
+    }
 
     // Next is an environment variable.
     if let Ok(env_var) = std::env::var("QORK_CONFIG_DIR") {
@@ -70,10 +75,10 @@ fn get_config_directory(logger: &Logger) -> PathBuf {
 }
 
 impl Context {
-    pub fn new(logger: Logger) -> Context {
+    pub fn new(logger: Logger, args: CommandLineArguments) -> Context {
         let exe = std::env::current_exe().ok();
         let md = exe.as_ref().and_then(|e| e.metadata().ok());
-        let cd = get_config_directory(&logger);
+        let cd = get_config_directory(&logger, &args);
 
         Context {
             logger: logger,
@@ -81,7 +86,8 @@ impl Context {
             exe_path: exe,
             exe_meta_data: md,
             hostname: hostname::get_hostname(),
-            config_directory: cd
+            config_directory: cd,
+            command_line_arguments: args
         }
     }
 
