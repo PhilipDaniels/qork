@@ -1,4 +1,5 @@
 use clap::{Arg, App};
+use qork;
 
 pub struct CommandLineArguments {
     config_dir: Option<String>
@@ -7,7 +8,7 @@ pub struct CommandLineArguments {
 impl CommandLineArguments {
     pub fn new() -> CommandLineArguments {
         let matches = App::new("Qork")
-                        .version("0.1.0")
+                        .version(qork::VERSION)
                         .author("Philip Daniels philip.daniels1971@gmail.com")
                         .about("A text editor/IDE written in Rust and Python.")
                         .arg(Arg::with_name("config-dir")

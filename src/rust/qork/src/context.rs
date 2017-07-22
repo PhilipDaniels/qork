@@ -1,11 +1,12 @@
 use std;
-use slog::Logger;
+use std::env;
+use std::path::PathBuf;
 use std::time::{SystemTime, UNIX_EPOCH};
 use chrono::{Utc, TimeZone, DateTime};
-use hostname;
-use std::path::PathBuf;
-use std::env;
 use command_line_arguments::CommandLineArguments;
+use hostname;
+use qork;
+use slog::Logger;
 
 // The complete execution context of Qork.
 pub struct Context {
@@ -92,7 +93,7 @@ impl Context {
     }
 
     pub fn version(&self) -> &'static str {
-        "0.1.0"
+        qork::VERSION
     }
 
     pub fn log_created_message(&self) -> () {
