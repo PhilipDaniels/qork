@@ -1,5 +1,6 @@
 use std;
 use std::env;
+use std::fs;
 use std::path::PathBuf;
 use command_line_arguments::CommandLineArguments;
 use datetime::system_time_to_date_time;
@@ -9,13 +10,13 @@ use slog::Logger;
 
 // The complete execution context of Qork.
 pub struct Context {
-    pub logger: Logger,
-    pub args: Vec<String>,
-    pub exe_path: Option<std::path::PathBuf>,
-    pub exe_meta_data: Option<std::fs::Metadata>,
-    pub hostname: Option<String>,
-    pub config_directory: PathBuf,
-    pub command_line_arguments: CommandLineArguments
+    logger: Logger,
+    args: Vec<String>,
+    exe_path: Option<PathBuf>,
+    exe_meta_data: Option<fs::Metadata>,
+    hostname: Option<String>,
+    config_directory: PathBuf,
+    command_line_arguments: CommandLineArguments
 }
 
 fn get_config_directory(logger: &Logger, args: &CommandLineArguments) -> PathBuf {
@@ -73,6 +74,34 @@ impl Context {
             config_directory: cd,
             command_line_arguments: args
         }
+    }
+
+    pub fn logger(&self) -> &Logger {
+        &self.logger
+    }
+
+    pub fn args(&self) -> &Vec<String> {
+        &self.args
+    }
+
+    pub fn exe_path(&self) -> &Option<PathBuf> {
+        &self.exe_path
+    }
+
+    pub fn exe_meta_data(&self) -> &Option<fs::Metadata> {
+        &self.exe_meta_data
+    }
+
+    pub fn hostname(&self) -> &Option<String> {
+        &self.hostname
+    }
+
+    pub fn config_directory(&self) -> &PathBuf {
+        &self.config_directory
+    }
+
+    pub fn command_line_arguments(&self) -> &CommandLineArguments {
+        &self.command_line_arguments
     }
 
     pub fn version(&self) -> &'static str {
