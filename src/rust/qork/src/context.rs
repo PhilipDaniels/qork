@@ -7,18 +7,25 @@ use datetime::system_time_to_date_time;
 use hostname;
 use qork;
 use slog::Logger;
+use xdg::BaseDirectories;
 
 // The complete execution context of Qork.
 pub struct Context {
     logger: Logger,
+    // The raw command line arguments.
     args: Vec<String>,
+    // Parsed form of the arguments.
+    command_line_arguments: CommandLineArguments,
     exe_path: Option<PathBuf>,
     exe_meta_data: Option<fs::Metadata>,
     hostname: Option<String>,
-    config_directory: PathBuf,
-    command_line_arguments: CommandLineArguments
+    // xdg base dir object, typically '~/.config/qork', with a default profile of
+    // 'default', which means the effective directory is '~/.config/qork/default'
+    xdg: BaseDirectories,
+    // TODO: system_type, user_name
 }
 
+/*
 fn get_config_directory(logger: &Logger, args: &CommandLineArguments) -> PathBuf {
     const CONFIG_DIR_KEY : &'static str = "config_dir";
     const CONFIG_DIR : &'static str = ".qork.d";
@@ -58,12 +65,14 @@ fn get_config_directory(logger: &Logger, args: &CommandLineArguments) -> PathBuf
         CONFIG_DIR_KEY => CONFIG_DIR);
     PathBuf::from(CONFIG_DIR)
 }
+*/
 
 impl Context {
     pub fn new(logger: Logger, args: CommandLineArguments) -> Context {
         let exe = std::env::current_exe().ok();
         let md = exe.as_ref().and_then(|e| e.metadata().ok());
-        let cd = get_config_directory(&logger, &args);
+        let profile = args.xdg_profile().as_ref().unwrap();
+        let bd = BaseDirectories::with_profile(qork::APP_NAME, profile).unwrap();
 
         Context {
             logger: logger,
@@ -71,8 +80,8 @@ impl Context {
             exe_path: exe,
             exe_meta_data: md,
             hostname: hostname::get_hostname(),
-            config_directory: cd,
-            command_line_arguments: args
+            command_line_arguments: args,
+            xdg: bd
         }
     }
 
@@ -82,6 +91,10 @@ impl Context {
 
     pub fn args(&self) -> &Vec<String> {
         &self.args
+    }
+
+    pub fn command_line_arguments(&self) -> &CommandLineArguments {
+        &self.command_line_arguments
     }
 
     pub fn exe_path(&self) -> &Option<PathBuf> {
@@ -96,12 +109,8 @@ impl Context {
         &self.hostname
     }
 
-    pub fn config_directory(&self) -> &PathBuf {
-        &self.config_directory
-    }
-
-    pub fn command_line_arguments(&self) -> &CommandLineArguments {
-        &self.command_line_arguments
+    pub fn xdg(&self) -> &BaseDirectories {
+        &self.xdg
     }
 
     pub fn version(&self) -> &'static str {
@@ -124,7 +133,7 @@ impl Context {
             .unwrap_or("unknown".to_string());
 
         info!(self.logger, "Created Context";
-               "config_directory" => &self.config_directory.to_str(),
+               "config_directory" => %&self.xdg.get_config_home().display(),
                "version" => self.version(),
                "hostname" => &self.hostname,
                "exe_modified" => mdate,
