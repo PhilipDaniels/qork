@@ -25,53 +25,19 @@ pub struct Context {
     // TODO: system_type, user_name
 }
 
-/*
-fn get_config_directory(logger: &Logger, args: &CommandLineArguments) -> PathBuf {
-    const CONFIG_DIR_KEY : &'static str = "config_dir";
-    const CONFIG_DIR : &'static str = ".qork.d";
-
-    // Command line has highest priority.
-    if let &Some(ref cd) = args.config_dir() {
-        info!(logger, "Configuration Directory set from command line argument"; CONFIG_DIR_KEY => &cd);
-        return PathBuf::from(&cd);
-    }
-
-    // Next is an environment variable.
-    if let Ok(env_var) = std::env::var("QORK_CONFIG_DIR") {
-        if !env_var.is_empty() {
-            info!(logger, "Configuration Directory determined from QORK_CONFIG_DIR environment variable"; CONFIG_DIR_KEY => &env_var);
-            return PathBuf::from(env_var);
-        }
-    }
-
-    // If still no luck, try for '.qork.d' in the user's home directory - if we can
-    // determine the user's home directory, that is.
-    if let Some(mut home_dir) = env::home_dir() {
-        home_dir.push(CONFIG_DIR);
-        info!(logger, "Configuration Directory defaulted to '{}' in user's home directory", CONFIG_DIR; CONFIG_DIR_KEY => %&home_dir.display());
-        return home_dir;
-    }
-
-    // Still stuck? Try .qork.d in the exe's directroy.
-    if let Ok(mut exe_path) = std::env::current_exe() {
-        exe_path.pop();
-        exe_path.push(CONFIG_DIR);
-        info!(logger, "Configuration Directory defaulted to '{}' in directory of the exe", CONFIG_DIR; CONFIG_DIR_KEY => %&exe_path.display());
-        return exe_path;
-    }
-
-    // Last, just default to .qork.d in the current working directory.
-    warn!(logger, "Unable to determine Configuration Directory from command line parameter, home dir, or exe dir: defaulting to '{}' in the current working directory", CONFIG_DIR;
-        CONFIG_DIR_KEY => CONFIG_DIR);
-    PathBuf::from(CONFIG_DIR)
-}
-*/
-
 impl Context {
     pub fn new(logger: Logger, args: CommandLineArguments) -> Context {
         let exe = std::env::current_exe().ok();
         let md = exe.as_ref().and_then(|e| e.metadata().ok());
-        let profile = args.xdg_profile().as_ref().unwrap();
+
+        let profile = {
+            match args.xdg_profile()
+            {
+                &Some(ref p) => { p.clone().to_string() },
+                &None => "default".to_string()
+            }
+        };
+
         let bd = BaseDirectories::with_profile(qork::APP_NAME, profile).unwrap();
 
         Context {
