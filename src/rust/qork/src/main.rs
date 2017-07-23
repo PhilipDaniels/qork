@@ -18,6 +18,7 @@ use execution_timer::ExecutionTimer;
 use slog::Logger;
 
 fn main() {
+    std::env::set_var("IN_QORK", "1");
     let throw_away_logger = create_root_logger();
     let _timer = ExecutionTimer::new(&throw_away_logger, "Main.Start");
 
@@ -28,7 +29,6 @@ fn main() {
 }
 
 fn create_root_logger() -> Logger {
-
     use slog::Drain;
 
     let decorator = slog_term::TermDecorator::new().build();
