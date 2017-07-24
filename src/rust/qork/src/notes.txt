@@ -11,10 +11,9 @@ same name which returns a reference to that data. Methods should take a referenc
 you will get confusing compiler errors about lifetimes (because you moved an object).
 
 
-TODO
+NEXT
 ====
-* Why has my app ballooned to 18MB in size? How can I tell how large a crate is?
-* Tidy up the context: make fields private.
+
 
 Logging Levels
 ==============
