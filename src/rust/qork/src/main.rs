@@ -24,8 +24,10 @@ fn main() {
     let throw_away_logger = create_root_logger();
     let _timer = ExecutionTimer::new(&throw_away_logger, "Main.Start");
 
+
     let args = CommandLineArguments::new();
     let main_logger = create_root_logger();
+    info!(&main_logger, "{:?}", args);
     let context = Context::new(main_logger, args);
     context.log_created_message();
 }
