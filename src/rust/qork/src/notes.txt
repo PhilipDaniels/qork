@@ -4,6 +4,9 @@ Formatting of SystemTime is really difficult! Need to bring in chrono
 and then Google for the special magic function to convert a SystemTime
 into a DateTime.
 
+Crates on crates.io should say which platforms they support.
+
+
 C# to Rust
 ==========
 To make a struct with private immutable data, just declare a field, then a pub fn with the
@@ -13,9 +16,9 @@ you will get confusing compiler errors about lifetimes (because you moved an obj
 
 NEXT
 ====
-Add target-info.
+Break ExeInfo (ExeInformation?) out of context. Get pid function, uid etc. Include version number.
 --create-config-dir : creates a skeleton configuration directory - need to define it!
-
+Consider dumping slog and moving to log and log4rs.
 
 Logging Levels
 ==============

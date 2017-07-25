@@ -12,6 +12,7 @@ mod command_line_arguments;
 mod context;
 mod datetime;
 mod execution_timer;
+mod system_info;
 mod qork;
 
 use command_line_arguments::CommandLineArguments;

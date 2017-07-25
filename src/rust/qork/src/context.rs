@@ -1,18 +1,16 @@
 use std;
-use std::env;
-use std::fmt;
 use std::fs;
 use std::path::PathBuf;
 
 use command_line_arguments::CommandLineArguments;
 use datetime::system_time_to_date_time;
-use hostname;
 use qork;
 use slog::Logger;
-use target_info;
+use system_info;
 use xdg::BaseDirectories;
 
 // The complete execution context of Qork.
+#[derive(Debug)]
 pub struct Context {
     logger: Logger,
     // The raw command line arguments.
@@ -21,16 +19,10 @@ pub struct Context {
     command_line_arguments: CommandLineArguments,
     exe_path: Option<PathBuf>,
     exe_meta_data: Option<fs::Metadata>,
-    hostname: Option<String>,
     // xdg base dir object, typically '~/.config/qork', with a default profile of
     // 'default', which means the effective directory is '~/.config/qork/default'
     xdg: BaseDirectories,
-    // Stuff from target_info.
-    arch: &'static str,
-    endian: &'static str,
-    env: &'static str,
-    family: &'static str,
-    os: &'static str
+    system_info: system_info::SystemInfo
     // TODO: user_name
 }
 
@@ -54,14 +46,9 @@ impl Context {
             args: std::env::args().collect(),
             exe_path: exe,
             exe_meta_data: md,
-            hostname: hostname::get_hostname(),
             command_line_arguments: args,
             xdg: bd,
-            arch: target_info::Target::arch(),
-            endian: target_info::Target::endian(),
-            env: target_info::Target::env(),
-            family: target_info::Target::family(),
-            os: target_info::Target::os()
+            system_info: system_info::SystemInfo::new()
         }
     }
 
@@ -83,10 +70,6 @@ impl Context {
 
     pub fn exe_meta_data(&self) -> &Option<fs::Metadata> {
         &self.exe_meta_data
-    }
-
-    pub fn hostname(&self) -> &Option<String> {
-        &self.hostname
     }
 
     pub fn xdg(&self) -> &BaseDirectories {
@@ -113,17 +96,17 @@ impl Context {
             .unwrap_or("unknown".to_string());
 
         info!(self.logger, "Created Context";
-                "arch" => self.arch,
-                "endian" => self.endian,
-                "env" => self.env,
-                "family" => self.family,
-                "os" => self.os,
-               "config_directory" => %&self.xdg.get_config_home().display(),
-               "version" => self.version(),
-               "hostname" => &self.hostname,
-               "exe_modified" => mdate,
-               "exe_bytes" => bytes,
-               "exe_path" => p
+            "system_info.hostname" => &self.system_info.hostname,
+            "system_info.arch" => &self.system_info.arch,
+            "system_info.endian" => &self.system_info.endian,
+            "system_info.env" => &self.system_info.env,
+            "system_info.family" => &self.system_info.family,
+            "system_info.os" => &self.system_info.os,
+            "config_directory" => %&self.xdg.get_config_home().display(),
+            "version" => self.version(),
+            "exe_modified" => mdate,
+            "exe_bytes" => bytes,
+            "exe_path" => p
          );
     }
 }
