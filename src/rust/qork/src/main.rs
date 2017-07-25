@@ -5,6 +5,7 @@ extern crate hostname;
 extern crate slog;
 extern crate slog_term;
 extern crate slog_async;
+extern crate target_info;
 extern crate xdg;
 
 mod command_line_arguments;

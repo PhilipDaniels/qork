@@ -1,13 +1,15 @@
 use std;
 use std::env;
+use std::fmt;
 use std::fs;
 use std::path::PathBuf;
+
 use command_line_arguments::CommandLineArguments;
 use datetime::system_time_to_date_time;
-use std::fmt;
 use hostname;
 use qork;
 use slog::Logger;
+use target_info;
 use xdg::BaseDirectories;
 
 // The complete execution context of Qork.
@@ -23,7 +25,12 @@ pub struct Context {
     // xdg base dir object, typically '~/.config/qork', with a default profile of
     // 'default', which means the effective directory is '~/.config/qork/default'
     xdg: BaseDirectories,
-    //os: OSInformation
+    // Stuff from target_info.
+    arch: &'static str,
+    endian: &'static str,
+    env: &'static str,
+    family: &'static str,
+    os: &'static str
     // TODO: user_name
 }
 
@@ -49,8 +56,12 @@ impl Context {
             exe_meta_data: md,
             hostname: hostname::get_hostname(),
             command_line_arguments: args,
-            xdg: bd
-            //os: os_type::current_platform()
+            xdg: bd,
+            arch: target_info::Target::arch(),
+            endian: target_info::Target::endian(),
+            env: target_info::Target::env(),
+            family: target_info::Target::family(),
+            os: target_info::Target::os()
         }
     }
 
@@ -102,8 +113,11 @@ impl Context {
             .unwrap_or("unknown".to_string());
 
         info!(self.logger, "Created Context";
-               //"os_version" => %&self.os.version,
-               //"os_type" => os_type_to_string(&self.os.os_type),
+                "arch" => self.arch,
+                "endian" => self.endian,
+                "env" => self.env,
+                "family" => self.family,
+                "os" => self.os,
                "config_directory" => %&self.xdg.get_config_home().display(),
                "version" => self.version(),
                "hostname" => &self.hostname,
