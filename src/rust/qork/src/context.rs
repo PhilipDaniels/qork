@@ -6,9 +6,6 @@ use command_line_arguments::CommandLineArguments;
 use datetime::system_time_to_date_time;
 use std::fmt;
 use hostname;
-use os_type;
-use os_type::OSType;
-use os_type::OSInformation;
 use qork;
 use slog::Logger;
 use xdg::BaseDirectories;
@@ -26,7 +23,7 @@ pub struct Context {
     // xdg base dir object, typically '~/.config/qork', with a default profile of
     // 'default', which means the effective directory is '~/.config/qork/default'
     xdg: BaseDirectories,
-    os: OSInformation
+    //os: OSInformation
     // TODO: user_name
 }
 
@@ -45,7 +42,6 @@ impl Context {
 
         let bd = BaseDirectories::with_profile(qork::APP_NAME, profile).unwrap();
 
-
         Context {
             logger: logger,
             args: std::env::args().collect(),
@@ -53,8 +49,8 @@ impl Context {
             exe_meta_data: md,
             hostname: hostname::get_hostname(),
             command_line_arguments: args,
-            xdg: bd,
-            os: os_type::current_platform()
+            xdg: bd
+            //os: os_type::current_platform()
         }
     }
 
@@ -106,8 +102,8 @@ impl Context {
             .unwrap_or("unknown".to_string());
 
         info!(self.logger, "Created Context";
-               "os_version" => %&self.os.version,
-               "os_type" => os_type_to_string(&self.os.os_type),
+               //"os_version" => %&self.os.version,
+               //"os_type" => os_type_to_string(&self.os.os_type),
                "config_directory" => %&self.xdg.get_config_home().display(),
                "version" => self.version(),
                "hostname" => &self.hostname,
@@ -115,17 +111,5 @@ impl Context {
                "exe_bytes" => bytes,
                "exe_path" => p
          );
-    }
-}
-
-fn os_type_to_string(os_type: &os_type::OSType) -> &'static str {
-    match *os_type {
-        OSType::Unknown => "Unknown",
-        OSType::Redhat => "Redhat",
-        OSType::OSX => "OSX",
-        OSType::Ubuntu => "Ubuntu",
-        OSType::Debian => "Debian",
-        OSType::Arch => "Arch",
-        OSType::CentOS => "CentOS"
     }
 }

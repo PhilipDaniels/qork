@@ -13,6 +13,8 @@ you will get confusing compiler errors about lifetimes (because you moved an obj
 
 NEXT
 ====
+Add target-info.
+--create-config-dir : creates a skeleton configuration directory - need to define it!
 
 
 Logging Levels

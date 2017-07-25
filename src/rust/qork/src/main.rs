@@ -1,7 +1,6 @@
 extern crate chrono;
 extern crate clap;
 extern crate hostname;
-extern crate os_type;
 #[macro_use]
 extern crate slog;
 extern crate slog_term;
