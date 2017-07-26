@@ -13,8 +13,8 @@ mod context;
 mod datetime;
 mod execution_timer;
 mod program_info;
-mod system_info;
 mod qork;
+mod system_info;
 
 use command_line_arguments::CommandLineArguments;
 use context::Context;
@@ -30,6 +30,7 @@ fn main() {
     let main_logger = create_root_logger();
     info!(&main_logger, "{:?}", args);
     let context = Context::new(main_logger, args);
+
     context.log_created_message();
 
     load_user_configuration_if_valid(&context);
@@ -47,7 +48,7 @@ fn create_root_logger() -> Logger {
 }
 
 fn load_user_configuration_if_valid(context: &Context) {
-    if context.program_info.parsed_args().load_config() {
+    if context.program_info().parsed_args().load_config() {
         let _timer = ExecutionTimer::new2(&context.logger(), "load_user_configuration");
         let dir = context.xdg().get_config_home();
         if !dir.exists() {

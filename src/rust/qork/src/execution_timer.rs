@@ -19,7 +19,6 @@ impl<'a> ExecutionTimer<'a> {
 	}
 
 	// Construct a new ExecutionTimer and prints a message saying execution is starting.
-	#[allow(dead_code)]
 	pub fn new2(logger: &'a Logger, name: &'a str) -> ExecutionTimer<'a> {
 		debug!(logger, "Execution Started"; "Name" => name);
 		ExecutionTimer::new(logger, name)

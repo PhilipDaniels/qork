@@ -5,14 +5,14 @@ use std::path::PathBuf;
 use chrono::*;
 
 use command_line_arguments::CommandLineArguments;
-use datetime::system_time_to_date_time;
+use datetime::*;
 use qork;
 
 // Information about the program (exe).
 #[derive(Debug)]
 pub struct ProgramInfo {
-    pub version: &'static str,
-    pub path: Option<PathBuf>,
+    version: &'static str,
+    path: Option<PathBuf>,
     raw_args: Vec<String>,
     parsed_args: CommandLineArguments,
     meta_data: Option<Metadata>
@@ -30,6 +30,14 @@ impl ProgramInfo {
             parsed_args: CommandLineArguments::new(),
             meta_data: md
         }
+    }
+
+    pub fn version(&self) -> &'static str {
+        &self.version
+    }
+
+    pub fn path(&self) -> &Option<PathBuf> {
+        &self.path
     }
 
     pub fn raw_args(&self) -> &Vec<String> {

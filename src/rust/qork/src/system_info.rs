@@ -6,17 +6,17 @@ use target_info;
 // and the target_info crate. Most of these fields are compile-time constants.
 #[derive(Debug)]
 pub struct SystemInfo {
-    pub hostname: String,
+    hostname: String,
     // e.g. x86, x86_64, mips...
-    pub arch: &'static str,
+    arch: &'static str,
     // little or big.
-    pub endian: &'static str,
+    endian: &'static str,
     // e.g. gnu, msvc, musl.
-    pub env: &'static str,
+    env: &'static str,
     // e.g. unix, windows.
-    pub family: &'static str,
+    family: &'static str,
     // e.g. linux, windows, macos, ios, android.
-    pub os: &'static str
+    os: &'static str
 }
 
 impl SystemInfo {
@@ -29,5 +29,29 @@ impl SystemInfo {
             family: target_info::Target::family(),
             os: target_info::Target::os()
         }
+    }
+
+    pub fn hostname(&self) -> &String {
+        &self.hostname
+    }
+
+    pub fn arch(&self) -> &'static str {
+        self.arch
+    }
+
+    pub fn endian(&self) -> &'static str {
+        self.endian
+    }
+
+    pub fn env(&self) -> &'static str {
+        self.env
+    }
+
+    pub fn family(&self) -> &'static str {
+        self.family
+    }
+
+    pub fn os(&self) -> &'static str {
+        self.os
     }
 }
