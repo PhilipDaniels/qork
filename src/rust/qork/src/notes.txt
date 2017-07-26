@@ -6,6 +6,9 @@ into a DateTime.
 
 Crates on crates.io should say which platforms they support.
 
+Just printing a PathBuf is difficult. Why do we need this OsString type as well
+as &str and String?
+
 
 C# to Rust
 ==========
@@ -19,6 +22,7 @@ NEXT
 Break ExeInfo (ExeInformation?) out of context. Get pid function, uid etc. Include version number.
 --create-config-dir : creates a skeleton configuration directory - need to define it!
 Consider dumping slog and moving to log and log4rs.
+
 
 Logging Levels
 ==============

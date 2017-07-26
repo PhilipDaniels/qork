@@ -12,6 +12,7 @@ mod command_line_arguments;
 mod context;
 mod datetime;
 mod execution_timer;
+mod program_info;
 mod system_info;
 mod qork;
 
@@ -46,7 +47,7 @@ fn create_root_logger() -> Logger {
 }
 
 fn load_user_configuration_if_valid(context: &Context) {
-    if context.command_line_arguments().load_config() {
+    if context.program_info.parsed_args().load_config() {
         let _timer = ExecutionTimer::new2(&context.logger(), "load_user_configuration");
         let dir = context.xdg().get_config_home();
         if !dir.exists() {
