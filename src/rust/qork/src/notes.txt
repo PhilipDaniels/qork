@@ -9,6 +9,9 @@ Crates on crates.io should say which platforms they support.
 Just printing a PathBuf is difficult. Why do we need this OsString type as well
 as &str and String?
 
+A struct with a lifetime always means that struct depends on other locations to hold the "meat" of the data.
+You are instructing the compiler to prove that values of the struct type never outlive those locations.
+
 
 C# to Rust
 ==========

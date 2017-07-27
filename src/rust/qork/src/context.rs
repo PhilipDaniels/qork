@@ -17,9 +17,11 @@ pub struct Context {
 }
 
 impl Context {
-    pub fn new(args: CommandLineArguments) -> Context {
+    pub fn new() -> Context {
+        let pi = ProgramInfo::new();
+
         let profile = {
-            match args.xdg_profile()
+            match pi.parsed_args().xdg_profile()
             {
                 &Some(ref p) => { p.clone().to_string() },
                 &None => "default".to_string()
@@ -31,7 +33,7 @@ impl Context {
         Context {
             xdg: bd,
             system_info: SystemInfo::new(),
-            program_info: ProgramInfo::new()
+            program_info: pi
         }
     }
 

@@ -31,8 +31,16 @@ impl SystemInfo {
         }
     }
 
+    // We are returning a shared (immutable) reference.
+    // There is no way for the caller to modify this string.
     pub fn hostname(&self) -> &String {
         &self.hostname
+    }
+
+    // You only get to specify the mutability in the return type of your function if you're returning
+    // a reference to (aka borrow of) an object, rather than the object itself.
+    pub fn mut_hostname(&mut self) -> &mut String {
+        &mut self.hostname
     }
 
     pub fn arch(&self) -> &'static str {

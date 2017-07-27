@@ -1,4 +1,5 @@
 use std;
+use std::fmt;
 use std::fs::Metadata;
 use std::path::PathBuf;
 
@@ -60,3 +61,11 @@ impl ProgramInfo {
          self.meta_data.as_ref().map(|m| m.modified().ok()).map(|m| system_time_to_date_time(m.unwrap()))
      }
 }
+
+/*
+impl<'a> fmt::Display for ProgramInfo<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "version: {}, path: {}", &self.version, &self.path)
+    }
+}
+*/

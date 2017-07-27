@@ -18,7 +18,6 @@ mod system_info;
 use log::LogLevelFilter;
 use log4rs::config::{Appender, Config, Logger, Root};
 
-use command_line_arguments::CommandLineArguments;
 use context::Context;
 use execution_timer::ExecutionTimer;
 
@@ -27,11 +26,14 @@ fn main() {
     std::env::set_var("IN_QORK", "1");
     let _timer = ExecutionTimer::new("main.main");
 
-    let args = CommandLineArguments::new();
-    info!("{:?}", args);
-    let context = Context::new(args);
+    let context = Context::new();
+    //context.log_created_message();
 
-    context.log_created_message();
+    let mut si = system_info::SystemInfo::new();
+    let hn = si.hostname();
+    info!("hn = {}", hn);
+    //hn.push_str("JJJJ");
+    info!("si.hostname = {}", si.hostname());
 
     load_user_configuration_if_valid(&context);
 }
