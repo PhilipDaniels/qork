@@ -19,13 +19,34 @@ you will get confusing compiler errors about lifetimes (because you moved an obj
 
 NEXT
 ====
-Create a UserInfo struct.
---create-config-dir : creates a skeleton configuration directory - need to define it!
-Consider dumping slog and moving to log and log4rs.
-Implement xdg ourselves?
-
+* Create a UserInfo struct.
+* --create-config-dir : creates a skeleton configuration directory - need to define it!
+* Consider dumping slog and moving to log and log4rs.
+* Consider removing hostname and replacing with the more widely applicable nix crate.
+  This would be good for getting the user info, but is not a solution for Windows.
 
 Logging Levels
 ==============
 trace, debug, info, warn, error, crit.
 debug only appears in Debug mode builds. trace does not appear at all by default.
+
+
+
+
+Rust Snippets
+=============
+From the xdg crate. A nice simple crate, good doc examples too.
+
+    impl fmt::Debug for Permissions {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            let Permissions(p) = *self;
+            write!(f, "{:#05o}", p)
+        }
+    }
+
+    impl fmt::Display for Permissions {
+        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+            fmt::Debug::fmt(self, f)
+        }
+    }
+
