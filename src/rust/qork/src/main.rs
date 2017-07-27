@@ -1,6 +1,8 @@
 extern crate chrono;
 extern crate clap;
 extern crate hostname;
+#[macro_use]
+extern crate log;
 extern crate target_info;
 extern crate xdg;
 
@@ -18,10 +20,10 @@ use execution_timer::ExecutionTimer;
 
 fn main() {
     std::env::set_var("IN_QORK", "1");
-    //let _timer = ExecutionTimer::new(&throw_away_logger, "main.main");
+    let _timer = ExecutionTimer::new("main.main");
 
     let args = CommandLineArguments::new();
-    //info!(&main_logger, "{:?}", args);
+    info!("{:?}", args);
     let context = Context::new(args);
 
     context.log_created_message();
@@ -31,24 +33,25 @@ fn main() {
 
 fn load_user_configuration_if_valid(context: &Context) {
     if context.program_info().parsed_args().load_config() {
-        let _timer = ExecutionTimer::new2("load_user_configuration");
+        let _timer = ExecutionTimer::new2("main.load_user_configuration_if_valid");
         let dir = context.xdg().get_config_home();
         if !dir.exists() {
-            //warn!(&context.logger(), "The config_directory does not exist, no config will be loaded"; "config_directory" => %dir.display());
+            warn!("The config_directory does not exist, no config will be loaded, config_directory={:?}", dir);
             return
         }
 
         if !dir.is_dir() {
-            //warn!(&context.logger(), "The config_directory is a file, not a directory, no config will be loaded"; "config_directory" => %dir.display());
+            warn!("The config_directory is a file, not a directory, no config will be loaded, config_directory={:?}", dir);
             return
         }
 
         load_user_configuration(context);
 
     } else {
-        //info!(&context.logger(), "Loading of user configuration is disabled.");
+        info!("Loading of user configuration is disabled.");
     }
 }
 
 fn load_user_configuration(context: &Context) {
+    let _timer = ExecutionTimer::new2("main.load_user_configuration");
 }

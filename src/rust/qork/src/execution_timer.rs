@@ -17,7 +17,7 @@ impl<'a> ExecutionTimer<'a> {
 
 	// Construct a new ExecutionTimer and prints a message saying execution is starting.
 	pub fn new2(name: &'a str) -> ExecutionTimer<'a> {
-		//debug!(logger, "Execution Started"; "Name" => name);
+		debug!("Execution Started, Name={}", name);
 		ExecutionTimer::new(name)
 	}
 }
@@ -26,6 +26,6 @@ impl<'a> Drop for ExecutionTimer<'a> {
 	fn drop(&mut self) {
 		let elapsed = self.start_time.elapsed();
         let secs = (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0);
-		//debug!(self.logger, "Execution Completed"; "Seconds" => secs, "Name" => self.name);
+		debug!("Execution Completed, Seconds={}, Name={}", secs, self.name);
 	}
 }
