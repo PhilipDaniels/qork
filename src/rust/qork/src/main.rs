@@ -3,6 +3,7 @@ extern crate clap;
 extern crate hostname;
 #[macro_use]
 extern crate log;
+extern crate log4rs;
 extern crate target_info;
 extern crate xdg;
 
@@ -14,11 +15,15 @@ mod program_info;
 mod qork;
 mod system_info;
 
+use log::LogLevelFilter;
+use log4rs::config::{Appender, Config, Logger, Root};
+
 use command_line_arguments::CommandLineArguments;
 use context::Context;
 use execution_timer::ExecutionTimer;
 
 fn main() {
+    configure_logging();
     std::env::set_var("IN_QORK", "1");
     let _timer = ExecutionTimer::new("main.main");
 
@@ -54,4 +59,17 @@ fn load_user_configuration_if_valid(context: &Context) {
 
 fn load_user_configuration(context: &Context) {
     let _timer = ExecutionTimer::new2("main.load_user_configuration");
+}
+
+fn configure_logging() {
+    use log4rs::append::console::ConsoleAppender;
+
+    let stdout = ConsoleAppender::builder().build();
+
+    let config = Config::builder()
+        .appender(Appender::builder().build("stdout", Box::new(stdout)))
+        .build(Root::builder().appender("stdout").build(LogLevelFilter::Debug))
+        .unwrap();
+
+    let handle = log4rs::init_config(config).unwrap();
 }

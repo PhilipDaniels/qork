@@ -51,6 +51,8 @@ impl Context {
         let mdate = &self.program_info.modified_date().map(|m| m.format("%Y-%m-%d %H:%M:%S%.3f UTC").to_string());
         let path = &self.program_info.path().as_ref().and_then(|p| p.to_str()).map(String::from);
 
+        info!("{:?}", self);
+
         // info!(self.logger, "Created Context";
         //     "system_info.hostname" => self.system_info.hostname(),
         //     "system_info.arch" => self.system_info.arch(),
