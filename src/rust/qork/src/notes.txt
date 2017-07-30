@@ -24,7 +24,6 @@ NEXT
 ====
 * Create a UserInfo struct.
 * --create-config-dir : creates a skeleton configuration directory - need to define it!
-* Consider dumping slog and moving to log and log4rs.
 * Consider removing hostname and replacing with the more widely applicable nix crate.
   This would be good for getting the user info, but is not a solution for Windows.
 

@@ -8,15 +8,15 @@ use target_info;
 pub struct SystemInfo {
     hostname: String,
     // e.g. x86, x86_64, mips...
-    arch: &'static str,
+    pub arch: &'static str,
     // little or big.
-    endian: &'static str,
+    pub endian: &'static str,
     // e.g. gnu, msvc, musl.
-    env: &'static str,
+    pub env: &'static str,
     // e.g. unix, windows.
-    family: &'static str,
+    pub family: &'static str,
     // e.g. linux, windows, macos, ios, android.
-    os: &'static str
+    pub os: &'static str
 }
 
 impl SystemInfo {
@@ -35,31 +35,5 @@ impl SystemInfo {
     // There is no way for the caller to modify this string.
     pub fn hostname(&self) -> &String {
         &self.hostname
-    }
-
-    // You only get to specify the mutability in the return type of your function if you're returning
-    // a reference to (aka borrow of) an object, rather than the object itself.
-    pub fn mut_hostname(&mut self) -> &mut String {
-        &mut self.hostname
-    }
-
-    pub fn arch(&self) -> &'static str {
-        self.arch
-    }
-
-    pub fn endian(&self) -> &'static str {
-        self.endian
-    }
-
-    pub fn env(&self) -> &'static str {
-        self.env
-    }
-
-    pub fn family(&self) -> &'static str {
-        self.family
-    }
-
-    pub fn os(&self) -> &'static str {
-        self.os
     }
 }

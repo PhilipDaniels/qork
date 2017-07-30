@@ -35,11 +35,11 @@ impl CommandLineArguments {
         }
     }
 
-    pub fn xdg_profile(&self) -> &Option<String> {
-        &self.xdg_profile
-    }
-
     pub fn load_config(&self) -> bool {
         self.load_config
+    }
+
+    pub fn xdg_profile(&self) -> &Option<String> {
+        &self.xdg_profile
     }
 }

@@ -1,5 +1,7 @@
 use std::time::Instant;
 
+// TODO: A better name for the ctor, or perhaps two separate structs?
+
 // When this struct is dropped, it logs a message stating its name and how long, in seconds,
 // execution time was. Can be used to time functions or other critical areas.
 pub struct ExecutionTimer<'a> {
