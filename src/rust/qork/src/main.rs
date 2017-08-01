@@ -24,7 +24,7 @@ use execution_timer::ExecutionTimer;
 fn main() {
     configure_logging();
     std::env::set_var("IN_QORK", "1");
-    let _timer = ExecutionTimer::new2("main.main");
+    let _timer = ExecutionTimer::with_start_message("main.main");
 
     let context = Context::new();
     context.log_created_message();
@@ -34,7 +34,7 @@ fn main() {
 
 fn load_user_configuration_if_valid(context: &Context) {
     if context.program_info().parsed_args().load_config() {
-        let _timer = ExecutionTimer::new2("main.load_user_configuration_if_valid");
+        let _timer = ExecutionTimer::with_start_message("main.load_user_configuration_if_valid");
         let dir = context.xdg().get_config_home();
         if !dir.exists() {
             warn!("The config_directory does not exist, no config will be loaded, config_directory={:?}", dir);
@@ -54,7 +54,7 @@ fn load_user_configuration_if_valid(context: &Context) {
 }
 
 fn load_user_configuration(context: &Context) {
-    let _timer = ExecutionTimer::new2("main.load_user_configuration");
+    let _timer = ExecutionTimer::with_start_message("main.load_user_configuration");
 }
 
 fn configure_logging() {
