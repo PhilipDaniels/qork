@@ -30,7 +30,7 @@ fn main() {
 }
 
 fn configure_logging(xdg: &BaseDirectories) {
-    let path = xdg.place_config_file("logging.yaml");
+    let path = xdg.place_config_file("logging.toml");
 
     match path {
         Ok(p) => {
