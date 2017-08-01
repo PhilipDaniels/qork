@@ -18,7 +18,10 @@ impl<'a> ExecutionTimer<'a> {
 	// Construct a new ExecutionTimer and prints a message saying execution is starting.
 	pub fn with_start_message(name: &'a str) -> ExecutionTimer<'a> {
 		debug!("Execution Starting, Name={}", name);
-		ExecutionTimer::new(name)
+		ExecutionTimer {
+			start_time: Instant::now(),
+			name: name
+		}
 	}
 }
 
