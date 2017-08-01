@@ -15,21 +15,36 @@ mod program_info;
 mod qork;
 mod system_info;
 
-use log::LogLevelFilter;
-use log4rs::config::{Appender, Config, Logger, Root};
+use xdg::BaseDirectories;
 
 use context::Context;
 use execution_timer::ExecutionTimer;
 
 fn main() {
-    configure_logging();
     std::env::set_var("IN_QORK", "1");
-    let _timer = ExecutionTimer::with_start_message("main.main");
-
     let context = Context::new();
+    configure_logging(context.xdg());
+    let _timer = ExecutionTimer::with_start_message("main.main");
     context.log_created_message();
-
     load_user_configuration_if_valid(&context);
+}
+
+fn configure_logging(xdg: &BaseDirectories) {
+    let path = xdg.place_config_file("logging.yaml");
+
+    match path {
+        Ok(p) => {
+            if p.exists() {
+                log4rs::init_file(&p, Default::default()).unwrap();
+                info!("Logging initialized using file at {:?}", &p);
+            }
+            else {
+            }
+        },
+        Err(_) => {
+            // Do nothing, not sure there is anything we can do.
+        }
+    }
 }
 
 fn load_user_configuration_if_valid(context: &Context) {
@@ -57,15 +72,3 @@ fn load_user_configuration(context: &Context) {
     let _timer = ExecutionTimer::with_start_message("main.load_user_configuration");
 }
 
-fn configure_logging() {
-    use log4rs::append::console::ConsoleAppender;
-
-    let stdout = ConsoleAppender::builder().build();
-
-    let config = Config::builder()
-        .appender(Appender::builder().build("stdout", Box::new(stdout)))
-        .build(Root::builder().appender("stdout").build(LogLevelFilter::Debug))
-        .unwrap();
-
-    let handle = log4rs::init_config(config).unwrap();
-}
