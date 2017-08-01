@@ -19,11 +19,10 @@ impl Context {
     pub fn new() -> Context {
         let pi = ProgramInfo::new();
 
-        // TODO: Can this be simplified?
         let profile = {
             match pi.parsed_args().xdg_profile()
             {
-                &Some(ref p) => { p.clone().to_string() },
+                &Some(ref p) => { p.clone() },
                 &None => "default".to_string()
             }
         };
