@@ -4,13 +4,12 @@ use program_info::ProgramInfo;
 use system_info::SystemInfo;
 
 // The complete execution context of Qork.
-#[derive(Debug)]
 pub struct Context {
-    // xdg base dir object, typically '~/.config/qork', with a default profile of
-    // 'default', which means the effective directory is '~/.config/qork/default'
-    xdg: BaseDirectories,
     system_info: SystemInfo,
-    program_info: ProgramInfo
+    program_info: ProgramInfo,
+    // xdg base dir object, typically '~/.config/qork', with a default profile of
+    // 'default', which means the effective directory is '~/.config/qork/default'.
+    xdg: BaseDirectories
     // TODO: user_name
 }
 
@@ -42,14 +41,9 @@ impl Context {
     pub fn log_created_message(&self) -> () {
         info!("Qork Context Created. program_info = {}", self.program_info);
         info!("Parsed command line args = {}", self.program_info.parsed_args());
+        info!("{:?}", self.system_info);
 
         // info!(self.logger, "Created Context";
-        //     "system_info.hostname" => self.system_info.hostname(),
-        //     "system_info.arch" => self.system_info.arch(),
-        //     "system_info.endian" => self.system_info.endian(),
-        //     "system_info.env" => self.system_info.env(),
-        //     "system_info.family" => self.system_info.family(),
-        //     "system_info.os" => self.system_info.os(),
         //     "config_directory" => %&self.xdg.get_config_home().display(),
         //  );
     }

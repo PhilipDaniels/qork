@@ -31,8 +31,6 @@ impl SystemInfo {
         }
     }
 
-    // We are returning a shared (immutable) reference.
-    // There is no way for the caller to modify this string.
     pub fn hostname(&self) -> &String {
         &self.hostname
     }
