@@ -68,7 +68,7 @@ impl fmt::Debug for ProgramInfo {
             &None => String::from("unknown")
         };
 
-        write!(f, "{{ version={}, path={}, size={}, modified_date={} }}",
+        write!(f, r#"ProgramInfo {{ version: "{}", path: "{}", size: {}, modified_date: "{}" }}"#,
             self.version,
             p,
             self.size().unwrap_or(0),

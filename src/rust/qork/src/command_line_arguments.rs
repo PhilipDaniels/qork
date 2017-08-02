@@ -49,7 +49,7 @@ impl CommandLineArguments {
 
 impl fmt::Debug for CommandLineArguments {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{{ load_config={}, xdg_profile={} }}",
+        write!(f, r#"CommandLineArguments {{ load_config: {}, xdg_profile: "{}" }}"#,
             self.load_config, self.xdg_profile
         )
     }
