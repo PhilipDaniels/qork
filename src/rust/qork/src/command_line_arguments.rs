@@ -13,7 +13,7 @@ impl CommandLineArguments {
     pub fn new() -> CommandLineArguments {
         let matches = App::new("Qork")
                         .version(crate_version!())
-                        .author("Philip Daniels philip.daniels1971@gmail.com")
+                        .author(env!("CARGO_PKG_AUTHORS"))
                         .about("A text editor/IDE written in Rust and Python.")
                         .arg(Arg::with_name("xdg-profile")
                                 .short("p")
