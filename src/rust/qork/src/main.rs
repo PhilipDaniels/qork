@@ -48,25 +48,22 @@ fn configure_logging(xdg: &BaseDirectories) {
 }
 
 fn load_user_configuration_if_valid(context: &Context) {
-    if context.program_info().parsed_args().load_config() {
-        let dir = context.xdg().get_config_home();
-        if !dir.exists() {
-            warn!("The config_directory does not exist, no config will be loaded, config_directory={:?}", dir);
-            return
-        }
-
-        if !dir.is_dir() {
-            warn!("The config_directory is a file, not a directory, no config will be loaded, config_directory={:?}", dir);
-            return
-        }
-
-        load_user_configuration(context);
-    } else {
+    if !context.program_info().parsed_args().load_config() {
         info!("Loading of user configuration is disabled.");
+        return
     }
-}
 
-fn load_user_configuration(context: &Context) {
-    let _timer = ExecutionTimer::with_start_message("main.load_user_configuration");
-}
+    let dir = context.xdg().get_config_home();
+    if !dir.exists() {
+        warn!("The config_directory does not exist, no config will be loaded, config_directory={:?}", dir);
+        return
+    }
 
+    if !dir.is_dir() {
+        warn!("The config_directory is a file, not a directory, no config will be loaded, config_directory={:?}", dir);
+        return
+    }
+
+    let _timer = ExecutionTimer::with_start_message("main.load_user_configuration_if_valid");
+    info!("Loading user configuration from {:?}", dir);
+}

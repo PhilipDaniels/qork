@@ -7,7 +7,7 @@ use system_info::SystemInfo;
 pub struct Context {
     system_info: SystemInfo,
     program_info: ProgramInfo,
-    // xdg base dir object, typically '~/.config/qork', with a default profile of
+    // xdg base directory object, typically '~/.config/qork', with a default profile of
     // 'default', which means the effective directory is '~/.config/qork/default'.
     xdg: BaseDirectories
     // TODO: user_name
@@ -42,9 +42,5 @@ impl Context {
         info!("Qork Context Created. {:?}", self.program_info);
         info!("{:?}", self.program_info.parsed_args());
         info!("{:?}", self.system_info);
-
-        // info!(self.logger, "Created Context";
-        //     "config_directory" => %&self.xdg.get_config_home().display(),
-        //  );
     }
 }
