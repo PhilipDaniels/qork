@@ -1,10 +1,13 @@
+use std::fmt;
 use clap::{Arg, App};
 use qork;
 
-#[derive(Debug)]
+// This struct represents the parsed command line arguments, not the raw ones.
+// For example, if no value is supplied for an argument then the default is applied
+// and set for the corresponding field in this struct.
 pub struct CommandLineArguments {
     load_config: bool,
-    xdg_profile: Option<String>
+    xdg_profile: String
 }
 
 impl CommandLineArguments {
@@ -18,6 +21,7 @@ impl CommandLineArguments {
                                 .long("xdg-profile")
                                 .value_name("DIRECTORY")
                                 .help("Sets the XDG profile directory.")
+                                .default_value("default")
                                 .takes_value(true)
                         )
                         .arg(Arg::with_name("no-config")
@@ -31,7 +35,7 @@ impl CommandLineArguments {
             // Flip this so that we express what we want to do as a positive boolean (double
             // negatives are hard to reason about). The code will read 'if args.load_config()...'
             load_config: !matches.is_present("no-config"),
-            xdg_profile: matches.value_of("xdg-profile").map(|s| s.to_string())
+            xdg_profile: String::from(matches.value_of("xdg-profile").unwrap())
         }
     }
 
@@ -39,7 +43,21 @@ impl CommandLineArguments {
         self.load_config
     }
 
-    pub fn xdg_profile(&self) -> &Option<String> {
+    pub fn xdg_profile(&self) -> &String {
         &self.xdg_profile
+    }
+}
+
+impl fmt::Debug for CommandLineArguments {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{{ load_config={}, xdg_profile={} }}",
+            self.load_config, self.xdg_profile
+        )
+    }
+}
+
+impl fmt::Display for CommandLineArguments {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        fmt::Debug::fmt(self, f)
     }
 }

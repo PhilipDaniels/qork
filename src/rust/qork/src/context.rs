@@ -19,15 +19,7 @@ impl Context {
     pub fn new() -> Context {
         let pi = ProgramInfo::new();
 
-        let profile = {
-            match pi.parsed_args().xdg_profile()
-            {
-                &Some(ref p) => { p.clone() },
-                &None => "default".to_string()
-            }
-        };
-
-        let bd = BaseDirectories::with_profile(qork::APP_NAME, profile).unwrap();
+        let bd = BaseDirectories::with_profile(qork::APP_NAME, pi.parsed_args().xdg_profile()).unwrap();
 
         Context {
             xdg: bd,
@@ -50,6 +42,7 @@ impl Context {
 
     pub fn log_created_message(&self) -> () {
         info!("Qork Context Created. program_info = {}", self.program_info);
+        info!("Parsed command line args = {}", self.program_info.parsed_args());
 
         // info!(self.logger, "Created Context";
         //     "system_info.hostname" => self.system_info.hostname(),
