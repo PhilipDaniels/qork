@@ -1,15 +1,15 @@
 use std;
+use std::fmt;
 use std::fs::Metadata;
 use std::path::PathBuf;
 
-use chrono::*;
+use chrono::prelude::*;
 
 use command_line_arguments::CommandLineArguments;
 use datetime::*;
 use qork;
 
 // Information about the program (exe).
-#[derive(Debug)]
 pub struct ProgramInfo {
     pub version: &'static str,
     path: Option<PathBuf>,
@@ -55,4 +55,31 @@ impl ProgramInfo {
     pub fn modified_date(&self) -> Option<DateTime<Utc>> {
          self.meta_data.as_ref().map(|m| m.modified().ok()).map(|m| system_time_to_date_time(m.unwrap()))
      }
+}
+
+impl fmt::Debug for ProgramInfo {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let p = match &self.path {
+            &Some(ref pb) => pb.to_str().unwrap_or("unknown"),
+            &None => "unknown"
+        };
+
+        let mdate = match &self.modified_date() {
+            &Some(t) => t.format("%Y-%m-%d %H:%M:%S%.3f UTC").to_string(),
+            &None => String::from("unknown")
+        };
+
+        write!(f, "{{ version={}, path={}, size={}, modified_date={} }}",
+            self.version,
+            p,
+            self.size().unwrap_or(0),
+            mdate
+        )
+    }
+}
+
+impl fmt::Display for ProgramInfo {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        fmt::Debug::fmt(self, f)
+    }
 }

@@ -49,10 +49,7 @@ impl Context {
     }
 
     pub fn log_created_message(&self) -> () {
-        let mdate = &self.program_info.modified_date().map(|m| m.format("%Y-%m-%d %H:%M:%S%.3f UTC").to_string());
-        let path = &self.program_info.path().as_ref().and_then(|p| p.to_str()).map(String::from);
-
-        //info!("{:?}", self);
+        info!("Qork Context Created. program_info = {}", self.program_info);
 
         // info!(self.logger, "Created Context";
         //     "system_info.hostname" => self.system_info.hostname(),
@@ -62,10 +59,6 @@ impl Context {
         //     "system_info.family" => self.system_info.family(),
         //     "system_info.os" => self.system_info.os(),
         //     "config_directory" => %&self.xdg.get_config_home().display(),
-        //     "program_info.version" => &self.program_info.version(),
-        //     "program_info.modified_date" => mdate,
-        //     "program_info.size" => &self.program_info.size(),
-        //     "program_info.path" => path
         //  );
     }
 }
