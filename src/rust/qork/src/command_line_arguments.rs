@@ -1,6 +1,5 @@
 use std::fmt;
 use clap::{Arg, App};
-use qork;
 
 // This struct represents the parsed command line arguments, not the raw ones.
 // For example, if no value is supplied for an argument then the default is applied
@@ -13,7 +12,7 @@ pub struct CommandLineArguments {
 impl CommandLineArguments {
     pub fn new() -> CommandLineArguments {
         let matches = App::new("Qork")
-                        .version(qork::VERSION)
+                        .version(crate_version!())
                         .author("Philip Daniels philip.daniels1971@gmail.com")
                         .about("A text editor/IDE written in Rust and Python.")
                         .arg(Arg::with_name("xdg-profile")

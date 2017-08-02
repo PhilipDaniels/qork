@@ -1,7 +1,6 @@
 use xdg::BaseDirectories;
 
 use program_info::ProgramInfo;
-use qork;
 use system_info::SystemInfo;
 
 // The complete execution context of Qork.
@@ -19,7 +18,7 @@ impl Context {
     pub fn new() -> Context {
         let pi = ProgramInfo::new();
 
-        let bd = BaseDirectories::with_profile(qork::APP_NAME, pi.parsed_args().xdg_profile()).unwrap();
+        let bd = BaseDirectories::with_profile(env!("CARGO_PKG_NAME"), pi.parsed_args().xdg_profile()).unwrap();
 
         Context {
             xdg: bd,

@@ -1,4 +1,5 @@
 extern crate chrono;
+#[macro_use]
 extern crate clap;
 extern crate hostname;
 #[macro_use]
@@ -12,7 +13,6 @@ mod context;
 mod datetime;
 mod execution_timer;
 mod program_info;
-mod qork;
 mod system_info;
 
 use xdg::BaseDirectories;

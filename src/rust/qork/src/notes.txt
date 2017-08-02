@@ -37,18 +37,3 @@ debug only appears in Debug mode builds. trace does not appear at all by default
 
 Rust Snippets
 =============
-From the xdg crate. A nice simple crate, good doc examples too.
-
-    impl fmt::Debug for Permissions {
-        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-            let Permissions(p) = *self;
-            write!(f, "{:#05o}", p)
-        }
-    }
-
-    impl fmt::Display for Permissions {
-        fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-            fmt::Debug::fmt(self, f)
-        }
-    }
-

@@ -7,7 +7,6 @@ use chrono::prelude::*;
 
 use command_line_arguments::CommandLineArguments;
 use datetime::*;
-use qork;
 
 // Information about the program (exe).
 pub struct ProgramInfo {
@@ -24,7 +23,7 @@ impl ProgramInfo {
         let md = path.as_ref().and_then(|e| e.metadata().ok());
 
         ProgramInfo {
-            version: qork::VERSION,
+            version: crate_version!(),
             path: path,
             raw_args: std::env::args().collect(),
             parsed_args: CommandLineArguments::new(),
