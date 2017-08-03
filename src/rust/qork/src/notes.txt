@@ -37,3 +37,13 @@ debug only appears in Debug mode builds. trace does not appear at all by default
 
 Rust Snippets
 =============
+
+
+COTW
+====
+Built
+
+Thoughts On Rust
+================
+I just discovered you can browse the source directly on docs.rs - this is a fantastic learning resource!
+Platforms show up on docs.rs, but why is that not on crates.io?

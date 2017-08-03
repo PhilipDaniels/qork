@@ -15,6 +15,11 @@ mod execution_timer;
 mod program_info;
 mod system_info;
 
+// The file has been placed there by the build.rs script and the 'built' crate.
+pub mod built_info {
+    include!(concat!(env!("OUT_DIR"), "/built.rs"));
+}
+
 use xdg::BaseDirectories;
 
 use context::Context;
@@ -27,6 +32,27 @@ fn main() {
     let _timer = ExecutionTimer::with_start_message("main.main");
     context.log_created_message();
     load_user_configuration_if_valid(&context);
+
+    // Keep, works.
+    info!("PKG_DESCRIPTION = {}", built_info::PKG_DESCRIPTION);
+    info!("PKG_NAME = {}", built_info::PKG_NAME);
+    info!("PKG_VERSION = {}", built_info::PKG_VERSION);
+    info!("PKG_AUTHORS = {}", built_info::PKG_AUTHORS);
+    info!("PROFILE = {}", built_info::PROFILE);
+    info!("DEBUG = {}", built_info::DEBUG);
+    info!("OPT_LEVEL = {}", built_info::OPT_LEVEL);
+    info!("FEATURES_STR = {}", built_info::FEATURES_STR);
+    info!("BUILT_TIME_UTC = {}", built_info::BUILT_TIME_UTC);
+
+    info!("NEED FIXING >>>>>>>>>>>>>>>>>>");
+    info!("RUSTC_VERSION = {:?}", built_info::RUSTC_VERSION);
+    info!("GIT_VERSION = {:?}", built_info::GIT_VERSION);
+    info!("CI_PLATFORM = {:?}", built_info::CI_PLATFORM);
+
+    // Do not use, duplicate of target_info.
+    info!("DO NOT USE >>>>>>>>>>>>>>>>>>");
+    info!("TARGET = {}", built_info::TARGET);
+    info!("HOST = {}", built_info::HOST);
 }
 
 fn configure_logging(xdg: &BaseDirectories) {
