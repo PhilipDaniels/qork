@@ -8,9 +8,10 @@ use chrono::prelude::*;
 use command_line_arguments::CommandLineArguments;
 use datetime::*;
 
-// Information about the program (exe).
+// Information about the program we are running (qork.exe), the invocation.
+// This information is derived at runtime.
+
 pub struct ProgramInfo {
-    pub version: &'static str,
     path: Option<PathBuf>,
     raw_args: Vec<String>,
     parsed_args: CommandLineArguments,
@@ -23,7 +24,6 @@ impl ProgramInfo {
         let md = path.as_ref().and_then(|e| e.metadata().ok());
 
         ProgramInfo {
-            version: crate_version!(),
             path: path,
             raw_args: std::env::args().collect(),
             parsed_args: CommandLineArguments::new(),
@@ -68,8 +68,7 @@ impl fmt::Debug for ProgramInfo {
             &None => String::from("unknown")
         };
 
-        write!(f, r#"ProgramInfo {{ version: "{}", path: "{}", size: {}, modified_date: "{}" }}"#,
-            self.version,
+        write!(f, r#"ProgramInfo {{ path: "{}", size: {}, modified_date: "{}" }}"#,
             p,
             self.size().unwrap_or(0),
             mdate

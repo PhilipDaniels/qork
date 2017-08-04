@@ -1,5 +1,6 @@
 use std::fmt;
 use clap::{Arg, App};
+use build_info;
 
 // This struct represents the parsed command line arguments, not the raw ones.
 // For example, if no value is supplied for an argument then the default is applied
@@ -12,9 +13,9 @@ pub struct CommandLineArguments {
 impl CommandLineArguments {
     pub fn new() -> CommandLineArguments {
         let matches = App::new("Qork")
-                        .version(crate_version!())
-                        .author(env!("CARGO_PKG_AUTHORS"))
-                        .about("A text editor/IDE written in Rust and Python.")
+                        .version(build_info::PKG_VERSION)
+                        .author(build_info::PKG_AUTHORS)
+                        .about(build_info::PKG_DESCRIPTION)
                         .arg(Arg::with_name("xdg-profile")
                                 .short("p")
                                 .long("xdg-profile")
