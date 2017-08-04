@@ -11,6 +11,28 @@ mod bi {
     include!(concat!(env!("OUT_DIR"), "/built.rs"));
 }
 
+
+// pub use bi::PKG_NAME;
+// pub use bi::PKG_DESCRIPTION;
+// pub use bi::PKG_VERSION;
+// pub use bi::PKG_VERSION_MAJOR;
+// pub use bi::PKG_VERSION_MINOR;
+// pub use bi::PKG_VERSION_PATCH;
+// pub use bi::PKG_VERSION_PRE;
+// pub use bi::PKG_AUTHORS;
+// pub use bi::PKG_HOMEPAGE;
+// pub use bi::PROFILE;
+// pub use bi::DEBUG;
+// pub use bi::OPT_LEVEL;
+// pub use bi::RUSTC;
+// pub use bi::RUSTC_VERSION;
+// pub use bi::RUSTDOC;
+// pub use bi::RUSTDOC_VERSION;
+// pub use bi::FEATURES;
+// pub use bi::FEATURES_STR;
+// pub use bi::BUILD_TIME_UTC;
+
+
 #[doc="The name of the program."]
 pub const PKG_NAME: &'static str = bi::PKG_NAME;
 
@@ -95,35 +117,9 @@ pub fn os() -> &'static str {
     target_info::Target::os()
 }
 
-
 pub fn log_build_info() {
     info!(r#"BuildInfo {{ PKG_VERSION: "{}", PROFILE: "{}", DEBUG: "{}", OPT_LEVEL: "{}", RUSTC: "{}", RUSTC_VERSION: "{}", FEATURES_STR: "{}", BUILD_TIME_UTC: "{}", arch: "{}", endian: "{}", env: "{}", family: "{}", os: "{}" }}"#,
         PKG_VERSION, PROFILE, DEBUG, OPT_LEVEL, RUSTC, RUSTC_VERSION, FEATURES_STR, BUILD_TIME_UTC,
         arch(), endian(), env(), family(), os()
         );
 }
-
-
-macro_rules! return_cfg {
-	($i:ident : $s:expr) => ( if cfg!($i = $s) { return $s; } );
-	($i:ident : $s:expr, $($t:expr),+) => ( return_cfg!($i: $s); return_cfg!($i: $($t),+) );
-}
-
-/*
-pub const ARCH: &'static str = {
-		return_cfg!(target_arch: "x86", "x86_64", "mips", "powerpc", "arm", "aarch64");
-		"unknown"
-	};
-
-    // e.g. x86, x86_64, mips...
-    pub arch: &'static str,
-    // little or big.
-    pub endian: &'static str,
-    // e.g. gnu, msvc, musl.
-    pub env: &'static str,
-    // e.g. unix, windows.
-    pub family: &'static str,
-    // e.g. linux, windows, macos, ios, android.
-    pub os: &'static str
-
-*/
