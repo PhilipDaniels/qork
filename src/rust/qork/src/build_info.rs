@@ -7,6 +7,9 @@ use chrono::*;
 // The file has been placed there by the build.rs script and the 'built' crate.
 // Import it privately so we can rename the constants to avoid too deep a nesting.
 // TODO: Is there a better way of doing this?
+// The best way is simply to combine the two crates into a single new crate called build_info,
+// and then just put this 'include' line into main.rs, then the constants can be referred to
+// as ::PKG_VERSION.
 mod bi {
     include!(concat!(env!("OUT_DIR"), "/built.rs"));
 }
