@@ -3,6 +3,8 @@ use hostname;
 // Information about the system/machine we are running on.
 // This information is derived at runtime.
 
+// TODO: Replace this with the sysinfo crate.
+
 #[derive(Debug)]
 pub struct SystemInfo {
     hostname: String,

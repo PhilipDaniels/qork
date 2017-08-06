@@ -40,8 +40,8 @@ impl Context {
     }
 
     pub fn log_created_message(&self) -> () {
-        info!("Qork Context Created. {:?}", self.program_info);
-        info!("{:?}", self.program_info.parsed_args());
         info!("{:?}", self.system_info);
+        info!("{:?}", self.program_info.parsed_args());
+        info!("{:?}", self.program_info);
     }
 }
