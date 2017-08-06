@@ -41,8 +41,6 @@ fn configure_logging(xdg: &BaseDirectories) {
                 log4rs::init_file(&p, Default::default()).unwrap();
                 info!("Logging initialized using file at {:?}", &p);
             }
-            else {
-            }
         },
         Err(_) => {
             // Do nothing, not sure there is anything we can do.
@@ -70,4 +68,18 @@ fn load_user_configuration(context: &Context) {
     }
 
     info!("Loading user configuration from {:?}", dir);
+    let path = context.xdg().place_config_file("config.toml");
+    match path {
+        Ok(p) => {
+            if p.exists() {
+
+            } else {
+                info!("The config file {:?} does not exist", p);
+            }
+        }
+        Err(e) => {
+            warn!("Error while asking for config.toml: {}", e);
+            return;
+        }
+    }
 }
