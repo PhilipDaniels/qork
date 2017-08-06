@@ -29,7 +29,7 @@ fn main() {
     let _timer = ExecutionTimer::with_start_message("main.main");
     build_info::log_build_info();
     context.log_created_message();
-    load_user_configuration_if_valid(&context);
+    load_user_configuration(&context);
 }
 
 fn configure_logging(xdg: &BaseDirectories) {
@@ -50,7 +50,9 @@ fn configure_logging(xdg: &BaseDirectories) {
     }
 }
 
-fn load_user_configuration_if_valid(context: &Context) {
+fn load_user_configuration(context: &Context) {
+    let _timer = ExecutionTimer::with_start_message("main.load_user_configuration");
+
     if !context.program_info().parsed_args().load_config() {
         info!("Loading of user configuration is disabled.");
         return
@@ -67,6 +69,5 @@ fn load_user_configuration_if_valid(context: &Context) {
         return
     }
 
-    let _timer = ExecutionTimer::with_start_message("main.load_user_configuration_if_valid");
     info!("Loading user configuration from {:?}", dir);
 }
