@@ -5,6 +5,9 @@ extern crate hostname;
 #[macro_use]
 extern crate log;
 extern crate log4rs;
+extern crate serde;
+#[macro_use]
+extern crate serde_derive;
 extern crate xdg;
 
 mod command_line_arguments;
@@ -31,7 +34,7 @@ fn main() {
     let _timer = ExecutionTimer::with_start_message("main.main");
     log_build_info();
     context.log_created_message();
-    load_user_configuration(&context);
+    let config = configuration::Configuration::load_user_configuration(&context);
 }
 
 fn configure_logging(xdg: &BaseDirectories) {
@@ -55,44 +58,4 @@ fn log_build_info() {
         PKG_VERSION, PROFILE, DEBUG, OPT_LEVEL, RUSTC, RUSTC_VERSION, FEATURES_STR, BUILT_TIME_UTC,
         CFG_TARGET_ARCH, CFG_ENDIAN, CFG_ENV, CFG_FAMILY, CFG_OS
         );
-}
-
-fn load_user_configuration(context: &Context) {
-    let _timer = ExecutionTimer::with_start_message("main.load_user_configuration");
-
-    if !context.program_info().parsed_args().load_config() {
-        info!("Loading of user configuration is disabled.");
-        return
-    }
-
-    let xdg = context.xdg();
-    let dir = xdg.get_config_home();
-    if !dir.exists() {
-        warn!("The config_directory does not exist, no config will be loaded, config_directory={:?}", dir);
-        return
-    }
-
-    if !dir.is_dir() {
-        warn!("The config_directory is a file, not a directory, no config will be loaded, config_directory={:?}", dir);
-        return
-    }
-
-    info!("Loading user configuration from {:?}", dir);
-
-    let path = xdg.place_config_file("config.toml");
-    if path.is_err() {
-        warn!("Could not locate config.toml file");
-        return;
-    }
-    let path = path.unwrap();
-    if !path.exists() {
-        debug!("The file {:?} does not exist. No user config will be loaded.", path);
-        return;
-    }
-    if !path.is_file() {
-        warn!("The user configuration file {:?} appears to be a directory.", path);
-        return;
-    }
-
-    // Ok, the file exists and can be loaded.
 }
