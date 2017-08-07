@@ -5,8 +5,6 @@ extern crate hostname;
 #[macro_use]
 extern crate log;
 extern crate log4rs;
-#[macro_use]
-extern crate target_info;
 extern crate xdg;
 
 mod command_line_arguments;
