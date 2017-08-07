@@ -1,6 +1,7 @@
 use xdg::BaseDirectories;
 
 use build_info::PKG_NAME;
+use configuration::Configuration;
 use program_info::ProgramInfo;
 use system_info::SystemInfo;
 
@@ -10,8 +11,9 @@ pub struct Context {
     program_info: ProgramInfo,
     // xdg base directory object, typically '~/.config/qork', with a default profile of
     // 'default', which means the effective directory is '~/.config/qork/default'.
-    xdg: BaseDirectories
+    xdg: BaseDirectories,
     // TODO: user_name
+    config: Configuration
 }
 
 impl Context {
@@ -23,7 +25,8 @@ impl Context {
         Context {
             xdg: bd,
             system_info: SystemInfo::new(),
-            program_info: pi
+            program_info: pi,
+            config: Configuration::default()
         }
     }
 

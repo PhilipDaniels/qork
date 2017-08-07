@@ -11,6 +11,7 @@ extern crate xdg;
 
 mod build_info;
 mod command_line_arguments;
+mod configuration;
 mod context;
 mod datetime;
 mod execution_timer;
@@ -56,7 +57,8 @@ fn load_user_configuration(context: &Context) {
         return
     }
 
-    let dir = context.xdg().get_config_home();
+    let xdg = context.xdg();
+    let dir = xdg.get_config_home();
     if !dir.exists() {
         warn!("The config_directory does not exist, no config will be loaded, config_directory={:?}", dir);
         return
@@ -68,7 +70,8 @@ fn load_user_configuration(context: &Context) {
     }
 
     info!("Loading user configuration from {:?}", dir);
-    let path = context.xdg().place_config_file("config.toml");
+
+    let path = xdg.place_config_file("config.toml");
     match path {
         Ok(p) => {
             if p.exists() {
