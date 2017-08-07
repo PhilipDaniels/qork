@@ -1,6 +1,5 @@
 use xdg::BaseDirectories;
 
-use build_info::PKG_NAME;
 use configuration::Configuration;
 use program_info::ProgramInfo;
 use system_info::SystemInfo;
@@ -20,7 +19,7 @@ impl Context {
     pub fn new() -> Context {
         let pi = ProgramInfo::new();
 
-        let bd = BaseDirectories::with_profile(PKG_NAME, pi.parsed_args().xdg_profile()).unwrap();
+        let bd = BaseDirectories::with_profile(::PKG_NAME, pi.parsed_args().xdg_profile()).unwrap();
 
         Context {
             xdg: bd,

@@ -16,7 +16,7 @@ toml = "0.4"
 xdg = "2.1.0"
 
 [build-dependencies]
-built = { version = "0.1.0", features = ["serialized_git"] }
+built = { git = "https://github.com/lukaslueg/built", branch = "master", features = ["serialized_git"] }
 
 [profile.release]
 lto = true
