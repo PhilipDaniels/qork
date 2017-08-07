@@ -17,6 +17,7 @@ mod execution_timer;
 mod program_info;
 mod system_info;
 
+use std::fs;
 use xdg::BaseDirectories;
 
 use context::Context;
@@ -81,17 +82,19 @@ fn load_user_configuration(context: &Context) {
     info!("Loading user configuration from {:?}", dir);
 
     let path = xdg.place_config_file("config.toml");
-    match path {
-        Ok(p) => {
-            if p.exists() {
-
-            } else {
-                info!("The config file {:?} does not exist", p);
-            }
-        }
-        Err(e) => {
-            warn!("Error while asking for config.toml: {}", e);
-            return;
-        }
+    if path.is_err() {
+        warn!("Could not locate config.toml file");
+        return;
     }
+    let path = path.unwrap();
+    if !path.exists() {
+        debug!("The file {:?} does not exist. No user config will be loaded.", path);
+        return;
+    }
+    if !path.is_file() {
+        warn!("The user configuration file {:?} appears to be a directory.", path);
+        return;
+    }
+
+    // Ok, the file exists and can be loaded.
 }
