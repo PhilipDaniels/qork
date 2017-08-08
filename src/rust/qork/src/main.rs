@@ -1,5 +1,4 @@
 extern crate chrono;
-#[macro_use]
 extern crate clap;
 extern crate hostname;
 #[macro_use]
@@ -19,7 +18,6 @@ mod execution_timer;
 mod program_info;
 mod system_info;
 
-use std::fs;
 use xdg::BaseDirectories;
 
 use context::Context;
