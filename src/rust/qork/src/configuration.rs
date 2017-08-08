@@ -1,21 +1,27 @@
+use std::fs::File;
+use std::io::{Error, ErrorKind, Read};
+use toml;
 use context::Context;
 use execution_timer::ExecutionTimer;
 
-// Stores the configuration.
+// Stores the configuration. Will be read from config.toml. Any values not
+// present in the file will be defaulted using the 'default' method below.
 #[derive(Serialize, Deserialize)]
+#[serde(default)]
 pub struct Configuration {
-    #[serde(default = "20")]
     num_mru_items: u32
 }
 
-impl Configuration {
-    pub fn default() -> Configuration {
+impl Default for Configuration {
+    fn default() -> Configuration {
         Configuration {
             num_mru_items: 20
         }
     }
+}
 
-    pub fn load_user_configuration(context: &Context) -> Configuration {
+impl Configuration {
+pub fn load_user_configuration(context: &Context) -> Configuration {
         let _timer = ExecutionTimer::with_start_message("main.load_user_configuration");
 
         if !context.program_info().parsed_args().load_config() {
@@ -35,7 +41,7 @@ impl Configuration {
             return Configuration::default();
         }
 
-        info!("Loading user configuration from {:?}", dir);
+        info!("Loading user configuration from directory {:?}", dir);
 
         let path = xdg.place_config_file("config.toml");
         if path.is_err() {
@@ -53,6 +59,12 @@ impl Configuration {
         }
 
         // Ok, the file exists and can be loaded.
-        return Configuration::default()
+        let file = File::open(&path);
+        let mut toml = String::new();
+        file.unwrap().read_to_string(&mut toml);
+        let cfg : Configuration = toml::from_str(&toml).unwrap();
+        info!("Got num_mru_items = {}", cfg.num_mru_items);
+
+        cfg
     }
 }
