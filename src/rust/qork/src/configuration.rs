@@ -27,7 +27,7 @@ pub fn load_user_configuration(context: &Context) -> Configuration {
         let _timer = ExecutionTimer::with_start_message("load_user_configuration");
 
         if !context.program_info().parsed_args().load_config() {
-            info!("Loading of user configuration is disabled.");
+            info!("Loading of user configuration is disabled by command line option.");
             return Configuration::default();
         }
 
