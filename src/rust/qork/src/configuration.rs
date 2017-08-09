@@ -6,16 +6,18 @@ use execution_timer::ExecutionTimer;
 
 // Stores the configuration. Will be read from config.toml. Any values not
 // present in the file will be defaulted using the 'default' method below.
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 #[serde(default)]
 pub struct Configuration {
-    max_mru_items: u32
+    max_mru_items: u32,
+    max_open_files: u32
 }
 
 impl Default for Configuration {
     fn default() -> Configuration {
         Configuration {
-            max_mru_items: 20
+            max_mru_items: 20,
+            max_open_files: 200
         }
     }
 }
@@ -23,7 +25,7 @@ impl Default for Configuration {
 const CONFIG_FILE : &'static str = "config.toml";
 
 impl Configuration {
-pub fn load_user_configuration(context: &Context) -> Configuration {
+    pub fn load_user_configuration(context: &Context) -> Configuration {
         let _timer = ExecutionTimer::with_start_message("load_user_configuration");
 
         if !context.program_info().parsed_args().load_config() {
@@ -63,13 +65,16 @@ pub fn load_user_configuration(context: &Context) -> Configuration {
         }
 
         // Ok, the file exists and we can try to load it.
-        let cfg = File::open(path)
+        let cfg = File::open(&path)
             .map_err(|err| err.to_string())
             .and_then(|mut f| {
                 let mut contents = String::new();
                 f.read_to_string(&mut contents)
                     .map_err(|err| err.to_string())
-                    .map(|_| contents)
+                    .map(|num_bytes_read| {
+                        info!("Read {} bytes from {:?}", num_bytes_read, &path);
+                        contents
+                    })
             })
             .and_then(|contents| {
                 toml::from_str::<Configuration>(&contents)
@@ -78,7 +83,7 @@ pub fn load_user_configuration(context: &Context) -> Configuration {
             .map_err(|err| warn!("Error reading {:?}: {:?}", CONFIG_FILE, err))
             .unwrap_or_default();
 
-        info!("Got max_mru_items = {}", cfg.max_mru_items);
+        info!("{:?}", cfg);
 
         cfg
     }

@@ -39,10 +39,6 @@ Rust Snippets
 =============
 
 
-COTW
-====
-Built
-
 Thoughts On Rust
 ================
 I just discovered you can browse the source directly on docs.rs - this is a fantastic learning resource!
