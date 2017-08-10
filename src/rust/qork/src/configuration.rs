@@ -72,7 +72,7 @@ impl Configuration {
                 f.read_to_string(&mut contents)
                     .map_err(|err| err.to_string())
                     .map(|num_bytes_read| {
-                        info!("Read {} bytes from {:?}", num_bytes_read, &path);
+                        info!("Read {} lines ({} bytes) from {:?}", contents.lines().count(), num_bytes_read,  &path);
                         contents
                     })
             })
