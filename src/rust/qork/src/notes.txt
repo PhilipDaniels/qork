@@ -1,26 +1,10 @@
-Rust Learning
-=============
-Formatting of SystemTime is really difficult! Need to bring in chrono
-and then Google for the special magic function to convert a SystemTime
-into a DateTime.
-
-Crates on crates.io should say which platforms they support.
-
-Just printing a PathBuf is difficult. Why do we need this OsString type as well
-as &str and String?
-
-A struct with a lifetime always means that struct depends on other locations to hold the "meat" of the data.
-You are instructing the compiler to prove that values of the struct type never outlive those locations.
-
-
 C# to Rust
 ==========
 To make a struct with private immutable data, just declare a field, then a pub fn with the
 same name which returns a reference to that data. Methods should take a reference otherwise
 you will get confusing compiler errors about lifetimes (because you moved an object).
 
-
-NEXT
+Next
 ====
 * Create a UserInfo struct.
 * --create-config-dir : creates a skeleton configuration directory - need to define it!
@@ -33,13 +17,23 @@ trace, debug, info, warn, error, crit.
 debug only appears in Debug mode builds. trace does not appear at all by default.
 
 
-
-
-Rust Snippets
-=============
+Package Platforms
+=================
+* sysinfo does not work on Windows.
 
 
 Thoughts On Rust
 ================
+Crates on crates.io should say which platforms they support (on the front page, they do in the docs).
+
 I just discovered you can browse the source directly on docs.rs - this is a fantastic learning resource!
 Platforms show up on docs.rs, but why is that not on crates.io?
+There are 6 types of strings, which makes doing simple stuff like opening files harder than it should be.
+Just printing a PathBuf is difficult. Why do we need this OsString type as well
+as &str and String?
+
+Also, there is no comprehensive treatment of date and time.
+Formatting of SystemTime is really difficult! Need to bring in chrono
+and then Google for the special magic function to convert a SystemTime
+into a DateTime.
+
