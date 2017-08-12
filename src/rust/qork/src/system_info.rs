@@ -8,6 +8,18 @@ use sysinfo::{get_current_pid, SystemExt};
 
 // TODO: Replace this with the sysinfo crate.
 
+/*
+use lazy_init::Lazy;
+
+
+    let mylazy = Lazy::<i32>::new();
+    mylazy.get_or_create(make_int);
+fn make_int() -> i32 {
+    info!("Returning the int");
+    42
+}
+*/
+
 #[derive(Debug, Default)]
 pub struct SystemInfo {
     pid: pid_t,

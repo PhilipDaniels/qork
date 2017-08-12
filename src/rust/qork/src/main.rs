@@ -21,7 +21,6 @@ mod execution_timer;
 mod program_info;
 mod system_info;
 
-use lazy_init::Lazy;
 use xdg::BaseDirectories;
 
 use context::Context;
@@ -38,16 +37,6 @@ fn main() {
     log_build_info();
     context.log_created_message();
     let config = configuration::Configuration::load_user_configuration(&context);
-
-    let mylazy = Lazy::<i32>::new();
-    mylazy.get_or_create(make_int);
-    mylazy.get_or_create(make_int);
-    mylazy.get_or_create(|| { info!("Returning 52");  52 } );
-}
-
-fn make_int() -> i32 {
-    info!("Returning the int");
-    42
 }
 
 fn configure_logging(xdg: &BaseDirectories) {
