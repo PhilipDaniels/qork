@@ -4,6 +4,9 @@ use std::fs::Metadata;
 use std::path::PathBuf;
 
 use chrono::prelude::*;
+use lazy_init::Lazy;
+use sysinfo;
+use sysinfo::{Process, System, SystemExt};
 
 use command_line_arguments::CommandLineArguments;
 use datetime::*;
@@ -12,9 +15,11 @@ use datetime::*;
 // This information is derived at runtime.
 
 pub struct ProgramInfo {
+    parsed_args: CommandLineArguments,
+    process: Lazy<Process>,
+
     path: Option<PathBuf>,
     raw_args: Vec<String>,
-    parsed_args: CommandLineArguments,
     meta_data: Option<Metadata>
 }
 
@@ -24,15 +29,26 @@ impl ProgramInfo {
         let md = path.as_ref().and_then(|e| e.metadata().ok());
 
         ProgramInfo {
+            parsed_args: CommandLineArguments::new(),
+            process: Lazy::new(),
             path: path,
             raw_args: std::env::args().collect(),
-            parsed_args: CommandLineArguments::new(),
+
             meta_data: md
         }
     }
 
     pub fn path(&self) -> &Option<PathBuf> {
         &self.path
+    }
+
+    pub fn process(&self) -> &Process {
+        self.process.get_or_create(|| {
+            let system = System::new();
+            let pid = sysinfo::get_current_pid();
+            let ref_to_process = system.get_process(pid).unwrap();
+            ref_to_process.clone()
+        })
     }
 
     pub fn raw_args(&self) -> &Vec<String> {

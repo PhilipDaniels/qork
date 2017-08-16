@@ -1,3 +1,6 @@
+#![allow(dead_code)]
+#![allow(warnings)]
+
 extern crate chrono;
 extern crate clap;
 extern crate hostname;

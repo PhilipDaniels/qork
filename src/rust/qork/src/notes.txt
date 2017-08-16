@@ -11,16 +11,31 @@ Next
 * Consider removing hostname and replacing with the more widely applicable nix crate.
   This would be good for getting the user info, but is not a solution for Windows.
 
+If we are going to use a static plugin system, is there any point building our own modules
+that wrap things like the sysinf crate?
+  - Yes. We need some OS-abstraction, at least. Some crates, at least in the short term,
+    may not work on Windows, and we want to provide a unified, simple API which hides
+    that fact.
+  - A good split: SystemInfo, ProcessInfo, DiskInfo, NetworkInfo.
+    We already have ProgramInfo, which is almost a duplicate of ProcessInfo.
+
+Program Structure
+=================
+Context
+  SystemInfo
+  ProgramInfo
+    CommandLineArguments
+  BaseDirectories
+  Configuration
+
 Logging Levels
 ==============
 trace, debug, info, warn, error, crit.
 debug only appears in Debug mode builds. trace does not appear at all by default.
 
-
 Package Platforms
 =================
 * sysinfo does not work on Windows.
-
 
 Thoughts On Rust
 ================
