@@ -19,6 +19,7 @@ that wrap things like the sysinf crate?
   - A good split: SystemInfo, ProcessInfo, DiskInfo, NetworkInfo.
     We already have ProgramInfo, which is almost a duplicate of ProcessInfo.
 * Try the SystemStat crate instead of sysinfo?
+* In ProgramInfo, we want the ability to get the names of the uid, euid, gid and egid.
 
 Program Structure
 =================

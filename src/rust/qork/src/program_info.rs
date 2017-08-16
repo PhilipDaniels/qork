@@ -5,14 +5,16 @@ use std::path::PathBuf;
 
 use chrono::prelude::*;
 use libc;
-use libc::{pid_t, uid_t, gid_t};
+use libc::{pid_t};
+use users;
+use users::{uid_t, gid_t};
 
 use command_line_arguments::CommandLineArguments;
 use datetime::*;
 
-// Information about the program we are running (qork.exe), the invocation.
-// This information is derived at runtime.
-
+/// Information about the program we are running (qork.exe), the invocation.
+/// This information is initialized at program startup. It is never refreshed,
+/// and so may become stale.
 pub struct ProgramInfo {
     path: Option<PathBuf>,
     meta_data: Option<Metadata>,
@@ -21,9 +23,13 @@ pub struct ProgramInfo {
     pub pid: pid_t,
     pub parent_pid: pid_t,
     pub uid: uid_t,
+    pub uid_name: String,
     pub effective_uid: uid_t,
+    pub effective_uid_name: String,
     pub gid: gid_t,
-    pub effective_gid: gid_t
+    pub gid_name: String,
+    pub effective_gid: gid_t,
+    pub effective_gid_name: String
 }
 
 impl ProgramInfo {
@@ -38,10 +44,14 @@ impl ProgramInfo {
             parsed_args: CommandLineArguments::new(),
             pid: unsafe { libc::getpid() },
             parent_pid: unsafe { libc::getppid() },
-            uid: unsafe { libc::getuid() },
-            effective_uid: unsafe { libc::getuid() },
-            gid: unsafe { libc::getgid() },
-            effective_gid: unsafe { libc::getegid() },
+            uid: users::get_current_uid(),
+            uid_name: users::get_current_username().unwrap_or(String::new()),
+            effective_uid: users::get_effective_uid(),
+            effective_uid_name: users::get_effective_username().unwrap_or(String::new()),
+            gid: users::get_current_gid(),
+            gid_name: users::get_current_groupname().unwrap_or(String::new()),
+            effective_gid: users::get_effective_gid(),
+            effective_gid_name: users::get_effective_groupname().unwrap_or(String::new())
         }
     }
 
@@ -82,13 +92,13 @@ impl fmt::Debug for ProgramInfo {
             &None => String::from("unknown")
         };
 
-        write!(f, r#"ProgramInfo {{ path: "{}", size: {}, modified_date: "{}", pid: {}, parent_pid: {}, uid: {}, effective_uid: {}, gid: {}, effective_gid: {} }}"#,
+        write!(f, r#"ProgramInfo {{ path: "{}", size: {}, modified_date: "{}", pid: {}, parent_pid: {}, uid: {}, uid_name: "{}", effective_uid: {}, effective_uid_name: "{}" gid: {}, gid_name: "{}", effective_gid: {}, effective_gid_name: "{}" }}"#,
             p,
             self.size().unwrap_or(0),
             mdate,
             self.pid, self.parent_pid,
-            self.uid, self.effective_uid,
-            self.gid, self.effective_gid
+            self.uid, self.uid_name, self.effective_uid, self.effective_uid_name,
+            self.gid, self.gid_name, self.effective_gid, self.effective_gid_name
         )
     }
 }

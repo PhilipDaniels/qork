@@ -13,6 +13,7 @@ extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 extern crate toml;
+extern crate users;
 extern crate xdg;
 
 mod command_line_arguments;
