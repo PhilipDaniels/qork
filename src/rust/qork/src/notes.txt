@@ -18,6 +18,7 @@ that wrap things like the sysinf crate?
     that fact.
   - A good split: SystemInfo, ProcessInfo, DiskInfo, NetworkInfo.
     We already have ProgramInfo, which is almost a duplicate of ProcessInfo.
+* Try the SystemStat crate instead of sysinfo?
 
 Program Structure
 =================

@@ -4,11 +4,8 @@ use std::fs::Metadata;
 use std::path::PathBuf;
 
 use chrono::prelude::*;
-use lazy_init::Lazy;
 use libc;
 use libc::{pid_t, uid_t, gid_t};
-use sysinfo;
-use sysinfo::{Process, System, SystemExt};
 
 use command_line_arguments::CommandLineArguments;
 use datetime::*;
@@ -21,7 +18,6 @@ pub struct ProgramInfo {
     meta_data: Option<Metadata>,
     raw_args: Vec<String>,
     parsed_args: CommandLineArguments,
-    process: Lazy<Process>,
     pub pid: pid_t,
     pub parent_pid: pid_t,
     pub uid: uid_t,
@@ -29,27 +25,6 @@ pub struct ProgramInfo {
     pub gid: gid_t,
     pub effective_gid: gid_t
 }
-
-/*
-pub struct Process {
-    pub name: String,
-    pub cmd: Vec<String>,
-    pub exe: String,
-    pub pid: pid_t,                    WANT
-    pub parent: Option<pid_t>,         WANT
-    pub environ: Vec<String>,
-    pub cwd: String,
-    pub root: String,
-    pub memory: u64,
-    pub start_time: u64,
-    pub cpu_usage: f32,
-    pub uid: uid_t,                    WANT
-    pub gid: gid_t,                    WANT
-    pub status: Option<ProcessStatus>,
-    pub tasks: HashMap<pid_t, Process>,
-}
-*/
-
 
 impl ProgramInfo {
     pub fn new() -> ProgramInfo {
@@ -61,7 +36,6 @@ impl ProgramInfo {
             meta_data: md,
             raw_args: std::env::args().collect(),
             parsed_args: CommandLineArguments::new(),
-            process: Lazy::new(),
             pid: unsafe { libc::getpid() },
             parent_pid: unsafe { libc::getppid() },
             uid: unsafe { libc::getuid() },
@@ -73,15 +47,6 @@ impl ProgramInfo {
 
     pub fn path(&self) -> &Option<PathBuf> {
         &self.path
-    }
-
-    pub fn process(&self) -> &Process {
-        self.process.get_or_create(|| {
-            let system = System::new();
-            let pid = sysinfo::get_current_pid();
-            let ref_to_process = system.get_process(pid).unwrap();
-            ref_to_process.clone()
-        })
     }
 
     pub fn raw_args(&self) -> &Vec<String> {

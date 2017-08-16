@@ -15,7 +15,6 @@ log = "0.3.8"
 log4rs = { version = "0.7.0", features = ["toml_format"] }
 serde = "1.0.10"
 serde_derive = "1.0"
-sysinfo = "0.3.13"
 toml = "0.4"
 xdg = "2.1.0"
 
