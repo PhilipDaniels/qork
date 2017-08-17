@@ -16,6 +16,7 @@ extern crate toml;
 extern crate users;
 extern crate xdg;
 
+mod command;
 mod command_line_arguments;
 mod configuration;
 mod context;
@@ -24,8 +25,10 @@ mod execution_timer;
 mod program_info;
 mod system_info;
 
+use std::io::{stdin};
 use xdg::BaseDirectories;
 
+use command::Command;
 use context::Context;
 use execution_timer::ExecutionTimer;
 use program_info::ProgramInfo;
@@ -50,6 +53,8 @@ fn main() {
     let config = Configuration::load_user_configuration(pi.parsed_args().load_config(), &xdg);
     let context = Context::new(xdg, pi, config);
     info!("{:?}", context.system_info());
+
+    run_event_loop(context);
 }
 
 fn configure_logging(xdg: &BaseDirectories) {
@@ -74,3 +79,42 @@ fn log_build_info() {
         CFG_TARGET_ARCH, CFG_ENDIAN, CFG_ENV, CFG_FAMILY, CFG_OS
         );
 }
+
+fn run_event_loop(context: Context) {
+    use std::io::BufRead;
+
+    let stdin = stdin();
+    for line in stdin.lock().lines() {
+        let l = line.unwrap();
+
+        let cmd = {
+            if l == "q" {
+                Command::Quit
+            }
+            else if l.starts_with("o ") {
+                Command::OpenFile{ filename: l.chars().skip(2).collect() }
+            }
+            else {
+                Command::NoOp
+            }
+        };
+
+        let done = despatch_command(cmd);
+        if done {
+            break;
+        }
+    }
+}
+
+fn despatch_command(command: Command) -> bool {
+    match command {
+        Command::NoOp => { println!("Doing nothing"); }
+        Command::Quit => { println!("Quitting"); return true; }
+        Command::OpenFile{filename} => { println!("Opening file {}", filename); }
+    }
+
+    false
+}
+
+
+// https://github.com/mkozachek/Rust-Events/blob/master/src/lib.rs
