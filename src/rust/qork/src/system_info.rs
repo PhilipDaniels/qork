@@ -1,8 +1,7 @@
 use hostname;
 
-// Information about the system/machine we are running on.
-// This information is derived at runtime.
-
+/// Information about the system/machine we are running on.
+/// This information is derived at runtime.
 #[derive(Debug, Default)]
 pub struct SystemInfo {
     hostname: String

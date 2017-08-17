@@ -15,6 +15,7 @@ use datetime::*;
 /// Information about the program we are running (qork.exe), the invocation.
 /// This information is initialized at program startup. It is never refreshed,
 /// and so may become stale.
+/// TODO: Should we call the function every time instead of caching these values?
 pub struct ProgramInfo {
     path: Option<PathBuf>,
     meta_data: Option<Metadata>,
@@ -23,13 +24,13 @@ pub struct ProgramInfo {
     pub pid: pid_t,
     pub parent_pid: pid_t,
     pub uid: uid_t,
-    pub uid_name: String,
+    pub uid_name: Option<String>,
     pub effective_uid: uid_t,
-    pub effective_uid_name: String,
+    pub effective_uid_name: Option<String>,
     pub gid: gid_t,
-    pub gid_name: String,
+    pub gid_name: Option<String>,
     pub effective_gid: gid_t,
-    pub effective_gid_name: String
+    pub effective_gid_name: Option<String>
 }
 
 impl ProgramInfo {
@@ -45,13 +46,13 @@ impl ProgramInfo {
             pid: unsafe { libc::getpid() },
             parent_pid: unsafe { libc::getppid() },
             uid: users::get_current_uid(),
-            uid_name: users::get_current_username().unwrap_or(String::new()),
+            uid_name: users::get_current_username(),
             effective_uid: users::get_effective_uid(),
-            effective_uid_name: users::get_effective_username().unwrap_or(String::new()),
+            effective_uid_name: users::get_effective_username(),
             gid: users::get_current_gid(),
-            gid_name: users::get_current_groupname().unwrap_or(String::new()),
+            gid_name: users::get_current_groupname(),
             effective_gid: users::get_effective_gid(),
-            effective_gid_name: users::get_effective_groupname().unwrap_or(String::new())
+            effective_gid_name: users::get_effective_groupname()
         }
     }
 
@@ -92,7 +93,8 @@ impl fmt::Debug for ProgramInfo {
             &None => String::from("unknown")
         };
 
-        write!(f, r#"ProgramInfo {{ path: "{}", size: {}, modified_date: "{}", pid: {}, parent_pid: {}, uid: {}, uid_name: "{}", effective_uid: {}, effective_uid_name: "{}" gid: {}, gid_name: "{}", effective_gid: {}, effective_gid_name: "{}" }}"#,
+        write!(f, "ProgramInfo {{ path: \"{}\", size: {}, modified_date: \"{}\", pid: {}, parent_pid: {}, uid: {}, uid_name: {:?}, \
+        effective_uid: {}, effective_uid_name: {:?} gid: {}, gid_name: {:?}, effective_gid: {}, effective_gid_name: {:?} }}",
             p,
             self.size().unwrap_or(0),
             mdate,

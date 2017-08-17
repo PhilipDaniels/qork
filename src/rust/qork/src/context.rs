@@ -4,14 +4,13 @@ use configuration::Configuration;
 use program_info::ProgramInfo;
 use system_info::SystemInfo;
 
-// The complete execution context of Qork.
+/// The complete execution context of Qork.
 pub struct Context {
     system_info: SystemInfo,
     program_info: ProgramInfo,
     // xdg base directory object, typically '~/.config/qork', with a default profile of
     // 'default', which means the effective directory is '~/.config/qork/default'.
     xdg: BaseDirectories,
-    // TODO: user_name
     config: Configuration
 }
 
