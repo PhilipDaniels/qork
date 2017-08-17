@@ -10,14 +10,12 @@ use execution_timer::ExecutionTimer;
 #[serde(default)]
 pub struct Configuration {
     max_mru_items: u32,
-    max_open_files: u32
 }
 
 impl Default for Configuration {
     fn default() -> Configuration {
         Configuration {
-            max_mru_items: 20,
-            max_open_files: 200
+            max_mru_items: 20
         }
     }
 }
