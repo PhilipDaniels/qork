@@ -29,6 +29,7 @@ impl<'a> Drop for ExecutionTimer<'a> {
 	fn drop(&mut self) {
 		let elapsed = self.start_time.elapsed();
         let secs = (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0);
-		debug!("Execution Completed, Seconds={}, Name={}", secs, self.name);
+        let msecs = secs * 1000.0;
+		debug!("Execution Completed, Name={}, MilliSecs={:.3}", self.name, msecs);
 	}
 }
