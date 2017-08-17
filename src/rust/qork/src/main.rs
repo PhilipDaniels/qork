@@ -28,18 +28,28 @@ use xdg::BaseDirectories;
 
 use context::Context;
 use execution_timer::ExecutionTimer;
+use program_info::ProgramInfo;
+use configuration::Configuration;
 
 // This produces various constants about the build environment which can be referred to using ::PKG_... syntax.
 include!(concat!(env!("OUT_DIR"), "/built.rs"));
 
 fn main() {
     std::env::set_var("IN_QORK", "1");
-    let context = Context::new();
-    configure_logging(context.xdg());
+
+    // Configure logging as early as possible (because, obviously, we want to log in the rest of the initialization process).
+    let pi = ProgramInfo::new();
+    let xdg = BaseDirectories::with_profile(::PKG_NAME, pi.parsed_args().xdg_profile()).unwrap();
+    configure_logging(&xdg);
+
     let _timer = ExecutionTimer::with_start_message("main.main");
     log_build_info();
-    context.log_created_message();
-    let config = configuration::Configuration::load_user_configuration(&context);
+    info!("{:?}", pi.parsed_args());
+    info!("{:?}", pi);
+
+    let config = Configuration::load_user_configuration(pi.parsed_args().load_config(), &xdg);
+    let context = Context::new(xdg, pi, config);
+    info!("{:?}", context.system_info());
 }
 
 fn configure_logging(xdg: &BaseDirectories) {

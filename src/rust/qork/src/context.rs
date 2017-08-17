@@ -11,20 +11,16 @@ pub struct Context {
     // xdg base directory object, typically '~/.config/qork', with a default profile of
     // 'default', which means the effective directory is '~/.config/qork/default'.
     xdg: BaseDirectories,
-    config: Configuration
+    configuration: Configuration
 }
 
 impl Context {
-    pub fn new() -> Context {
-        let pi = ProgramInfo::new();
-
-        let bd = BaseDirectories::with_profile(::PKG_NAME, pi.parsed_args().xdg_profile()).unwrap();
-
+    pub fn new(xdg: BaseDirectories, pi: ProgramInfo, config: Configuration) -> Context {
         Context {
-            xdg: bd,
+            xdg: xdg,
             system_info: SystemInfo::new(),
             program_info: pi,
-            config: Configuration::default()
+            configuration: config
         }
     }
 
@@ -40,9 +36,7 @@ impl Context {
         &self.xdg
     }
 
-    pub fn log_created_message(&self) -> () {
-        info!("{:?}", self.system_info);
-        info!("{:?}", self.program_info.parsed_args());
-        info!("{:?}", self.program_info);
+    pub fn configuration(&self) -> &Configuration {
+        &self.configuration
     }
 }

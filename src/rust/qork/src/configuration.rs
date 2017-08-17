@@ -1,6 +1,8 @@
 use std::fs::File;
 use std::io::{Read};
 use toml;
+use xdg::BaseDirectories;
+
 use context::Context;
 use execution_timer::ExecutionTimer;
 
@@ -23,15 +25,14 @@ impl Default for Configuration {
 const CONFIG_FILE : &'static str = "config.toml";
 
 impl Configuration {
-    pub fn load_user_configuration(context: &Context) -> Configuration {
+    pub fn load_user_configuration(load_config: bool, xdg: &BaseDirectories) -> Configuration {
         let _timer = ExecutionTimer::with_start_message("load_user_configuration");
 
-        if !context.program_info().parsed_args().load_config() {
+        if !load_config {
             info!("Loading of user configuration is disabled by command line option.");
             return Configuration::default();
         }
 
-        let xdg = context.xdg();
         let dir = xdg.get_config_home();
         if !dir.exists() {
             warn!("The config_directory does not exist, no config will be loaded, config_directory: {:?}", dir);
