@@ -113,17 +113,9 @@ impl<T> Index<usize> for MRUList<T> {
     }
 }
 
-impl<T> IndexMut<usize> for MRUList<T> {
-    fn index_mut<'a>(&'a mut self, index: usize) -> &'a mut T {
-        &mut self.data[index]
-    }
-}
-
-
 
 // Run the tests using String since that is what we are likely to be using this class for.
 // This makes them a little more verbose than using int or str but is worth it.
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -405,15 +397,6 @@ mod tests {
 
         assert!(mru.is_changed());
         assert!(mru.is_empty());
-    }
-
-    #[test]
-    fn index_mut_changes_item() {
-        let mut mru = MRUList::new(20);
-        mru.insert("a".to_owned());
-        mru[0] = "b".to_owned();
-        assert_eq!(mru.len(), 1);
-        assert_eq!(mru[0], "b");
     }
 
     #[test]
