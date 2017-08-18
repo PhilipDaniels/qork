@@ -25,7 +25,7 @@ impl<T> MRUList<T>
         MRUList {
             is_changed: false,
             max_items: max_items,
-            data: Vec::<T>::new()
+            data: Vec::<T>::with_capacity(max_items)
         }
     }
 
