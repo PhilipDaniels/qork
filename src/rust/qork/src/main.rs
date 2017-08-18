@@ -22,6 +22,7 @@ mod configuration;
 mod context;
 mod datetime;
 mod execution_timer;
+mod mru_list;
 mod program_info;
 mod system_info;
 
