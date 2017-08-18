@@ -1,8 +1,9 @@
+use std::cmp;
 use std::ops::{Index, IndexMut};
 use std::slice::{Iter, IterMut};
 
 /// A simple MRU-list data structure. Create a list of the appropriate
-/// maximum size (which can be changed later) then use `push` to add new
+/// maximum size (which can be changed later) then use `insert` to add new
 /// items. New items are always added at the front of the list. Adding
 /// an item which is already in the list is ok - it is moved to the beginning
 /// of the list. The list keeps track of whether its contents have changed,
@@ -18,15 +19,34 @@ pub struct MRUList<T> {
 }
 
 impl<T> MRUList<T>
-    // This constaint is required by the `remove` method.
-    where T: Eq {
-
+    where T: Eq +       // Required by `remove`.
+             Clone      // Required by `clone_from_slice`.
+{
     pub fn new(max_items: usize) -> MRUList<T> {
         MRUList {
             is_changed: false,
             max_items: max_items,
-            data: Vec::<T>::with_capacity(max_items)
+            data: Vec::with_capacity(max_items)
         }
+    }
+
+    /// Clone the first `max_items` from `src` and build an MRU list from them.
+    pub fn clone_from_slice(max_items: usize, src: &[T]) -> MRUList<T> {
+        //let mut mru = MRUList::new(src.len());
+        // The next line crashes with 'destination and source slices have different lengths'. I don't know why.
+        //mru.data.clone_from_slice(src);
+
+        let mut mru = MRUList::new(max_items);
+
+        if !src.is_empty() {
+            let max_i_exclusive = cmp::min(max_items, src.len());
+
+            for i in (0..max_i_exclusive).rev() {
+                mru.data.insert(0, src[i].clone());
+            }
+        }
+
+        mru
     }
 
     pub fn is_changed(&self) -> bool {
@@ -50,6 +70,10 @@ impl<T> MRUList<T>
             self.data.remove(idx);
             self.is_changed = true;
         }
+    }
+
+    pub fn max_items(&self) -> usize {
+        self.max_items
     }
 
     pub fn set_max_items(&mut self, max_items: usize) {
@@ -129,6 +153,72 @@ mod tests {
 
         mru.insert("b".to_owned());
         assert_eq!(mru.len(), 1, "Since max_items is 1, pushing a 2nd element should not increase the length");
+    }
+
+    #[test]
+    fn clone_from_slice_for_empty_slice_creates_list() {
+        let src = Vec::<String>::new();
+        let mut mru = MRUList::clone_from_slice(20, &src);
+
+        assert_eq!(mru.max_items, 20);
+        assert_eq!(mru.len(), 0);
+        assert!(!mru.is_changed());
+    }
+
+    #[test]
+    fn clone_from_slice_for_slice_with_one_item_creates_list_with_one_item() {
+        let src = ["a".to_owned()];
+        let mut mru = MRUList::clone_from_slice(20, &src);
+
+        assert_eq!(mru.max_items, 20);
+        assert_eq!(mru.len(), 1);
+        assert!(!mru.is_changed());
+        assert_eq!(mru[0], "a");
+    }
+
+    #[test]
+    fn clone_from_slice_for_non_empty_slice_creates_list_with_items_in_same_order() {
+        let src = ["a".to_owned(), "b".to_owned(), "c".to_owned()];
+        let mut mru = MRUList::clone_from_slice(20, &src);
+
+        assert_eq!(mru.max_items, 20);
+        assert_eq!(mru.len(), 3);
+        assert!(!mru.is_changed());
+        assert_eq!(mru[0], "a");
+        assert_eq!(mru[1], "b");
+        assert_eq!(mru[2], "c");
+    }
+
+    #[test]
+    fn clone_from_slice_for_zero_max_items_and_empty_slice_takes_no_items() {
+        let src = Vec::<String>::new();
+        let mut mru = MRUList::clone_from_slice(0, &src);
+
+        assert_eq!(mru.max_items, 0);
+        assert_eq!(mru.len(), 0);
+        assert!(!mru.is_changed());
+    }
+
+    #[test]
+    fn clone_from_slice_for_zero_max_items_takes_no_items() {
+        let src = ["a".to_owned(), "b".to_owned(), "c".to_owned()];
+        let mut mru = MRUList::clone_from_slice(0, &src);
+
+        assert_eq!(mru.max_items, 0);
+        assert_eq!(mru.len(), 0);
+        assert!(!mru.is_changed());
+    }
+
+    #[test]
+    fn clone_from_slice_for_max_items_less_than_slice_length_takes_only_requested_items() {
+        let src = ["a".to_owned(), "b".to_owned(), "c".to_owned()];
+        let mut mru = MRUList::clone_from_slice(2, &src);
+
+        assert_eq!(mru.max_items, 2);
+        assert_eq!(mru.len(), 2);
+        assert!(!mru.is_changed());
+        assert_eq!(mru[0], "a");
+        assert_eq!(mru[1], "b");
     }
 
     #[test]
