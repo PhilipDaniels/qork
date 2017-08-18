@@ -5,13 +5,16 @@ use std::slice::{Iter, IterMut};
 /// maximum size (which can be changed later) then use `push` to add new
 /// items. New items are always added at the front of the list. Adding
 /// an item which is already in the list is ok - it is moved to the beginning
-/// of the list.
+/// of the list. The MRUList is not intended to be a high-performance data
+/// structure, it is intended for managing small numbers of items such as
+/// might appear in an editor's MRU menu.
 pub struct MRUList<T> {
     max_items: usize,
     data: Vec<T>
 }
 
 impl<T> MRUList<T>
+    // This constaint is required by the `remove` method.
     where T: Eq {
 
     pub fn new(max_items: usize) -> MRUList<T> {
@@ -74,9 +77,6 @@ impl<T> IndexMut<usize> for MRUList<T> {
     }
 }
 
-pub fn new_string_mru(max_items: usize) -> MRUList<String> {
-    MRUList::new(max_items)
-}
 
 
 // Run the tests using String since that is what we are likely to be using this class for.
@@ -88,7 +88,7 @@ mod tests {
 
     #[test]
     fn new_for_zero_size_creates_empty_list() {
-        let mut mru = new_string_mru(0);
+        let mut mru = MRUList::new(0);
         assert_eq!(mru.len(), 0);
         assert!(mru.is_empty());
         mru.push("a".to_owned());
@@ -98,7 +98,7 @@ mod tests {
 
     #[test]
     fn new_for_size_of_one_creates_list() {
-        let mut mru = new_string_mru(1);
+        let mut mru = MRUList::new(1);
         assert_eq!(mru.len(), 0);
         assert!(mru.is_empty());
         mru.push("a".to_owned());
@@ -110,22 +110,22 @@ mod tests {
 
     #[test]
     fn is_empty_for_empty_list_returns_true() {
-        let mut mru = new_string_mru(0);
+        let mut mru = MRUList::<String>::new(0);
         assert!(mru.is_empty());
-        let mut mru = new_string_mru(1);
+        let mut mru = MRUList::<String>::new(1);
         assert!(mru.is_empty());
     }
 
     #[test]
     fn clear_for_empty_list_does_not_panic() {
-        let mut mru = new_string_mru(20);
+        let mut mru = MRUList::<String>::new(20);
         mru.clear();
         assert!(mru.is_empty());
     }
 
     #[test]
     fn clear_for_non_empty_list_clears_list() {
-        let mut mru = new_string_mru(20);
+        let mut mru = MRUList::new(20);
         mru.push("a".to_owned());
         mru.clear();
         assert!(mru.is_empty());
@@ -133,7 +133,7 @@ mod tests {
 
     #[test]
     fn push_adds_items_in_push_down_stack_order() {
-        let mut mru = new_string_mru(20);
+        let mut mru = MRUList::new(20);
         mru.push("a".to_owned());
         mru.push("b".to_owned());
         assert_eq!(mru[0], "b", "b was pushed last, so should be at the head of the list");
@@ -142,7 +142,7 @@ mod tests {
 
     #[test]
     fn push_for_item_already_in_list_moves_item_to_front() {
-        let mut mru = new_string_mru(20);
+        let mut mru = MRUList::new(20);
         mru.push("a".to_owned());
         mru.push("b".to_owned());
         mru.push("c".to_owned());
@@ -157,7 +157,7 @@ mod tests {
 
     #[test]
     fn push_for_list_at_capacity_drops_items_off_end() {
-        let mut mru = new_string_mru(2);
+        let mut mru = MRUList::new(2);
         mru.push("a".to_owned());
         mru.push("b".to_owned());
         mru.push("c".to_owned());
@@ -169,7 +169,7 @@ mod tests {
 
     #[test]
     fn remove_for_item_not_in_list_does_nothing() {
-        let mut mru = new_string_mru(20);
+        let mut mru = MRUList::new(20);
         mru.push("a".to_owned());
         mru.push("b".to_owned());
         mru.remove(&"c".to_owned());
@@ -180,7 +180,7 @@ mod tests {
 
     #[test]
     fn remove_for_list_of_one_item_removes_item() {
-        let mut mru = new_string_mru(20);
+        let mut mru = MRUList::new(20);
         mru.push("a".to_owned());
         mru.remove(&"a".to_owned());
         assert!(mru.is_empty());
@@ -188,7 +188,7 @@ mod tests {
 
     #[test]
     fn remove_for_list_of_several_items_with_item_at_end_removes_item() {
-        let mut mru = new_string_mru(20);
+        let mut mru = MRUList::new(20);
         mru.push("a".to_owned());
         mru.push("b".to_owned());
         mru.push("c".to_owned());
@@ -200,7 +200,7 @@ mod tests {
 
     #[test]
     fn remove_for_list_of_several_items_with_item_at_beginning_removes_item() {
-        let mut mru = new_string_mru(20);
+        let mut mru = MRUList::new(20);
         mru.push("a".to_owned());
         mru.push("b".to_owned());
         mru.push("c".to_owned());
@@ -212,7 +212,7 @@ mod tests {
 
     #[test]
     fn set_max_items_for_new_size_smaller_than_current_trims_list_to_size() {
-        let mut mru = new_string_mru(20);
+        let mut mru = MRUList::new(20);
         mru.push("a".to_owned());
         mru.push("b".to_owned());
         mru.push("c".to_owned());
@@ -226,7 +226,7 @@ mod tests {
 
     #[test]
     fn set_max_items_for_new_size_greater_than_current_leaves_list_untouched() {
-        let mut mru = new_string_mru(3);
+        let mut mru = MRUList::new(3);
         mru.push("a".to_owned());
         mru.push("b".to_owned());
         mru.push("c".to_owned());
@@ -241,7 +241,7 @@ mod tests {
 
     #[test]
     fn index_mut_changes_item() {
-        let mut mru = new_string_mru(20);
+        let mut mru = MRUList::new(20);
         mru.push("a".to_owned());
         mru[0] = "b".to_owned();
         assert_eq!(mru.len(), 1);
@@ -250,18 +250,18 @@ mod tests {
 
     #[test]
     fn iter_for_empty_list_returns_zero_items() {
-        let mut mru = new_string_mru(0);
+        let mut mru = MRUList::<String>::new(0);
         let mut iter = mru.iter();
         assert_eq!(iter.next(), None);
 
-        let mut mru = new_string_mru(1);
+        let mut mru = MRUList::<String>::new(1);
         let mut iter = mru.iter();
         assert_eq!(iter.next(), None);
     }
 
     #[test]
     fn iter_for_list_with_items_returns_items_in_correct_order() {
-        let mut mru = new_string_mru(20);
+        let mut mru = MRUList::new(20);
         mru.push("a".to_owned());
         mru.push("b".to_owned());
         mru.push("c".to_owned());
