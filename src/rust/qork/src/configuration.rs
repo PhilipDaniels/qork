@@ -11,7 +11,7 @@ use execution_timer::ExecutionTimer;
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(default)]
 pub struct Configuration {
-    max_mru_items: u32,
+    max_mru_items: usize,
 }
 
 impl Default for Configuration {
@@ -25,6 +25,10 @@ impl Default for Configuration {
 const CONFIG_FILE : &'static str = "config.toml";
 
 impl Configuration {
+    pub fn max_mru_items(&self) -> usize {
+        self.max_mru_items
+    }
+
     pub fn load_user_configuration(load_config: bool, xdg: &BaseDirectories) -> Configuration {
         let _timer = ExecutionTimer::with_start_message("load_user_configuration");
 

@@ -22,18 +22,21 @@ mod configuration;
 mod context;
 mod datetime;
 mod execution_timer;
+mod file;
 mod mru_list;
 mod program_info;
 mod system_info;
+mod runtime_data;
 
 use std::io::{stdin};
 use xdg::BaseDirectories;
 
 use command::Command;
+use configuration::Configuration;
 use context::Context;
 use execution_timer::ExecutionTimer;
 use program_info::ProgramInfo;
-use configuration::Configuration;
+use runtime_data::RuntimeData;
 
 // This produces various constants about the build environment which can be referred to using ::PKG_... syntax.
 include!(concat!(env!("OUT_DIR"), "/built.rs"));
@@ -52,6 +55,8 @@ fn main() {
     info!("{:?}", pi);
 
     let config = Configuration::load_user_configuration(pi.parsed_args().load_config(), &xdg);
+    let runtime_data = RuntimeData::load_runtime_data(&config, &xdg);
+
     let context = Context::new(xdg, pi, config);
     info!("{:?}", context.system_info());
 
