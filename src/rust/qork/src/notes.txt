@@ -20,6 +20,7 @@ that wrap things like the sysinf crate?
     We already have ProgramInfo, which is almost a duplicate of ProcessInfo.
 * Try the SystemStat crate instead of sysinfo?
 * In ProgramInfo, we have now get everything from http://www.gnu.org/software/emacs/manual/html_node/elisp/User-Identification.html
+* We also effectively have got http://www.gnu.org/software/emacs/manual/html_node/elisp/System-Environment.html#System-Environment
 
 
 Program Structure

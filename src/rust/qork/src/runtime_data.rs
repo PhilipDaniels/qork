@@ -88,14 +88,22 @@ impl RuntimeData {
     }
 
     /// Writes the runtime data to disk.
-    pub fn save_runtime_data(&self, xdg: &BaseDirectories) {
+    pub fn save(&mut self, config: &Configuration, xdg: &BaseDirectories) {
+        let _timer = ExecutionTimer::with_start_message("save_runtime_data");
+
         if self.mru.is_changed() {
-            save_mru(xdg);
+            let path = RuntimeData::place_file(&xdg, MRU_FILE);
+            if let Some(filename) = path {
+                if let Ok(num_bytes) = save_mru(&filename, &self.mru) {
+                    self.mru.clear_is_changed();
+                    info!("Wrote {} bytes to {:?}", num_bytes, filename);
+                }
+            }
         }
     }
 
-    pub fn mru(&self) -> &MRUList<String> {
-        &self.mru
+    pub fn mru(&mut self) -> &mut MRUList<String> {
+        &mut self.mru
     }
 }
 
@@ -105,7 +113,7 @@ impl RuntimeData {
 const MRU_FILE : &'static str = "mru.toml";
 
 fn load_mru(max_mru_items: usize, filename: &PathBuf) -> Option<MRUList<String>> {
-    let list = file::load_file_as_vector(filename);
+    let list = file::load_to_vector(filename);
 
     match list {
         Ok(list) => {
@@ -116,6 +124,7 @@ fn load_mru(max_mru_items: usize, filename: &PathBuf) -> Option<MRUList<String>>
     }
 }
 
-fn save_mru(xdg: &BaseDirectories) {
-
+fn save_mru(filename: &PathBuf, mru: &MRUList<String>) -> Result<usize, String> {
+    let v = Vec::<String>::new();
+    file::save_from_vector(filename, v)
 }

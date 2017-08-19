@@ -2,6 +2,7 @@ use xdg::BaseDirectories;
 
 use configuration::Configuration;
 use program_info::ProgramInfo;
+use runtime_data::RuntimeData;
 use system_info::SystemInfo;
 
 /// The complete execution context of Qork.
@@ -11,16 +12,18 @@ pub struct Context {
     // xdg base directory object, typically '~/.config/qork', with a default profile of
     // 'default', which means the effective directory is '~/.config/qork/default'.
     xdg: BaseDirectories,
-    configuration: Configuration
+    configuration: Configuration,
+    runtime_data: RuntimeData
 }
 
 impl Context {
-    pub fn new(xdg: BaseDirectories, pi: ProgramInfo, config: Configuration) -> Context {
+    pub fn new(xdg: BaseDirectories, pi: ProgramInfo, config: Configuration, runtime_data: RuntimeData) -> Context {
         Context {
             xdg: xdg,
             system_info: SystemInfo::new(),
             program_info: pi,
-            configuration: config
+            configuration: config,
+            runtime_data: runtime_data
         }
     }
 
@@ -38,5 +41,9 @@ impl Context {
 
     pub fn configuration(&self) -> &Configuration {
         &self.configuration
+    }
+
+    pub fn runtime_data(&mut self) -> &mut RuntimeData {
+        &mut self.runtime_data
     }
 }

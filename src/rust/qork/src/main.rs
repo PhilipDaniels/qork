@@ -57,10 +57,13 @@ fn main() {
     let config = Configuration::load_user_configuration(pi.parsed_args().load_config(), &xdg);
     let runtime_data = RuntimeData::load_runtime_data(&config, &xdg);
 
-    let context = Context::new(xdg, pi, config);
+    let context = Context::new(xdg, pi, config, runtime_data);
     info!("{:?}", context.system_info());
 
-    run_event_loop(context);
+    run_event_loop(&context);
+
+    let rd = context.runtime_data();
+    rd.save(context.configuration(), context.xdg());
 }
 
 fn configure_logging(xdg: &BaseDirectories) {
@@ -86,7 +89,7 @@ fn log_build_info() {
         );
 }
 
-fn run_event_loop(context: Context) {
+fn run_event_loop(context: &Context) {
     use std::io::BufRead;
 
     let stdin = stdin();
@@ -105,18 +108,21 @@ fn run_event_loop(context: Context) {
             }
         };
 
-        let done = despatch_command(cmd);
+        let done = despatch_command(context, cmd);
         if done {
             break;
         }
     }
 }
 
-fn despatch_command(command: Command) -> bool {
+fn despatch_command(context: &Context, command: Command) -> bool {
     match command {
         Command::NoOp => { println!("Doing nothing"); }
         Command::Quit => { println!("Quitting"); return true; }
-        Command::OpenFile{filename} => { println!("Opening file {}", filename); }
+        Command::OpenFile{filename} => {
+            println!("Opening file {}", filename);
+            //context.runtime_data().mru().insert(filename);
+        }
     }
 
     false

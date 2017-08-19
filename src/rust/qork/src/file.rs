@@ -1,10 +1,10 @@
 use std::fs::File;
 use std::path::PathBuf;
 //use std::io::{self, Read, BufReader};
-use std::io::{BufReader};
+use std::io::{BufReader, BufWriter};
 use std::io::prelude::*;
 
-pub fn load_file_as_vector(filename: &PathBuf) -> Result<Vec<String>, String> {
+pub fn load_to_vector(filename: &PathBuf) -> Result<Vec<String>, String> {
     File::open(filename)
         .map_err(|err| err.to_string())
         .and_then(|mut f| {
@@ -19,6 +19,23 @@ pub fn load_file_as_vector(filename: &PathBuf) -> Result<Vec<String>, String> {
             }
 
             Ok(v)
+        })
+}
+
+pub fn save_from_vector(filename: &PathBuf, data: Vec<String>) -> Result<usize, String> {
+    File::create(filename)
+        .map_err(|err| err.to_string())
+        .and_then(|mut f| {
+            let mut f = BufWriter::new(f);
+            let mut byte_count = 0;
+            for line in data {
+                let bytes = line.as_bytes();
+                f.write(bytes);
+                f.write(b"\n");
+                byte_count += bytes.len() + 1;
+            }
+
+            Ok(byte_count)
         })
 }
 
