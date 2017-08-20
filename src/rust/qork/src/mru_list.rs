@@ -18,6 +18,10 @@ pub struct MRUList<T> {
     data: Vec<T>
 }
 
+/// A type of MRUList that uses Strings as its values. Probably covers 99% of cases.
+pub type StringMRUList = MRUList<String>;
+
+
 impl<T> MRUList<T>
     where T: Eq +       // Required by `remove`.
              Clone      // Required by `clone_from_slice`.
@@ -122,7 +126,7 @@ mod tests {
 
     #[test]
     fn new_for_zero_size_creates_empty_list() {
-        let mut mru = MRUList::new(0);
+        let mut mru = StringMRUList::new(0);
         assert_eq!(mru.len(), 0);
         assert!(mru.is_empty());
         assert!(!mru.is_changed());
@@ -134,7 +138,7 @@ mod tests {
 
     #[test]
     fn new_for_size_of_one_creates_list() {
-        let mut mru = MRUList::new(1);
+        let mut mru = StringMRUList::new(1);
         assert_eq!(mru.len(), 0);
         assert!(mru.is_empty());
         assert!(!mru.is_changed());
@@ -150,7 +154,7 @@ mod tests {
     #[test]
     fn clone_from_slice_for_empty_slice_creates_list() {
         let src = Vec::<String>::new();
-        let mut mru = MRUList::clone_from_slice(20, &src);
+        let mut mru = StringMRUList::clone_from_slice(20, &src);
 
         assert_eq!(mru.max_items, 20);
         assert_eq!(mru.len(), 0);
@@ -160,7 +164,7 @@ mod tests {
     #[test]
     fn clone_from_slice_for_slice_with_one_item_creates_list_with_one_item() {
         let src = ["a".to_owned()];
-        let mut mru = MRUList::clone_from_slice(20, &src);
+        let mut mru = StringMRUList::clone_from_slice(20, &src);
 
         assert_eq!(mru.max_items, 20);
         assert_eq!(mru.len(), 1);
@@ -171,7 +175,7 @@ mod tests {
     #[test]
     fn clone_from_slice_for_non_empty_slice_creates_list_with_items_in_same_order() {
         let src = ["a".to_owned(), "b".to_owned(), "c".to_owned()];
-        let mut mru = MRUList::clone_from_slice(20, &src);
+        let mut mru = StringMRUList::clone_from_slice(20, &src);
 
         assert_eq!(mru.max_items, 20);
         assert_eq!(mru.len(), 3);
@@ -184,7 +188,7 @@ mod tests {
     #[test]
     fn clone_from_slice_for_zero_max_items_and_empty_slice_takes_no_items() {
         let src = Vec::<String>::new();
-        let mut mru = MRUList::clone_from_slice(0, &src);
+        let mut mru = StringMRUList::clone_from_slice(0, &src);
 
         assert_eq!(mru.max_items, 0);
         assert_eq!(mru.len(), 0);
@@ -194,7 +198,7 @@ mod tests {
     #[test]
     fn clone_from_slice_for_zero_max_items_takes_no_items() {
         let src = ["a".to_owned(), "b".to_owned(), "c".to_owned()];
-        let mut mru = MRUList::clone_from_slice(0, &src);
+        let mut mru = StringMRUList::clone_from_slice(0, &src);
 
         assert_eq!(mru.max_items, 0);
         assert_eq!(mru.len(), 0);
@@ -204,7 +208,7 @@ mod tests {
     #[test]
     fn clone_from_slice_for_max_items_less_than_slice_length_takes_only_requested_items() {
         let src = ["a".to_owned(), "b".to_owned(), "c".to_owned()];
-        let mut mru = MRUList::clone_from_slice(2, &src);
+        let mut mru = StringMRUList::clone_from_slice(2, &src);
 
         assert_eq!(mru.max_items, 2);
         assert_eq!(mru.len(), 2);
@@ -215,16 +219,16 @@ mod tests {
 
     #[test]
     fn is_empty_for_empty_list_returns_true() {
-        let mut mru = MRUList::<String>::new(0);
+        let mut mru = StringMRUList::new(0);
         assert!(mru.is_empty());
 
-        let mut mru = MRUList::<String>::new(1);
+        let mut mru = StringMRUList::new(1);
         assert!(mru.is_empty());
     }
 
     #[test]
     fn push_sets_is_changed_flag() {
-        let mut mru = MRUList::new(20);
+        let mut mru = StringMRUList::new(20);
         mru.insert("a".to_owned());
 
         assert!(mru.is_changed());
@@ -232,7 +236,7 @@ mod tests {
 
     #[test]
     fn push_adds_items_in_push_down_stack_order() {
-        let mut mru = MRUList::new(20);
+        let mut mru = StringMRUList::new(20);
         mru.insert("a".to_owned());
         mru.insert("b".to_owned());
 
@@ -242,7 +246,7 @@ mod tests {
 
     #[test]
     fn push_for_item_already_in_list_moves_item_to_front() {
-        let mut mru = MRUList::new(20);
+        let mut mru = StringMRUList::new(20);
         mru.insert("a".to_owned());
         mru.insert("b".to_owned());
         mru.insert("c".to_owned());
@@ -256,7 +260,7 @@ mod tests {
 
     #[test]
     fn push_for_list_at_capacity_drops_items_off_end() {
-        let mut mru = MRUList::new(2);
+        let mut mru = StringMRUList::new(2);
         mru.insert("a".to_owned());
         mru.insert("b".to_owned());
         mru.insert("c".to_owned());
@@ -268,7 +272,7 @@ mod tests {
 
     #[test]
     fn remove_for_item_not_in_list_does_nothing() {
-        let mut mru = MRUList::new(20);
+        let mut mru = StringMRUList::new(20);
         mru.insert("a".to_owned());
         mru.insert("b".to_owned());
         mru.remove(&"c".to_owned());
@@ -282,7 +286,7 @@ mod tests {
 
     #[test]
     fn remove_for_list_of_one_item_removes_item() {
-        let mut mru = MRUList::new(20);
+        let mut mru = StringMRUList::new(20);
         mru.insert("a".to_owned());
         mru.remove(&"a".to_owned());
 
@@ -292,7 +296,7 @@ mod tests {
 
     #[test]
     fn remove_for_list_of_several_items_with_item_at_end_removes_item() {
-        let mut mru = MRUList::new(20);
+        let mut mru = StringMRUList::new(20);
         mru.insert("a".to_owned());
         mru.insert("b".to_owned());
         mru.insert("c".to_owned());
@@ -306,7 +310,7 @@ mod tests {
 
     #[test]
     fn remove_for_list_of_several_items_with_item_at_beginning_removes_item() {
-        let mut mru = MRUList::new(20);
+        let mut mru = StringMRUList::new(20);
         mru.insert("a".to_owned());
         mru.insert("b".to_owned());
         mru.insert("c".to_owned());
@@ -320,7 +324,7 @@ mod tests {
 
     #[test]
     fn remove_for_list_of_several_items_with_item_in_middle_removes_item() {
-        let mut mru = MRUList::new(20);
+        let mut mru = StringMRUList::new(20);
         mru.insert("a".to_owned());
         mru.insert("b".to_owned());
         mru.insert("c".to_owned());
@@ -334,7 +338,7 @@ mod tests {
 
     #[test]
     fn set_max_items_sets_is_changed_flag() {
-        let mut mru = MRUList::<String>::new(20);
+        let mut mru = StringMRUList::new(20);
         assert!(!mru.is_changed());
 
         mru.set_max_items(3);
@@ -353,7 +357,7 @@ mod tests {
 
     #[test]
     fn set_max_items_for_new_size_smaller_than_current_trims_list_to_size() {
-        let mut mru = MRUList::new(20);
+        let mut mru = StringMRUList::new(20);
         mru.insert("a".to_owned());
         mru.insert("b".to_owned());
         mru.insert("c".to_owned());
@@ -367,7 +371,7 @@ mod tests {
 
     #[test]
     fn set_max_items_for_new_size_greater_than_current_leaves_list_untouched() {
-        let mut mru = MRUList::new(3);
+        let mut mru = StringMRUList::new(3);
         mru.insert("a".to_owned());
         mru.insert("b".to_owned());
         mru.insert("c".to_owned());
@@ -382,7 +386,7 @@ mod tests {
 
     #[test]
     fn clear_for_empty_list_does_not_panic_and_does_not_set_the_changed_flag() {
-        let mut mru = MRUList::<String>::new(20);
+        let mut mru = StringMRUList::new(20);
         mru.clear();
 
         assert!(mru.is_empty());
@@ -391,7 +395,7 @@ mod tests {
 
     #[test]
     fn clear_for_non_empty_list_clears_list() {
-        let mut mru = MRUList::new(20);
+        let mut mru = StringMRUList::new(20);
         mru.insert("a".to_owned());
         mru.clear();
 
@@ -401,18 +405,18 @@ mod tests {
 
     #[test]
     fn iter_for_empty_list_returns_zero_items() {
-        let mut mru = MRUList::<String>::new(0);
+        let mut mru = StringMRUList::new(0);
         let mut iter = mru.iter();
         assert_eq!(iter.next(), None);
 
-        let mut mru = MRUList::<String>::new(1);
+        let mut mru = StringMRUList::new(1);
         let mut iter = mru.iter();
         assert_eq!(iter.next(), None);
     }
 
     #[test]
     fn iter_for_list_with_items_returns_items_in_correct_order() {
-        let mut mru = MRUList::new(20);
+        let mut mru = StringMRUList::new(20);
         mru.insert("a".to_owned());
         mru.insert("b".to_owned());
         mru.insert("c".to_owned());
