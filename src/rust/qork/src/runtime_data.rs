@@ -8,7 +8,7 @@ use xdg::BaseDirectories;
 use configuration::Configuration;
 use execution_timer::ExecutionTimer;
 use file;
-use mru_list::StringMRUList;
+use mru_list::MRUList;
 
 /// Represents the persistent runtime data of the system. This is things like MRU lists
 /// that we expect to get written to disk and be available the next time we start.
@@ -23,16 +23,16 @@ struct DataItem<T> {
 }
 
 pub struct RuntimeData {
-    mru: StringMRUList,
-    mru2: DataItem<StringMRUList>
+    mru: MRUList,
+    mru2: DataItem<MRUList>
 }
 
 impl RuntimeData {
     /// Constructs a new RuntimeData object based on the default configuration.
     pub fn new(config: &Configuration) -> RuntimeData {
         RuntimeData {
-            mru: StringMRUList::new(config.max_mru_items()),
-            mru2: DataItem { filename: "mru.toml", data: StringMRUList::new(config.max_mru_items()) }
+            mru: MRUList::new(config.max_mru_items()),
+            mru2: DataItem { filename: "mru.toml", data: MRUList::new(config.max_mru_items()) }
         }
     }
 
@@ -100,7 +100,7 @@ impl RuntimeData {
         }
     }
 
-    pub fn mru(&mut self) -> &mut StringMRUList {
+    pub fn mru(&mut self) -> &mut MRUList {
         &mut self.mru
     }
 }
@@ -110,13 +110,15 @@ impl RuntimeData {
 
 const MRU_FILE : &'static str = "mru.toml";
 
-fn load_mru(max_mru_items: usize, filename: &PathBuf) -> Option<StringMRUList> {
+fn load_mru(max_mru_items: usize, filename: &PathBuf) -> Option<MRUList> {
     let list = file::load_to_vector(filename);
+
+    // TODO: if num lines loaded > max_mru_items then the mru list needs to be marked as changed.
 
     match list {
         Ok(list) => {
             info!("Loaded {} lines from {:?}", list.len(), filename);
-            let mru = StringMRUList::clone_from_slice(max_mru_items, &list);
+            let mru = MRUList::clone_from_slice(max_mru_items, &list);
             dump(&mru);
             Some(mru)
         },
@@ -124,12 +126,12 @@ fn load_mru(max_mru_items: usize, filename: &PathBuf) -> Option<StringMRUList> {
     }
 }
 
-fn save_mru(filename: &PathBuf, mru: &StringMRUList) -> Result<usize, String> {
+fn save_mru(filename: &PathBuf, mru: &MRUList) -> Result<usize, String> {
     let v = mru.iter().map(|f| f.clone()).collect();
     file::save_from_vector(filename, v)
 }
 
-pub fn dump(mru: &StringMRUList) {
+pub fn dump(mru: &MRUList) {
     for (i, file) in mru.iter().enumerate() {
         info!("{} = {:?}", i, file);
     }
