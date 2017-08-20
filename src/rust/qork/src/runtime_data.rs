@@ -8,7 +8,7 @@ use xdg::BaseDirectories;
 use configuration::Configuration;
 use execution_timer::ExecutionTimer;
 use file;
-use mru_list::MRUList;
+use mru_list::StringMRUList;
 
 /// Represents the persistent runtime data of the system. This is things like MRU lists
 /// that we expect to get written to disk and be available the next time we start.
@@ -23,33 +23,30 @@ struct DataItem<T> {
 }
 
 pub struct RuntimeData {
-    mru: MRUList<String>,
-    mru2: DataItem<MRUList<String>>
+    mru: StringMRUList,
+    mru2: DataItem<StringMRUList>
 }
 
 impl RuntimeData {
     /// Constructs a new RuntimeData object based on the default configuration.
     pub fn new(config: &Configuration) -> RuntimeData {
         RuntimeData {
-            mru: MRUList::new(config.max_mru_items()),
-            mru2: DataItem { filename: "mru.toml", data: MRUList::new(config.max_mru_items()) }
+            mru: StringMRUList::new(config.max_mru_items()),
+            mru2: DataItem { filename: "mru.toml", data: StringMRUList::new(config.max_mru_items()) }
         }
     }
 
     fn place_file(xdg: &BaseDirectories, filename: &str) -> Option<PathBuf> {
         let path = xdg.place_data_file(filename);
         if path.is_err() {
-            warn!("Could not locate {} file in xdg directory structure", filename);
+            warn!("Could not locate runtime data file {}  in xdg directory structure", filename);
             return None;
         }
 
         let path = path.unwrap();
-        if !path.exists() {
-            return None;
-        }
 
-        if !path.is_file() {
-            warn!("The runtime data file {:?} appears to be a directory, no data will be loaded", path);
+        if path.exists() && !path.is_file() {
+            warn!("The runtime data file {:?} is not a file", path);
             return None;
         }
 
@@ -82,8 +79,6 @@ impl RuntimeData {
             }
         }
 
-
-
         rd
     }
 
@@ -92,7 +87,10 @@ impl RuntimeData {
         let _timer = ExecutionTimer::with_start_message("save_runtime_data");
 
         if self.mru.is_changed() {
+
             let path = RuntimeData::place_file(&xdg, MRU_FILE);
+            info!("MRU is changed, path = {:?}", path);
+
             if let Some(filename) = path {
                 if let Ok(num_bytes) = save_mru(&filename, &self.mru) {
                     self.mru.clear_is_changed();
@@ -102,7 +100,7 @@ impl RuntimeData {
         }
     }
 
-    pub fn mru(&mut self) -> &mut MRUList<String> {
+    pub fn mru(&mut self) -> &mut StringMRUList {
         &mut self.mru
     }
 }
@@ -112,19 +110,27 @@ impl RuntimeData {
 
 const MRU_FILE : &'static str = "mru.toml";
 
-fn load_mru(max_mru_items: usize, filename: &PathBuf) -> Option<MRUList<String>> {
+fn load_mru(max_mru_items: usize, filename: &PathBuf) -> Option<StringMRUList> {
     let list = file::load_to_vector(filename);
 
     match list {
         Ok(list) => {
             info!("Loaded {} lines from {:?}", list.len(), filename);
-            Some(MRUList::clone_from_slice(max_mru_items, &list))
+            let mru = StringMRUList::clone_from_slice(max_mru_items, &list);
+            dump(&mru);
+            Some(mru)
         },
         Err(e) => None
     }
 }
 
-fn save_mru(filename: &PathBuf, mru: &MRUList<String>) -> Result<usize, String> {
-    let v = Vec::<String>::new();
+fn save_mru(filename: &PathBuf, mru: &StringMRUList) -> Result<usize, String> {
+    let v = mru.iter().map(|f| f.clone()).collect();
     file::save_from_vector(filename, v)
+}
+
+pub fn dump(mru: &StringMRUList) {
+    for (i, file) in mru.iter().enumerate() {
+        info!("{} = {:?}", i, file);
+    }
 }

@@ -12,18 +12,16 @@ pub struct Context {
     // xdg base directory object, typically '~/.config/qork', with a default profile of
     // 'default', which means the effective directory is '~/.config/qork/default'.
     xdg: BaseDirectories,
-    configuration: Configuration,
-    runtime_data: RuntimeData
+    configuration: Configuration
 }
 
 impl Context {
-    pub fn new(xdg: BaseDirectories, pi: ProgramInfo, config: Configuration, runtime_data: RuntimeData) -> Context {
+    pub fn new(xdg: BaseDirectories, pi: ProgramInfo, config: Configuration) -> Context {
         Context {
             xdg: xdg,
             system_info: SystemInfo::new(),
             program_info: pi,
             configuration: config,
-            runtime_data: runtime_data
         }
     }
 
@@ -41,9 +39,5 @@ impl Context {
 
     pub fn configuration(&self) -> &Configuration {
         &self.configuration
-    }
-
-    pub fn runtime_data(&mut self) -> &mut RuntimeData {
-        &mut self.runtime_data
     }
 }

@@ -55,15 +55,14 @@ fn main() {
     info!("{:?}", pi);
 
     let config = Configuration::load_user_configuration(pi.parsed_args().load_config(), &xdg);
-    let runtime_data = RuntimeData::load_runtime_data(&config, &xdg);
+    let mut runtime_data = RuntimeData::load_runtime_data(&config, &xdg);
 
-    let context = Context::new(xdg, pi, config, runtime_data);
+    let context = Context::new(xdg, pi, config);
     info!("{:?}", context.system_info());
 
-    run_event_loop(&context);
+    run_event_loop(&context, &mut runtime_data);
 
-    let rd = context.runtime_data();
-    rd.save(context.configuration(), context.xdg());
+    runtime_data.save(context.configuration(), context.xdg());
 }
 
 fn configure_logging(xdg: &BaseDirectories) {
@@ -89,7 +88,7 @@ fn log_build_info() {
         );
 }
 
-fn run_event_loop(context: &Context) {
+fn run_event_loop(context: &Context, runtime_data: &mut RuntimeData) {
     use std::io::BufRead;
 
     let stdin = stdin();
@@ -108,20 +107,20 @@ fn run_event_loop(context: &Context) {
             }
         };
 
-        let done = despatch_command(context, cmd);
+        let done = despatch_command(context, runtime_data, cmd);
         if done {
             break;
         }
     }
 }
 
-fn despatch_command(context: &Context, command: Command) -> bool {
+fn despatch_command(context: &Context, runtime_data: &mut RuntimeData, command: Command) -> bool {
     match command {
         Command::NoOp => { println!("Doing nothing"); }
         Command::Quit => { println!("Quitting"); return true; }
         Command::OpenFile{filename} => {
             println!("Opening file {}", filename);
-            //context.runtime_data().mru().insert(filename);
+            runtime_data.mru().insert(filename);
         }
     }
 
