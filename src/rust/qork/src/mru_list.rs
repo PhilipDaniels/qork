@@ -1,10 +1,11 @@
 use std::cmp;
 use std::fmt::Display;
 use std::fs::File;
-use std::io::{BufReader, BufWriter, Write};
+use std::io::{BufReader, BufWriter, Read, Write, Seek, SeekFrom};
 use std::ops::{Index, IndexMut};
 use std::path::Path;
 use std::slice::{Iter};
+use tempfile::{tempfile, NamedTempFile};
 
 use file;
 
@@ -128,11 +129,9 @@ impl MRUList {
 
     pub fn save(&mut self, filename: &Path) -> Result<usize, String> {
         if self.is_changed {
-            File::create(filename)
+            return File::create(filename)
                 .map_err(|err| err.to_string())
-                .and_then(|mut f| {
-                    self.write(f)
-                });
+                .and_then(|mut f| { self.write(f) });
         }
 
         Ok(0)
@@ -175,6 +174,14 @@ impl Index<usize> for MRUList {
 mod tests {
     use super::*;
 
+    fn make_simple_mru() -> MRUList {
+        let mut mru = MRUList::new(20);
+        mru.insert("a".to_owned());
+        mru.insert("b".to_owned());
+        mru.insert("c".to_owned());
+        mru
+    }
+
     #[test]
     fn write_for_empty_list_writes_no_data() {
         let mut v = Vec::<u8>::new();
@@ -188,11 +195,7 @@ mod tests {
     #[test]
     fn write_for_non_empty_list_writes_data_and_clears_changed_flag() {
         let mut v = Vec::<u8>::new();
-        let mut mru = MRUList::new(20);
-        mru.insert("a".to_owned());
-        mru.insert("b".to_owned());
-        mru.insert("c".to_owned());
-
+        let mut mru = make_simple_mru();
         let cnt = mru.write(&mut v).unwrap();
 
         assert!(!mru.is_changed());
@@ -203,12 +206,31 @@ mod tests {
 
     #[test]
     fn save_if_mru_is_changed_writes_file() {
+        let mut mru = make_simple_mru();
+        let mut file = NamedTempFile::new().expect("failed to create temporary file");
+        let cnt = mru.save(file.path()).unwrap();
 
+        assert!(!mru.is_changed());
+
+        file.seek(SeekFrom::Start(0)).unwrap();
+        let mut output = String::new();
+        file.read_to_string(&mut output);
+        assert_eq!(output, "c\nb\na\n");
+        assert_eq!(output.len(), cnt);
     }
 
     #[test]
     fn save_if_mru_is_not_changed_does_not_write_file() {
+         let mut mru = make_simple_mru();
+        let mut file = NamedTempFile::new().expect("failed to create temporary file");
+        mru.clear_is_changed();
+        let cnt = mru.save(file.path()).unwrap();
+        assert_eq!(cnt, 0);
 
+        file.seek(SeekFrom::Start(0)).unwrap();
+        let mut output = String::new();
+        file.read_to_string(&mut output);
+        assert_eq!(output.len(), 0);
     }
 
 
