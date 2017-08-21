@@ -1,6 +1,7 @@
 use std::cmp;
 use std::fs::File;
 use std::io::{BufReader, BufWriter, Read, Write, Seek, SeekFrom};
+use std::io::prelude::*;
 use std::ops::{Index};
 use std::path::Path;
 use std::slice::{Iter};
@@ -142,24 +143,41 @@ impl MRUList {
         None
     }
 
-    pub fn load(max_mru_items: usize, filename: &Path) -> Option<MRUList> {
-        let list = file::load_to_vector(filename);
+    pub fn load(max_mru_items: usize, filename: &Path) -> Result<MRUList, String> {
+        File::open(filename)
+            .map_err(|err| err.to_string())
+            .and_then(|mut f| {
+                let mut mru = MRUList::new(max_mru_items);
+                let mut f = BufReader::new(f);
+                for line in f.lines() {
+                    match line {
+                        Ok(line) => { mru.insert(line); },
+                        Err(e) => return Err(e.to_string())
+                    }
+                }
 
-        match list {
-            Ok(list) => {
-                let mut mru = MRUList::new_from_slice(max_mru_items, &list);
+                Ok(mru)
+            })
 
-                // If we were told to load fewer items than were actually in the file, then
-                // we should consider ourselves changed, so that when we write out again
-                // we truncate the list, even if nobody adds an item to the list.
-                if max_mru_items < list.len() {
-                    mru.is_changed = true;
-                };
+        //Err("aaa".to_owned())
 
-                Some(mru)
-            },
-            Err(e) => None
-        }
+        // let list = file::load_to_vector(filename);
+
+        // match list {
+        //     Ok(list) => {
+        //         let mut mru = MRUList::new_from_slice(max_mru_items, &list);
+
+        //         // If we were told to load fewer items than were actually in the file, then
+        //         // we should consider ourselves changed, so that when we write out again
+        //         // we truncate the list, even if nobody adds an item to the list.
+        //         if max_mru_items < list.len() {
+        //             mru.is_changed = true;
+        //         };
+
+        //         Some(mru)
+        //     },
+        //     Err(e) => None
+        // }
     }
 }
 
@@ -238,10 +256,7 @@ mod tests {
     #[test]
     fn load_for_file_that_does_not_exist_returns_error() {
         let result = MRUList::load(0, Path::new("/i/definitely/do/not/exist"));
-        assert!(result.is_none());
-
-        let mut v = Vec::<u8>::new();
-        write!(&mut v, "hello");
+        assert!(result.is_err());
     }
 
 
