@@ -109,7 +109,7 @@ impl MRUList {
         self.data.iter()
     }
 
-    pub fn write<T:Write>(&mut self, mut dest: T) -> Result<usize, String> {
+    pub fn write<T:Write>(&mut self, dest: &mut T) -> Result<usize, String> {
         let mut f = BufWriter::new(dest);
         let mut byte_count = 0;
 
@@ -123,7 +123,7 @@ impl MRUList {
         }
 
         f.flush();
-        self.is_changed = false;
+
         Ok(byte_count)
     }
 
@@ -131,10 +131,19 @@ impl MRUList {
         if self.is_changed {
             return File::create(filename)
                 .map_err(|err| err.to_string())
-                .and_then(|mut f| { self.write(f) });
+                .and_then(|mut f| {
+                    let result = self.write(&mut f);
+                    self.is_changed = false;
+                    result
+                    }
+                );
         }
 
         Ok(0)
+    }
+
+    pub fn read<T:Read>(src: &mut T) -> Option<MRUList> {
+        None
     }
 
     pub fn load(max_mru_items: usize, filename: &Path) -> Option<MRUList> {
@@ -142,7 +151,6 @@ impl MRUList {
 
         match list {
             Ok(list) => {
-                //info!("Loaded {} lines from {:?}", list.len(), filename);
                 let mut mru = MRUList::clone_from_slice(max_mru_items, &list);
 
                 // If we were told to load fewer items than were actually in the file, then
@@ -152,7 +160,6 @@ impl MRUList {
                     mru.is_changed = true;
                 };
 
-                // dump(&mru);
                 Some(mru)
             },
             Err(e) => None
@@ -189,16 +196,14 @@ mod tests {
         mru.write(&mut v);
 
         assert!(v.is_empty());
-        assert!(!mru.is_changed());
     }
 
     #[test]
-    fn write_for_non_empty_list_writes_data_and_clears_changed_flag() {
+    fn write_for_non_empty_list_writes_data() {
         let mut v = Vec::<u8>::new();
         let mut mru = make_simple_mru();
         let cnt = mru.write(&mut v).unwrap();
 
-        assert!(!mru.is_changed());
         let output = String::from_utf8(v).unwrap();
         assert_eq!(output, "c\nb\na\n");
         assert_eq!(output.len(), cnt);
@@ -233,8 +238,6 @@ mod tests {
         assert_eq!(output.len(), 0);
     }
 
-
-
     #[test]
     fn load_for_file_that_does_not_exist_returns_error() {
         let result = MRUList::load(0, Path::new("/i/definitely/do/not/exist"));
@@ -243,6 +246,10 @@ mod tests {
         let mut v = Vec::<u8>::new();
         write!(&mut v, "hello");
     }
+
+
+
+
 
     #[test]
     fn new_for_zero_size_creates_empty_list() {
