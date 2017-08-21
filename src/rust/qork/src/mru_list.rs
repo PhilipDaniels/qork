@@ -1,8 +1,7 @@
 use std::cmp;
-use std::fmt::Display;
 use std::fs::File;
 use std::io::{BufReader, BufWriter, Read, Write, Seek, SeekFrom};
-use std::ops::{Index, IndexMut};
+use std::ops::{Index};
 use std::path::Path;
 use std::slice::{Iter};
 use tempfile::{tempfile, NamedTempFile};
@@ -172,11 +171,12 @@ impl Index<usize> for MRUList {
     }
 }
 
-// Run the tests using String since that is what we are likely to be using this class for.
-// This makes them a little more verbose than using int or str but is worth it.
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    const SIMPLE_MRU_AS_STRING : &'static str = "c\nb\na\n";
 
     fn make_simple_mru() -> MRUList {
         let mut mru = MRUList::new(20);
@@ -202,7 +202,7 @@ mod tests {
         let cnt = mru.write(&mut v).unwrap();
 
         let output = String::from_utf8(v).unwrap();
-        assert_eq!(output, "c\nb\na\n");
+        assert_eq!(output, SIMPLE_MRU_AS_STRING);
         assert_eq!(output.len(), cnt);
     }
 
@@ -217,7 +217,7 @@ mod tests {
         file.seek(SeekFrom::Start(0)).unwrap();
         let mut output = String::new();
         file.read_to_string(&mut output);
-        assert_eq!(output, "c\nb\na\n");
+        assert_eq!(output, SIMPLE_MRU_AS_STRING);
         assert_eq!(output.len(), cnt);
     }
 
@@ -344,7 +344,8 @@ mod tests {
     #[test]
     fn new_from_slice_works_for_owned_strings() {
         // I wrote this test when I changed new_from_slice to use AsRef, since
-        // it was a new technique to me.
+        // it was a new technique to me. It duplicates another test, and hence
+        // mainly checks that things compile.
         let src = ["a".to_owned(), "b".to_owned(), "c".to_owned()];
         let mut mru = MRUList::new_from_slice(2, &src);
 
