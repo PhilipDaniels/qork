@@ -35,12 +35,7 @@ impl MRUList {
         }
     }
 
-    /// Clone the first `max_items` from `src` and build an MRU list from them.
-    pub fn clone_from_slice<S : AsRef<str>>(max_items: usize, src: &[S]) -> MRUList {
-        //let mut mru = MRUList::new(src.len());
-        // The next line crashes with 'destination and source slices have different lengths'. I don't know why.
-        //mru.data.clone_from_slice(src);
-
+    pub fn new_from_slice<S : AsRef<str>>(max_items: usize, src: &[S]) -> MRUList {
         let mut mru = MRUList::new(max_items);
 
         if !src.is_empty() {
@@ -153,7 +148,7 @@ impl MRUList {
 
         match list {
             Ok(list) => {
-                let mut mru = MRUList::clone_from_slice(max_mru_items, &list);
+                let mut mru = MRUList::new_from_slice(max_mru_items, &list);
 
                 // If we were told to load fewer items than were actually in the file, then
                 // we should consider ourselves changed, so that when we write out again
@@ -281,9 +276,9 @@ mod tests {
     }
 
     #[test]
-    fn clone_from_slice_for_empty_slice_creates_list() {
+    fn new_from_slice_for_empty_slice_creates_list() {
         let src = Vec::<String>::new();
-        let mut mru = MRUList::clone_from_slice(20, &src);
+        let mut mru = MRUList::new_from_slice(20, &src);
 
         assert_eq!(mru.max_items, 20);
         assert_eq!(mru.len(), 0);
@@ -291,9 +286,9 @@ mod tests {
     }
 
     #[test]
-    fn clone_from_slice_for_slice_with_one_item_creates_list_with_one_item() {
+    fn new_from_slice_for_slice_with_one_item_creates_list_with_one_item() {
         let src = ["a"];
-        let mut mru = MRUList::clone_from_slice(20, &src);
+        let mut mru = MRUList::new_from_slice(20, &src);
 
         assert_eq!(mru.max_items, 20);
         assert_eq!(mru.len(), 1);
@@ -302,9 +297,9 @@ mod tests {
     }
 
     #[test]
-    fn clone_from_slice_for_non_empty_slice_creates_list_with_items_in_same_order() {
+    fn new_from_slice_for_non_empty_slice_creates_list_with_items_in_same_order() {
         let src = ["a", "b", "c"];
-        let mut mru = MRUList::clone_from_slice(20, &src);
+        let mut mru = MRUList::new_from_slice(20, &src);
 
         assert_eq!(mru.max_items, 20);
         assert_eq!(mru.len(), 3);
@@ -315,9 +310,9 @@ mod tests {
     }
 
     #[test]
-    fn clone_from_slice_for_zero_max_items_and_empty_slice_takes_no_items() {
+    fn new_from_slice_for_zero_max_items_and_empty_slice_takes_no_items() {
         let src = Vec::<String>::new();
-        let mut mru = MRUList::clone_from_slice(0, &src);
+        let mut mru = MRUList::new_from_slice(0, &src);
 
         assert_eq!(mru.max_items, 0);
         assert_eq!(mru.len(), 0);
@@ -325,9 +320,9 @@ mod tests {
     }
 
     #[test]
-    fn clone_from_slice_for_zero_max_items_takes_no_items() {
+    fn new_from_slice_for_zero_max_items_takes_no_items() {
         let src = ["a", "b", "c"];
-        let mut mru = MRUList::clone_from_slice(0, &src);
+        let mut mru = MRUList::new_from_slice(0, &src);
 
         assert_eq!(mru.max_items, 0);
         assert_eq!(mru.len(), 0);
@@ -335,9 +330,9 @@ mod tests {
     }
 
     #[test]
-    fn clone_from_slice_for_max_items_less_than_slice_length_takes_only_requested_items() {
+    fn new_from_slice_for_max_items_less_than_slice_length_takes_only_requested_items() {
         let src = ["a", "b", "c"];
-        let mut mru = MRUList::clone_from_slice(2, &src);
+        let mut mru = MRUList::new_from_slice(2, &src);
 
         assert_eq!(mru.max_items, 2);
         assert_eq!(mru.len(), 2);
@@ -347,11 +342,11 @@ mod tests {
     }
 
     #[test]
-    fn clone_from_slice_works_for_owned_strings() {
-        // I wrote this test when I changed clone_from_slice to use AsRef, since
+    fn new_from_slice_works_for_owned_strings() {
+        // I wrote this test when I changed new_from_slice to use AsRef, since
         // it was a new technique to me.
         let src = ["a".to_owned(), "b".to_owned(), "c".to_owned()];
-        let mut mru = MRUList::clone_from_slice(2, &src);
+        let mut mru = MRUList::new_from_slice(2, &src);
 
         assert_eq!(mru.max_items, 2);
         assert_eq!(mru.len(), 2);

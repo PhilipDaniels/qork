@@ -118,7 +118,7 @@ fn load_mru(max_mru_items: usize, filename: &PathBuf) -> Option<MRUList> {
     match list {
         Ok(list) => {
             info!("Loaded {} lines from {:?}", list.len(), filename);
-            let mru = MRUList::clone_from_slice(max_mru_items, &list);
+            let mru = MRUList::new_from_slice(max_mru_items, &list);
             dump(&mru);
             Some(mru)
         },
