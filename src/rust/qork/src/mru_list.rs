@@ -36,7 +36,7 @@ impl MRUList {
     }
 
     /// Clone the first `max_items` from `src` and build an MRU list from them.
-    pub fn clone_from_slice(max_items: usize, src: &[String]) -> MRUList {
+    pub fn clone_from_slice<S : AsRef<str>>(max_items: usize, src: &[S]) -> MRUList {
         //let mut mru = MRUList::new(src.len());
         // The next line crashes with 'destination and source slices have different lengths'. I don't know why.
         //mru.data.clone_from_slice(src);
@@ -47,7 +47,8 @@ impl MRUList {
             let max_i_exclusive = cmp::min(max_items, src.len());
 
             for i in (0..max_i_exclusive).rev() {
-                mru.data.insert(0, src[i].clone());
+                let s2 = src[i].as_ref().to_owned();
+                mru.data.insert(0, s2);
             }
         }
 
@@ -291,7 +292,7 @@ mod tests {
 
     #[test]
     fn clone_from_slice_for_slice_with_one_item_creates_list_with_one_item() {
-        let src = ["a".to_owned()];
+        let src = ["a"];
         let mut mru = MRUList::clone_from_slice(20, &src);
 
         assert_eq!(mru.max_items, 20);
@@ -302,7 +303,7 @@ mod tests {
 
     #[test]
     fn clone_from_slice_for_non_empty_slice_creates_list_with_items_in_same_order() {
-        let src = ["a".to_owned(), "b".to_owned(), "c".to_owned()];
+        let src = ["a", "b", "c"];
         let mut mru = MRUList::clone_from_slice(20, &src);
 
         assert_eq!(mru.max_items, 20);
@@ -325,7 +326,7 @@ mod tests {
 
     #[test]
     fn clone_from_slice_for_zero_max_items_takes_no_items() {
-        let src = ["a".to_owned(), "b".to_owned(), "c".to_owned()];
+        let src = ["a", "b", "c"];
         let mut mru = MRUList::clone_from_slice(0, &src);
 
         assert_eq!(mru.max_items, 0);
@@ -335,6 +336,20 @@ mod tests {
 
     #[test]
     fn clone_from_slice_for_max_items_less_than_slice_length_takes_only_requested_items() {
+        let src = ["a", "b", "c"];
+        let mut mru = MRUList::clone_from_slice(2, &src);
+
+        assert_eq!(mru.max_items, 2);
+        assert_eq!(mru.len(), 2);
+        assert!(!mru.is_changed());
+        assert_eq!(mru[0], "a");
+        assert_eq!(mru[1], "b");
+    }
+
+    #[test]
+    fn clone_from_slice_works_for_owned_strings() {
+        // I wrote this test when I changed clone_from_slice to use AsRef, since
+        // it was a new technique to me.
         let src = ["a".to_owned(), "b".to_owned(), "c".to_owned()];
         let mut mru = MRUList::clone_from_slice(2, &src);
 
