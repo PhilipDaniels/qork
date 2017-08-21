@@ -70,7 +70,7 @@ impl MRUList {
         self.is_changed = true;
     }
 
-    pub fn remove(&mut self, value: &String) {
+    pub fn remove(&mut self, value: &str) {
         let pos = self.data.iter().position(|v| v == value);
         if let Some(idx) = pos {
             self.data.remove(idx);
@@ -403,7 +403,7 @@ mod tests {
         let mut mru = MRUList::new(20);
         mru.insert("a");
         mru.insert("b");
-        mru.remove(&"c".to_owned());
+        mru.remove("c");
         mru.clear_is_changed();
 
         assert!(!mru.is_changed());
@@ -416,7 +416,7 @@ mod tests {
     fn remove_for_list_of_one_item_removes_item() {
         let mut mru = MRUList::new(20);
         mru.insert("a");
-        mru.remove(&"a".to_owned());
+        mru.remove("a");
 
         assert!(mru.is_changed());
         assert!(mru.is_empty());
@@ -428,7 +428,7 @@ mod tests {
         mru.insert("a");
         mru.insert("b");
         mru.insert("c");
-        mru.remove(&"a".to_owned());
+        mru.remove("a");
 
         assert!(mru.is_changed());
         assert_eq!(mru.len(), 2);
@@ -442,7 +442,7 @@ mod tests {
         mru.insert("a");
         mru.insert("b");
         mru.insert("c");
-        mru.remove(&"c".to_owned());
+        mru.remove("c");
 
         assert!(mru.is_changed());
         assert_eq!(mru.len(), 2);
@@ -456,7 +456,7 @@ mod tests {
         mru.insert("a");
         mru.insert("b");
         mru.insert("c");
-        mru.remove(&"b".to_owned());
+        mru.remove("b");
 
         assert!(mru.is_changed());
         assert_eq!(mru.len(), 2);
