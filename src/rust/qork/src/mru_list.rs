@@ -62,7 +62,8 @@ impl MRUList {
         self.is_changed = false;
     }
 
-    pub fn insert(&mut self, value: String) {
+    pub fn insert<S : Into<String>>(&mut self, value: S) {
+        let value = value.into();
         self.remove(&value);
         self.data.insert(0, value);
         self.data.truncate(self.max_items);
@@ -183,9 +184,9 @@ mod tests {
 
     fn make_simple_mru() -> MRUList {
         let mut mru = MRUList::new(20);
-        mru.insert("a".to_owned());
-        mru.insert("b".to_owned());
-        mru.insert("c".to_owned());
+        mru.insert("a");
+        mru.insert("b");
+        mru.insert("c");
         mru
     }
 
@@ -258,7 +259,7 @@ mod tests {
         assert!(mru.is_empty());
         assert!(!mru.is_changed());
 
-        mru.insert("a".to_owned());
+        mru.insert("a");
         assert_eq!(mru.len(), 0, "Since max_items is zero, pushing a new element should not increase the length");
         assert!(mru.is_empty());
     }
@@ -270,11 +271,11 @@ mod tests {
         assert!(mru.is_empty());
         assert!(!mru.is_changed());
 
-        mru.insert("a".to_owned());
+        mru.insert("a");
         assert_eq!(mru.len(), 1);
         assert!(!mru.is_empty());
 
-        mru.insert("b".to_owned());
+        mru.insert("b");
         assert_eq!(mru.len(), 1, "Since max_items is 1, pushing a 2nd element should not increase the length");
     }
 
@@ -356,7 +357,7 @@ mod tests {
     #[test]
     fn push_sets_is_changed_flag() {
         let mut mru = MRUList::new(20);
-        mru.insert("a".to_owned());
+        mru.insert("a");
 
         assert!(mru.is_changed());
     }
@@ -364,8 +365,8 @@ mod tests {
     #[test]
     fn push_adds_items_in_push_down_stack_order() {
         let mut mru = MRUList::new(20);
-        mru.insert("a".to_owned());
-        mru.insert("b".to_owned());
+        mru.insert("a");
+        mru.insert("b");
 
         assert_eq!(mru[0], "b", "b was pushed last, so should be at the head of the list");
         assert_eq!(mru[1], "a", "a was pushed before b, so should be the second item");
@@ -374,10 +375,10 @@ mod tests {
     #[test]
     fn push_for_item_already_in_list_moves_item_to_front() {
         let mut mru = MRUList::new(20);
-        mru.insert("a".to_owned());
-        mru.insert("b".to_owned());
-        mru.insert("c".to_owned());
-        mru.insert("a".to_owned());
+        mru.insert("a");
+        mru.insert("b");
+        mru.insert("c");
+        mru.insert("a");
 
         assert_eq!(mru[0], "a");
         assert_eq!(mru[1], "c");
@@ -388,9 +389,9 @@ mod tests {
     #[test]
     fn push_for_list_at_capacity_drops_items_off_end() {
         let mut mru = MRUList::new(2);
-        mru.insert("a".to_owned());
-        mru.insert("b".to_owned());
-        mru.insert("c".to_owned());
+        mru.insert("a");
+        mru.insert("b");
+        mru.insert("c");
 
         assert_eq!(mru[0], "c");
         assert_eq!(mru[1], "b");
@@ -400,8 +401,8 @@ mod tests {
     #[test]
     fn remove_for_item_not_in_list_does_nothing() {
         let mut mru = MRUList::new(20);
-        mru.insert("a".to_owned());
-        mru.insert("b".to_owned());
+        mru.insert("a");
+        mru.insert("b");
         mru.remove(&"c".to_owned());
         mru.clear_is_changed();
 
@@ -414,7 +415,7 @@ mod tests {
     #[test]
     fn remove_for_list_of_one_item_removes_item() {
         let mut mru = MRUList::new(20);
-        mru.insert("a".to_owned());
+        mru.insert("a");
         mru.remove(&"a".to_owned());
 
         assert!(mru.is_changed());
@@ -424,9 +425,9 @@ mod tests {
     #[test]
     fn remove_for_list_of_several_items_with_item_at_end_removes_item() {
         let mut mru = MRUList::new(20);
-        mru.insert("a".to_owned());
-        mru.insert("b".to_owned());
-        mru.insert("c".to_owned());
+        mru.insert("a");
+        mru.insert("b");
+        mru.insert("c");
         mru.remove(&"a".to_owned());
 
         assert!(mru.is_changed());
@@ -438,9 +439,9 @@ mod tests {
     #[test]
     fn remove_for_list_of_several_items_with_item_at_beginning_removes_item() {
         let mut mru = MRUList::new(20);
-        mru.insert("a".to_owned());
-        mru.insert("b".to_owned());
-        mru.insert("c".to_owned());
+        mru.insert("a");
+        mru.insert("b");
+        mru.insert("c");
         mru.remove(&"c".to_owned());
 
         assert!(mru.is_changed());
@@ -452,9 +453,9 @@ mod tests {
     #[test]
     fn remove_for_list_of_several_items_with_item_in_middle_removes_item() {
         let mut mru = MRUList::new(20);
-        mru.insert("a".to_owned());
-        mru.insert("b".to_owned());
-        mru.insert("c".to_owned());
+        mru.insert("a");
+        mru.insert("b");
+        mru.insert("c");
         mru.remove(&"b".to_owned());
 
         assert!(mru.is_changed());
@@ -474,8 +475,8 @@ mod tests {
         mru.set_max_items(2);
         assert!(!mru.is_changed(), "is_changed should still be false, because we are decreasing the size of the list, but it is currently empty, so this is a no-op");
 
-        mru.insert("a".to_owned());
-        mru.insert("b".to_owned());
+        mru.insert("a");
+        mru.insert("b");
         mru.clear_is_changed();
 
         mru.set_max_items(1);
@@ -485,9 +486,9 @@ mod tests {
     #[test]
     fn set_max_items_for_new_size_smaller_than_current_trims_list_to_size() {
         let mut mru = MRUList::new(20);
-        mru.insert("a".to_owned());
-        mru.insert("b".to_owned());
-        mru.insert("c".to_owned());
+        mru.insert("a");
+        mru.insert("b");
+        mru.insert("c");
 
         mru.set_max_items(2);
 
@@ -499,9 +500,9 @@ mod tests {
     #[test]
     fn set_max_items_for_new_size_greater_than_current_leaves_list_untouched() {
         let mut mru = MRUList::new(3);
-        mru.insert("a".to_owned());
-        mru.insert("b".to_owned());
-        mru.insert("c".to_owned());
+        mru.insert("a");
+        mru.insert("b");
+        mru.insert("c");
 
         mru.set_max_items(20);
 
@@ -523,7 +524,7 @@ mod tests {
     #[test]
     fn clear_for_non_empty_list_clears_list() {
         let mut mru = MRUList::new(20);
-        mru.insert("a".to_owned());
+        mru.insert("a");
         mru.clear();
 
         assert!(mru.is_changed());
@@ -544,9 +545,9 @@ mod tests {
     #[test]
     fn iter_for_list_with_items_returns_items_in_correct_order() {
         let mut mru = MRUList::new(20);
-        mru.insert("a".to_owned());
-        mru.insert("b".to_owned());
-        mru.insert("c".to_owned());
+        mru.insert("a");
+        mru.insert("b");
+        mru.insert("c");
 
         let mut iter = mru.iter();
         assert_eq!(iter.next(), Some(&"c".to_owned()));
