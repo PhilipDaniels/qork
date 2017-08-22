@@ -139,20 +139,18 @@ impl MRUList {
         Ok(0)
     }
 
-    pub fn read<T:Read>(src: &mut T) -> Option<MRUList> {
-        None
+    pub fn read<T:Read>(max_mru_items: usize, src: &mut T) -> Result<MRUList, String> {
+        let mut f = BufReader::new(src);
+        let data = f.lines().take(max_mru_items + 1).map(|l| l.unwrap()).collect::<Vec<String>>();
+        let mut mru = MRUList::new_from_slice(max_mru_items, &data);
+        mru.is_changed = data.len() > max_mru_items;
+        Ok(mru)
     }
 
     pub fn load(max_mru_items: usize, filename: &Path) -> Result<MRUList, String> {
         File::open(filename)
             .map_err(|err| err.to_string())
-            .and_then(|mut f| {
-                let mut f = BufReader::new(f);
-                let data = f.lines().take(max_mru_items + 1).map(|l| l.unwrap()).collect::<Vec<String>>();
-                let mut mru = MRUList::new_from_slice(max_mru_items, &data);
-                mru.is_changed = data.len() > max_mru_items;
-                Ok(mru)
-            })
+            .and_then(|mut f| { MRUList::read(max_mru_items, &mut f) })
     }
 }
 
