@@ -35,7 +35,7 @@ impl MRUList {
         }
     }
 
-    pub fn new_from_slice<S : AsRef<str>>(max_items: usize, src: &[S]) -> MRUList {
+    pub fn from_slice<S : AsRef<str>>(max_items: usize, src: &[S]) -> MRUList {
         let mut mru = MRUList::new(max_items);
 
         if !src.is_empty() {
@@ -142,7 +142,7 @@ impl MRUList {
     pub fn read<T:Read>(max_mru_items: usize, src: &mut T) -> Result<MRUList, String> {
         let mut rdr = BufReader::new(src);
         let data = rdr.lines().take(max_mru_items + 1).map(|l| l.unwrap()).collect::<Vec<String>>();
-        let mut mru = MRUList::new_from_slice(max_mru_items, &data);
+        let mut mru = MRUList::from_slice(max_mru_items, &data);
         mru.is_changed = data.len() > max_mru_items;
         Ok(mru)
     }
@@ -294,7 +294,7 @@ mod tests {
     #[test]
     fn new_from_slice_for_empty_slice_creates_list() {
         let src = Vec::<String>::new();
-        let mut mru = MRUList::new_from_slice(20, &src);
+        let mut mru = MRUList::from_slice(20, &src);
 
         assert_eq!(mru.max_items, 20);
         assert_eq!(mru.len(), 0);
@@ -304,7 +304,7 @@ mod tests {
     #[test]
     fn new_from_slice_for_slice_with_one_item_creates_list_with_one_item() {
         let src = ["a"];
-        let mut mru = MRUList::new_from_slice(20, &src);
+        let mut mru = MRUList::from_slice(20, &src);
 
         assert_eq!(mru.max_items, 20);
         assert_eq!(mru.len(), 1);
@@ -315,7 +315,7 @@ mod tests {
     #[test]
     fn new_from_slice_for_non_empty_slice_creates_list_with_items_in_same_order() {
         let src = ["a", "b", "c"];
-        let mut mru = MRUList::new_from_slice(20, &src);
+        let mut mru = MRUList::from_slice(20, &src);
 
         assert_eq!(mru.max_items, 20);
         assert_eq!(mru.len(), 3);
@@ -328,7 +328,7 @@ mod tests {
     #[test]
     fn new_from_slice_for_zero_max_items_and_empty_slice_takes_no_items() {
         let src = Vec::<String>::new();
-        let mut mru = MRUList::new_from_slice(0, &src);
+        let mut mru = MRUList::from_slice(0, &src);
 
         assert_eq!(mru.max_items, 0);
         assert_eq!(mru.len(), 0);
@@ -338,7 +338,7 @@ mod tests {
     #[test]
     fn new_from_slice_for_zero_max_items_takes_no_items() {
         let src = ["a", "b", "c"];
-        let mut mru = MRUList::new_from_slice(0, &src);
+        let mut mru = MRUList::from_slice(0, &src);
 
         assert_eq!(mru.max_items, 0);
         assert_eq!(mru.len(), 0);
@@ -348,7 +348,7 @@ mod tests {
     #[test]
     fn new_from_slice_for_max_items_less_than_slice_length_takes_only_requested_items() {
         let src = ["a", "b", "c"];
-        let mut mru = MRUList::new_from_slice(2, &src);
+        let mut mru = MRUList::from_slice(2, &src);
 
         assert_eq!(mru.max_items, 2);
         assert_eq!(mru.len(), 2);
@@ -359,11 +359,11 @@ mod tests {
 
     #[test]
     fn new_from_slice_works_for_owned_strings() {
-        // I wrote this test when I changed new_from_slice to use AsRef, since
+        // I wrote this test when I changed from_slice to use AsRef, since
         // it was a new technique to me. It duplicates another test, and hence
         // mainly checks that things compile.
         let src = ["a".to_owned(), "b".to_owned(), "c".to_owned()];
-        let mut mru = MRUList::new_from_slice(2, &src);
+        let mut mru = MRUList::from_slice(2, &src);
 
         assert_eq!(mru.max_items, 2);
         assert_eq!(mru.len(), 2);
