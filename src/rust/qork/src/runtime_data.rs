@@ -87,14 +87,13 @@ impl RuntimeData {
         let _timer = ExecutionTimer::with_start_message("save_runtime_data");
 
         if self.mru.is_changed() {
-
             let path = RuntimeData::place_file(&xdg, MRU_FILE);
             info!("MRU is changed, path = {:?}", path);
 
             if let Some(filename) = path {
-                if let Ok(num_bytes) = save_mru(&filename, &self.mru) {
-                    self.mru.clear_is_changed();
-                    info!("Wrote {} bytes to {:?}", num_bytes, filename);
+                match self.mru.save(filename.as_path()) {
+                    Ok(num_bytes) => { info!("Wrote {} bytes to {:?}", num_bytes, filename); },
+                    Err(e) => { warn!("Could not save MRU List to {:?}", filename); }
                 }
             }
         }
@@ -124,11 +123,6 @@ fn load_mru(max_mru_items: usize, filename: &PathBuf) -> Option<MRUList> {
         },
         Err(e) => None
     }
-}
-
-fn save_mru(filename: &PathBuf, mru: &MRUList) -> Result<usize, String> {
-    let v = mru.iter().map(|f| f.clone()).collect();
-    file::save_from_vector(filename, v)
 }
 
 pub fn dump(mru: &MRUList) {
