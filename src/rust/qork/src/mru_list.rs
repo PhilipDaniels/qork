@@ -140,8 +140,8 @@ impl MRUList {
     }
 
     pub fn read<T:Read>(max_mru_items: usize, src: &mut T) -> Result<MRUList, String> {
-        let mut f = BufReader::new(src);
-        let data = f.lines().take(max_mru_items + 1).map(|l| l.unwrap()).collect::<Vec<String>>();
+        let mut rdr = BufReader::new(src);
+        let data = rdr.lines().take(max_mru_items + 1).map(|l| l.unwrap()).collect::<Vec<String>>();
         let mut mru = MRUList::new_from_slice(max_mru_items, &data);
         mru.is_changed = data.len() > max_mru_items;
         Ok(mru)
@@ -233,34 +233,35 @@ mod tests {
     }
 
     #[test]
-    fn load_for_valid_file_and_max_more_than_file_lines_loads_whole_list_in_correct_order() {
-        let mut mru = make_simple_mru();
+    fn read_for_empty_source_returns_empty_mru_list()
+    {
+        let mut src = b"" as &[u8];
+        let mru = MRUList::read(3, &mut src).unwrap();
 
-        let mut file = NamedTempFile::new().expect("failed to create temporary file");
-        let cnt = mru.save(file.path()).unwrap();
-        assert_eq!(SIMPLE_MRU_AS_STRING.len(), cnt, "This assert checks the file was written correctly");
-
-        let mru = MRUList::load(20, file.path()).unwrap();
-        assert_eq!(mru[0], "c", "c is pushed last, so should be the first item in the list");
-        assert_eq!(mru[1], "b");
-        assert_eq!(mru[2], "a");
-        assert_eq!(mru.len(), 3);
-        assert!(!mru.is_changed(), "We loaded the entire file, so the MRU does not need truncating, so is_changed should be false");
+        assert_eq!(mru.len(), 0);
+        assert!(!mru.is_changed(), "An empty MRUList should have is_changed set to false");
     }
 
     #[test]
-    fn load_for_valid_file_and_max_less_than_file_lines_loads_only_needed_lines_in_correct_order_and_mru_is_changed() {
-        let mut mru = make_simple_mru();
+    fn read_for_valid_source_and_max_more_than_lines_loads_whole_list_in_correct_order() {
+        let mut src = b"c\nb\na\n" as &[u8];
+        let mru = MRUList::read(20, &mut src).unwrap();
+        assert_eq!(mru[0], "c");
+        assert_eq!(mru[1], "b");
+        assert_eq!(mru[2], "a");
+        assert_eq!(mru.len(), 3);
+        assert!(!mru.is_changed(), "We loaded the entire source, so the MRU does not need truncating, so is_changed should be false");
+    }
 
-        let mut file = NamedTempFile::new().expect("failed to create temporary file");
-        let cnt = mru.save(file.path()).unwrap();
-        assert_eq!(SIMPLE_MRU_AS_STRING.len(), cnt, "This assert checks the file was written correctly");
+    #[test]
+    fn read_for_valid_source_and_max_less_than_lines_loads_only_needed_lines_in_correct_order_and_mru_is_changed() {
+        let mut src = b"c\nb\na\n" as &[u8];
+        let mru = MRUList::read(2, &mut src).unwrap();
 
-        let mru = MRUList::load(2, file.path()).unwrap();
-        assert_eq!(mru[0], "c", "c is pushed last, so should be the first item in the list");
+        assert_eq!(mru[0], "c");
         assert_eq!(mru[1], "b");
         assert_eq!(mru.len(), 2);
-        assert!(mru.is_changed(), "We loaded only the beginning of the file, so the MRU needs truncating, so is_changed should be true");
+        assert!(mru.is_changed(), "We loaded only the beginning of the source, so the MRU needs truncating, so is_changed should be true");
     }
 
     #[test]
