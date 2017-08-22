@@ -147,37 +147,12 @@ impl MRUList {
         File::open(filename)
             .map_err(|err| err.to_string())
             .and_then(|mut f| {
-                let mut mru = MRUList::new(max_mru_items);
                 let mut f = BufReader::new(f);
-                for line in f.lines() {
-                    match line {
-                        Ok(line) => { mru.insert(line); },
-                        Err(e) => return Err(e.to_string())
-                    }
-                }
-
+                let data = f.lines().take(max_mru_items + 1).map(|l| l.unwrap()).collect::<Vec<String>>();
+                let mut mru = MRUList::new_from_slice(max_mru_items, &data);
+                mru.is_changed = data.len() > max_mru_items;
                 Ok(mru)
             })
-
-        //Err("aaa".to_owned())
-
-        // let list = file::load_to_vector(filename);
-
-        // match list {
-        //     Ok(list) => {
-        //         let mut mru = MRUList::new_from_slice(max_mru_items, &list);
-
-        //         // If we were told to load fewer items than were actually in the file, then
-        //         // we should consider ourselves changed, so that when we write out again
-        //         // we truncate the list, even if nobody adds an item to the list.
-        //         if max_mru_items < list.len() {
-        //             mru.is_changed = true;
-        //         };
-
-        //         Some(mru)
-        //     },
-        //     Err(e) => None
-        // }
     }
 }
 
@@ -241,7 +216,7 @@ mod tests {
 
     #[test]
     fn save_if_mru_is_not_changed_does_not_write_file() {
-         let mut mru = make_simple_mru();
+        let mut mru = make_simple_mru();
         let mut file = NamedTempFile::new().expect("failed to create temporary file");
         mru.clear_is_changed();
         let cnt = mru.save(file.path()).unwrap();
@@ -259,9 +234,36 @@ mod tests {
         assert!(result.is_err());
     }
 
+    #[test]
+    fn load_for_valid_file_and_max_more_than_file_lines_loads_whole_list_in_correct_order() {
+        let mut mru = make_simple_mru();
 
+        let mut file = NamedTempFile::new().expect("failed to create temporary file");
+        let cnt = mru.save(file.path()).unwrap();
+        assert_eq!(SIMPLE_MRU_AS_STRING.len(), cnt, "This assert checks the file was written correctly");
 
+        let mru = MRUList::load(20, file.path()).unwrap();
+        assert_eq!(mru[0], "c", "c is pushed last, so should be the first item in the list");
+        assert_eq!(mru[1], "b");
+        assert_eq!(mru[2], "a");
+        assert_eq!(mru.len(), 3);
+        assert!(!mru.is_changed(), "We loaded the entire file, so the MRU does not need truncating, so is_changed should be false");
+    }
 
+    #[test]
+    fn load_for_valid_file_and_max_less_than_file_lines_loads_only_needed_lines_in_correct_order_and_mru_is_changed() {
+        let mut mru = make_simple_mru();
+
+        let mut file = NamedTempFile::new().expect("failed to create temporary file");
+        let cnt = mru.save(file.path()).unwrap();
+        assert_eq!(SIMPLE_MRU_AS_STRING.len(), cnt, "This assert checks the file was written correctly");
+
+        let mru = MRUList::load(2, file.path()).unwrap();
+        assert_eq!(mru[0], "c", "c is pushed last, so should be the first item in the list");
+        assert_eq!(mru[1], "b");
+        assert_eq!(mru.len(), 2);
+        assert!(mru.is_changed(), "We loaded only the beginning of the file, so the MRU needs truncating, so is_changed should be true");
+    }
 
     #[test]
     fn new_for_zero_size_creates_empty_list() {
