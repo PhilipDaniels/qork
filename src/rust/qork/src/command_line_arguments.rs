@@ -19,7 +19,7 @@ impl CommandLineArguments {
                                 .short("p")
                                 .long("xdg-profile")
                                 .value_name("DIRECTORY")
-                                .help("Sets the XDG profile directory.")
+                                .help("Sets the XDG profile name.")
                                 .default_value("default")
                                 .takes_value(true)
                         )
