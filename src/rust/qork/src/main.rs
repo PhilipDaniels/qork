@@ -56,7 +56,7 @@ fn main() {
     info!("{:?}", pi);
 
     let config = Configuration::load_user_configuration(pi.parsed_args().load_config(), &xdg);
-    let mut runtime_data = RuntimeData::load_runtime_data(&config, &xdg);
+    let mut runtime_data = RuntimeData::load(&config, &xdg);
 
     let context = Context::new(xdg, pi, config);
     info!("{:?}", context.system_info());

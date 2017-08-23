@@ -27,6 +27,8 @@ pub struct RuntimeData {
     mru2: DataItem<MRUList>
 }
 
+const MRU_FILE : &'static str = "mru.toml";
+
 impl RuntimeData {
     /// Constructs a new RuntimeData object based on the default configuration.
     pub fn new(config: &Configuration) -> RuntimeData {
@@ -53,8 +55,8 @@ impl RuntimeData {
         Some(path)
     }
 
-    pub fn load_runtime_data(config: &Configuration, xdg: &BaseDirectories) -> RuntimeData {
-        let _timer = ExecutionTimer::with_start_message("load_runtime_data");
+    pub fn load(config: &Configuration, xdg: &BaseDirectories) -> RuntimeData {
+        let _timer = ExecutionTimer::with_start_message("RuntimeData::load");
 
         let mut rd = RuntimeData::new(&config);
 
@@ -74,17 +76,20 @@ impl RuntimeData {
 
         let path = RuntimeData::place_file(&xdg, MRU_FILE);
         if let Some(filename) = path {
-            if let Some(mru) = load_mru(config.max_mru_items(), &filename) {
-                rd.mru = mru;
-            }
+            match MRUList::load(config.max_mru_items(), &filename)
+            {
+                Ok(mru) => { rd.mru = mru;
+                    info!("Loaded {} items into the MRU List from {:?}", rd.mru.iter().count(), filename);
+                }
+                Err(e) => { }
+            };
         }
 
         rd
     }
 
-    /// Writes the runtime data to disk.
     pub fn save(&mut self, config: &Configuration, xdg: &BaseDirectories) {
-        let _timer = ExecutionTimer::with_start_message("save_runtime_data");
+        let _timer = ExecutionTimer::with_start_message("RuntimeData::save");
 
         if self.mru.is_changed() {
             let path = RuntimeData::place_file(&xdg, MRU_FILE);
@@ -106,27 +111,3 @@ impl RuntimeData {
 
 
 
-
-const MRU_FILE : &'static str = "mru.toml";
-
-fn load_mru(max_mru_items: usize, filename: &PathBuf) -> Option<MRUList> {
-    let list = file::load_to_vector(filename);
-
-    // TODO: if num lines loaded > max_mru_items then the mru list needs to be marked as changed.
-
-    match list {
-        Ok(list) => {
-            info!("Loaded {} lines from {:?}", list.len(), filename);
-            let mru = MRUList::from_slice(max_mru_items, &list);
-            dump(&mru);
-            Some(mru)
-        },
-        Err(e) => None
-    }
-}
-
-pub fn dump(mru: &MRUList) {
-    for (i, file) in mru.iter().enumerate() {
-        info!("{} = {:?}", i, file);
-    }
-}
