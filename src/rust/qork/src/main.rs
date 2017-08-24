@@ -19,6 +19,7 @@ extern crate xdg;
 
 mod command;
 mod command_line_arguments;
+mod config_dir;
 mod configuration;
 mod context;
 mod datetime;
@@ -33,6 +34,7 @@ use std::io::{stdin};
 use xdg::BaseDirectories;
 
 use command::Command;
+use config_dir::ConfigDir;
 use configuration::Configuration;
 use context::Context;
 use execution_timer::ExecutionTimer;
@@ -42,28 +44,41 @@ use runtime_data::RuntimeData;
 // This produces various constants about the build environment which can be referred to using ::PKG_... syntax.
 include!(concat!(env!("OUT_DIR"), "/built.rs"));
 
+fn do_stuff() {
+    let pi = ProgramInfo::new();
+    let xdg = BaseDirectories::with_profile(::PKG_NAME, pi.parsed_args().xdg_profile()).unwrap();
+    let cdir = ConfigDir::new(&xdg);
+    info!("home() = {:?}", cdir.home());
+
+    let p = cdir.open("foo.txt");
+    info!("p = {:?}", p);
+}
+
 fn main() {
     std::env::set_var("IN_QORK", "1");
 
-    // Configure logging as early as possible (because, obviously, we want to log in the rest of the initialization process).
+    // // Configure logging as early as possible (because, obviously, we want to log in the rest of the initialization process).
     let pi = ProgramInfo::new();
     let xdg = BaseDirectories::with_profile(::PKG_NAME, pi.parsed_args().xdg_profile()).unwrap();
     configure_logging(&xdg);
 
-    let _timer = ExecutionTimer::with_start_message("main.main");
-    log_build_info();
-    info!("{:?}", pi.parsed_args());
-    info!("{:?}", pi);
+    do_stuff();
 
-    let config = Configuration::load_user_configuration(pi.parsed_args().load_config(), &xdg);
-    let mut runtime_data = RuntimeData::load(&config, &xdg);
 
-    let context = Context::new(xdg, pi, config);
-    info!("{:?}", context.system_info());
+    // let _timer = ExecutionTimer::with_start_message("main.main");
+    // log_build_info();
+    // info!("{:?}", pi.parsed_args());
+    // info!("{:?}", pi);
 
-    run_event_loop(&context, &mut runtime_data);
+    // let config = Configuration::load_user_configuration(pi.parsed_args().load_config(), &xdg);
+    // let mut runtime_data = RuntimeData::load(&config, &xdg);
 
-    runtime_data.save(context.configuration(), context.xdg());
+    // let context = Context::new(xdg, pi, config);
+    // info!("{:?}", context.system_info());
+
+    // run_event_loop(&context, &mut runtime_data);
+
+    // runtime_data.save(context.configuration(), context.xdg());
 }
 
 fn configure_logging(xdg: &BaseDirectories) {
