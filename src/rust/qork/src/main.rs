@@ -47,7 +47,7 @@ include!(concat!(env!("OUT_DIR"), "/built.rs"));
 fn do_stuff() {
     let pi = ProgramInfo::new();
     let xdg = BaseDirectories::with_profile(::PKG_NAME, pi.parsed_args().xdg_profile()).unwrap();
-    let cdir = ConfigDir::new(&xdg);
+    let cdir = ConfigDir::new(xdg.clone());
     info!("home() = {:?}", cdir.home());
 
     let p = cdir.open("foo.txt");

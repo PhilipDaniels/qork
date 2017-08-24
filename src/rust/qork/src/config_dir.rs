@@ -2,12 +2,14 @@ use std::fs::{File, OpenOptions};
 use std::path::{Path, PathBuf};
 use xdg::BaseDirectories;
 
-pub struct ConfigDir<'a> {
-    xdg: &'a BaseDirectories
+pub struct ConfigDir {
+    xdg: BaseDirectories
 }
 
-impl<'a> ConfigDir<'a> {
-    pub fn new(xdg: &BaseDirectories) -> ConfigDir {
+impl ConfigDir {
+    pub fn new(xdg: BaseDirectories) -> ConfigDir {
+        // TODO: Check that the home dir exists and is a directory.
+        // TODO: Use a command line flag to turn every function into a no-op.
         ConfigDir { xdg }
     }
 
