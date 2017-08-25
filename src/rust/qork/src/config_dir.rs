@@ -18,17 +18,17 @@ impl ConfigDir {
     }
 
     /// Gets a filepath within the config directory, creating leading directories. Logs and returns None if an error occurs.
-    pub fn place<P>(&self, path: P) -> Option<PathBuf>
+    pub fn get_proposed_path<P>(&self, path: P) -> Option<PathBuf>
         where P: AsRef<Path>
     {
         match self.xdg.place_config_file(&path) {
-            Err(e) => { error!("Error attempting to place file {:?}, err = {}", &path.as_ref(), e); None },
+            Err(e) => { error!("Error attempting to place file {:?}, err = {}. Returning None.", &path.as_ref(), e); None },
             Ok(p) => Some(p)
         }
     }
 
     /// Get the path of an existing file, or return None if the file does not exist or the path refers to a directory.
-    pub fn find<P>(&self, path: P) -> Option<PathBuf>
+    pub fn get_existing_path<P>(&self, path: P) -> Option<PathBuf>
         where P: AsRef<Path>
     {
         self.xdg.find_config_file(path)
@@ -45,7 +45,7 @@ impl ConfigDir {
     pub fn open<P>(&self, path: P) -> Option<File>
         where P: AsRef<Path>
     {
-        match self.find(path) {
+        match self.get_existing_path(path) {
             None => None,
             Some(p) => {
                 match File::open(&p) {
