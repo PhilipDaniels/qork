@@ -3,22 +3,37 @@ use std::path::{Path, PathBuf};
 use xdg::BaseDirectories;
 
 pub struct ConfigDir {
-    xdg: BaseDirectories
+    xdg: BaseDirectories,
+    valid: bool
 }
 
 pub struct DataDir {
-    xdg: BaseDirectories
+    xdg: BaseDirectories,
+    valid: bool
 }
 
 impl ConfigDir {
     pub fn new(xdg: BaseDirectories) -> ConfigDir {
-        // TODO: Check that the home dir exists and is a directory.
         // TODO: Use a command line flag to turn every function into a no-op.
         // TODO: Move these methods to a trait and use them to implement it on both classes.
         // TODO: Allow "no-op" operations under the control of a flag?
         // TODO: xdg:  create_{config,data,cache,runtime}_directory  - creates dirs under the XDG dir structure
         // TODO: xdg:  list_{config,data,cache,runtime}_files_[once] - lists files under the XDG dir structure
-        ConfigDir { xdg }
+
+        let home = xdg.get_config_home();
+        let mut valid = true;
+        if !home.is_dir() {
+            error!("The root configuration directory {:?} is not a directory. No config will be loaded.", home);
+            // Extra print, because this scenario means logging probably did not get configured.
+            // Likewise, logging will not be configured if the directory does not exist, so there is no point logging anything
+            // in that scenario.
+            eprintln!("The root configuration directory {:?} is not a directory. No config will be loaded.", home);
+            valid = false;
+        }
+
+        ConfigDir {
+            xdg, valid
+        }
     }
 
     /// Gets the root configuration directory.
@@ -32,6 +47,8 @@ impl ConfigDir {
     pub fn get_proposed_path<P>(&self, path: P) -> Option<PathBuf>
         where P: AsRef<Path>
     {
+        if !self.valid { return None; }
+
         match self.xdg.place_config_file(&path) {
             Err(e) => { error!("Error attempting to place file {:?}, err = {}. Returning None.", &path.as_ref(), e); None },
             Ok(p) => Some(p)
@@ -43,6 +60,8 @@ impl ConfigDir {
     pub fn get_existing_path<P>(&self, path: P) -> Option<PathBuf>
         where P: AsRef<Path>
     {
+        if !self.valid { return None; }
+
         self.xdg.find_config_file(path)
             .and_then(|p| if p.is_dir() {
                 error!("The path {:?} is a directory, expected a file. Returning None.", p);
@@ -57,6 +76,8 @@ impl ConfigDir {
     pub fn open<P>(&self, path: P) -> Option<File>
         where P: AsRef<Path>
     {
+        if !self.valid { return None; }
+
         match self.get_existing_path(path) {
             None => None,
             Some(p) => {
@@ -73,6 +94,8 @@ impl ConfigDir {
     pub fn create<P>(&self, path: P) -> Option<File>
         where P: AsRef<Path>
     {
+        if !self.valid { return None; }
+
         match self.get_proposed_path(path) {
             None => None,
             Some(p) => {
@@ -88,6 +111,8 @@ impl ConfigDir {
     pub fn open_with_options<P>(&self, path: P, options: &OpenOptions) -> Option<File>
         where P: AsRef<Path>
     {
+        if !self.valid { return None; }
+
         match self.get_proposed_path(path) {
             None => None,
             Some(p) => {
