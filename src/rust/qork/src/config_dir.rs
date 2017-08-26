@@ -13,22 +13,23 @@ pub struct DataDir {
 }
 
 impl ConfigDir {
-    pub fn new(xdg: BaseDirectories) -> ConfigDir {
-        // TODO: Use a command line flag to turn every function into a no-op.
+    pub fn new(xdg: BaseDirectories, load_config: bool) -> ConfigDir {
         // TODO: Move these methods to a trait and use them to implement it on both classes.
-        // TODO: Allow "no-op" operations under the control of a flag?
         // TODO: xdg:  create_{config,data,cache,runtime}_directory  - creates dirs under the XDG dir structure
         // TODO: xdg:  list_{config,data,cache,runtime}_files_[once] - lists files under the XDG dir structure
 
-        let home = xdg.get_config_home();
-        let mut valid = true;
-        if !home.is_dir() {
-            error!("The root configuration directory {:?} is not a directory. No config will be loaded.", home);
-            // Extra print, because this scenario means logging probably did not get configured.
-            // Likewise, logging will not be configured if the directory does not exist, so there is no point logging anything
-            // in that scenario.
-            eprintln!("The root configuration directory {:?} is not a directory. No config will be loaded.", home);
-            valid = false;
+        let mut valid = load_config;
+        if !load_config {
+            info!("Loading and saving of user configuration is disabled by command line option.");
+        } else {
+            let home = xdg.get_config_home();
+            if !home.is_dir() {
+                // Print to stderr, because this scenario means logging probably did not get configured.
+                // Likewise, logging will not be configured if the directory does not exist, so there is no point
+                // logging anything in that scenario.
+                eprintln!("The root configuration directory {:?} is not a directory. No config will be loaded.", home);
+                valid = false;
+            }
         }
 
         ConfigDir {
