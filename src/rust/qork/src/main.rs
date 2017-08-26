@@ -30,7 +30,7 @@ mod program_info;
 mod system_info;
 mod runtime_data;
 
-use std::io::{stdin};
+use std::io::{stdin, Write};
 use xdg::BaseDirectories;
 
 use command::Command;
@@ -50,8 +50,9 @@ fn do_stuff() {
     let cdir = ConfigDir::new(xdg.clone());
     info!("home() = {:?}", cdir.home());
 
-    let p = cdir.open("foo.txt");
+    let mut p = cdir.create("foo.txt").unwrap();
     info!("p = {:?}", p);
+    writeln!(p, "Hello file");
 }
 
 fn main() {
