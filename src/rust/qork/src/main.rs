@@ -34,7 +34,7 @@ use std::io::{stdin};
 use xdg::BaseDirectories;
 
 use command::Command;
-use config_dir::ConfigDir;
+use config_dir::{ConfigDir, WellKnownDir};
 use configuration::Configuration;
 use context::Context;
 use execution_timer::ExecutionTimer;
