@@ -58,27 +58,26 @@ fn do_stuff() {
 fn main() {
     std::env::set_var("IN_QORK", "1");
 
-    // // Configure logging as early as possible (because, obviously, we want to log in the rest of the initialization process).
+    // Configure logging as early as possible (because, obviously, we want to log in the rest of the initialization process).
     let pi = ProgramInfo::new();
     let xdg = BaseDirectories::with_profile(::PKG_NAME, pi.parsed_args().xdg_profile()).unwrap();
     configure_logging(&xdg);
-    do_stuff();
 
+    let _timer = ExecutionTimer::with_start_message("main.main");
+    log_build_info();
+    info!("{:?}", pi.parsed_args());
+    info!("{:?}", pi);
 
-    // let _timer = ExecutionTimer::with_start_message("main.main");
-    // log_build_info();
-    // info!("{:?}", pi.parsed_args());
-    // info!("{:?}", pi);
+    let config_dir = ConfigDir::new(xdg.clone(), pi.parsed_args().load_config());
+    let config = Configuration::load_user_configuration(&config_dir);
+    let mut runtime_data = RuntimeData::load(&config, &xdg);
 
-    // let config = Configuration::load_user_configuration(pi.parsed_args().load_config(), &xdg);
-    // let mut runtime_data = RuntimeData::load(&config, &xdg);
+    let context = Context::new(xdg, pi, config);
+    info!("{:?}", context.system_info());
 
-    // let context = Context::new(xdg, pi, config);
-    // info!("{:?}", context.system_info());
+    run_event_loop(&context, &mut runtime_data);
 
-    // run_event_loop(&context, &mut runtime_data);
-
-    // runtime_data.save(context.configuration(), context.xdg());
+    runtime_data.save(context.configuration(), context.xdg());
 }
 
 fn configure_logging(xdg: &BaseDirectories) {

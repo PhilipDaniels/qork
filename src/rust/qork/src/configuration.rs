@@ -4,6 +4,7 @@ use toml;
 use xdg::BaseDirectories;
 
 use context::Context;
+use config_dir::{ConfigDir, WellKnownDir};
 use execution_timer::ExecutionTimer;
 
 // Stores the configuration. Will be read from config.toml. Any values not
@@ -29,62 +30,28 @@ impl Configuration {
         self.max_mru_items
     }
 
-    pub fn load_user_configuration(load_config: bool, xdg: &BaseDirectories) -> Configuration {
+    pub fn load_user_configuration(cd: &ConfigDir) -> Configuration {
         let _timer = ExecutionTimer::with_start_message("load_user_configuration");
 
-        if !load_config {
-            info!("Loading of user configuration is disabled by command line option.");
-            return Configuration::default();
-        }
+        let mut cfg = Configuration::default();
 
-        let dir = xdg.get_config_home();
-        if !dir.exists() {
-            warn!("The config_directory does not exist, no config will be loaded, config_directory: {:?}", dir);
-            return Configuration::default();
-        }
-
-        if !dir.is_dir() {
-            warn!("The config_directory is a file, not a directory, no config will be loaded, config_directory: {:?}", dir);
-            return Configuration::default();
-        }
-
-        info!("Loading user configuration file {:?} from config_directory: {:?}", CONFIG_FILE, dir);
-
-        let path = xdg.place_config_file(CONFIG_FILE);
-        if path.is_err() {
-            warn!("Could not locate {} file in xdg directory structure", CONFIG_FILE);
-            return Configuration::default();
-        }
-
-        let path = path.unwrap();
-        if !path.exists() {
-            debug!("The file {:?} does not exist, no user config will be loaded", path);
-            return Configuration::default();
-        }
-
-        if !path.is_file() {
-            warn!("The user configuration file {:?} appears to be a directory, no user config will be loaded", path);
-            return Configuration::default();
-        }
-
-        // Ok, the file exists and we can try to load it.
-        let cfg = File::open(&path)
-            .map_err(|err| err.to_string())
-            .and_then(|mut f| {
+        if let Some(mut f) = cd.open(CONFIG_FILE) {
+            cfg = {
                 let mut contents = String::new();
                 f.read_to_string(&mut contents)
                     .map_err(|err| err.to_string())
                     .map(|num_bytes_read| {
-                        info!("Read {} lines ({} bytes) from {:?}", contents.lines().count(), num_bytes_read,  &path);
+                        info!("Read {} lines ({} bytes) from {:?}", contents.lines().count(), num_bytes_read,  CONFIG_FILE);
                         contents
                     })
-            })
-            .and_then(|contents| {
-                toml::from_str::<Configuration>(&contents)
-                    .map_err(|err| err.to_string())
-            })
-            .map_err(|err| warn!("Error reading {:?}: {:?}", CONFIG_FILE, err))
-            .unwrap_or_default();
+                .and_then(|contents| {
+                    toml::from_str::<Configuration>(&contents)
+                        .map_err(|err| err.to_string())
+                })
+                .map_err(|err| warn!("Error reading {:?}: {:?}", CONFIG_FILE, err))
+                .unwrap_or_default()
+            };
+        }
 
         info!("{:?}", cfg);
 
