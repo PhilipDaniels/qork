@@ -1,5 +1,4 @@
-use xdg::BaseDirectories;
-
+use config_dir::ConfigDir;
 use configuration::Configuration;
 use program_info::ProgramInfo;
 use runtime_data::RuntimeData;
@@ -9,18 +8,16 @@ use system_info::SystemInfo;
 pub struct Context {
     system_info: SystemInfo,
     program_info: ProgramInfo,
-    // xdg base directory object, typically '~/.config/qork', with a default profile of
-    // 'default', which means the effective directory is '~/.config/qork/default'.
-    xdg: BaseDirectories,
+    config_dir: ConfigDir,
     configuration: Configuration
 }
 
 impl Context {
-    pub fn new(xdg: BaseDirectories, pi: ProgramInfo, config: Configuration) -> Context {
+    pub fn new(pi: ProgramInfo, config_dir: ConfigDir, config: Configuration) -> Context {
         Context {
-            xdg: xdg,
             system_info: SystemInfo::new(),
             program_info: pi,
+            config_dir: config_dir,
             configuration: config,
         }
     }
@@ -33,8 +30,8 @@ impl Context {
         &self.program_info
     }
 
-    pub fn xdg(&self) -> &BaseDirectories {
-        &self.xdg
+    pub fn config_dir(&self) -> &ConfigDir {
+        &self.config_dir
     }
 
     pub fn configuration(&self) -> &Configuration {

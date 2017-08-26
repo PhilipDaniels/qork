@@ -72,12 +72,12 @@ fn main() {
     let config = Configuration::load_user_configuration(&config_dir);
     let mut runtime_data = RuntimeData::load(&config, &xdg);
 
-    let context = Context::new(xdg, pi, config);
+    let context = Context::new(pi, config_dir, config);
     info!("{:?}", context.system_info());
 
     run_event_loop(&context, &mut runtime_data);
 
-    runtime_data.save(context.configuration(), context.xdg());
+    //runtime_data.save(context.configuration(), context.xdg());
 }
 
 fn configure_logging(xdg: &BaseDirectories) {

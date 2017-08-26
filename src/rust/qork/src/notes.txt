@@ -18,9 +18,10 @@ that wrap things like the sysinf crate?
     that fact.
   - A good split: SystemInfo, ProcessInfo, DiskInfo, NetworkInfo.
     We already have ProgramInfo, which is almost a duplicate of ProcessInfo.
-* Try the SystemStat crate instead of sysinfo?
+* Try the SystemState crate instead of sysinfo?
 * In ProgramInfo, we have now get everything from http://www.gnu.org/software/emacs/manual/html_node/elisp/User-Identification.html
 * We also effectively have got http://www.gnu.org/software/emacs/manual/html_node/elisp/System-Environment.html#System-Environment
+* Ability to get a filename that does not exist (or is highly unlikely to)
 
 
 QorkDirs design
@@ -34,47 +35,6 @@ XDG_CONFIG_HOME     config_dir()        $HOME/.config           $HOME/.config/qo
 XDG_DATA_HOME       data_dir()          $HOME/.local/share      $HOME/.local/share/qork/default/mru.toml
 XDG_CACHE_HOME      cache_dir()         $HOME/.cache
 XDG_RUNTIME_DIR     runtime_dir()       ???
-
-Our RuntimeData must become SessionData and be stored in data_dir(). This is to avoid confusion with XDG_RUNTIME_DIR,
-which is used for temporary sockets etc.
-
-Can we consider some things fatal?
-* dirs do not exist/cannot be created
-* dirs are actually files
-* files are actually dirs
-
-Can we create a higher-level abstraction, something like a src/sink for file data?
-
-QorkDirs.config_file("mru.toml").and_then()
-         ^ does File::create()
-
-QorkDirs.config_file("mru.toml", data_writer: Fn);
-QorkDirs.config_file(Read, "mru.toml", Func()-> result)
-
-
-QorkDirs.place_config_file(&str) -> Result<File, err>
-
-
-
-open file - Need open options.
-create file - Need create options.
-delete_config
-place_config_file - is a mixture of the two!
-
-Two structures:
-    ConfigDirs
-    DataDirs
-XDG supports these operations
-  find_{config,data,cache,runtime}_file -> Option<PathBuf>       - gets an existing file, or returns None
-  place_{config,data,cache,runtime}_file -> ioResult<PathBuf>    - gets a filepath, creates leading dirs (errors if cannot)
-
-  create_{config,data,cache,runtime}_directory  - creates dirs under the XDG dir structure
-  list_{config,data,cache,runtime}_files_[once] - lists files under the XDG dir structure
-  get_{config,data,cache}_home                  - gets the root dir under the XDG dir structure
-
->> To load a file, use find(). We should wrap find() and check exists and is a file. Or we can write a series of open() methods.
->> To save a file, use place().
-
 
 
 Program Structure
