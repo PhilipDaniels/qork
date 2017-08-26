@@ -29,14 +29,14 @@ pub trait WellKnownDir {
     fn get_existing_path<P: AsRef<Path>>(&self, path: P) -> Option<PathBuf>;
 
     /// Opens a file in read-only mode, or returns None if the file cannot be opened.
-    fn open<P: AsRef<Path>>(&self, path: P) -> Option<File>;
+    fn open<P: AsRef<Path>>(&self, path: P) -> Option<(File, PathBuf)>;
 
     /// Opens a file in write-only mode, if the file already exists it will be truncated.
     /// Returns None if the file cannot be opened.
-    fn create<P: AsRef<Path>>(&self, path: P) -> Option<File>;
+    fn create<P: AsRef<Path>>(&self, path: P) -> Option<(File, PathBuf)>;
 
     /// Opens a file with specific options, or returns None if the file cannot be opened.
-    fn open_with_options<P: AsRef<Path>>(&self, path: P, options: &OpenOptions) -> Option<File>;
+    fn open_with_options<P: AsRef<Path>>(&self, path: P, options: &OpenOptions) -> Option<(File, PathBuf)>;
 }
 
 impl WellKnownDir for ConfigDir {
@@ -73,7 +73,7 @@ impl WellKnownDir for ConfigDir {
     }
 
     /// Opens a file in read-only mode, or returns None if the file cannot be opened.
-    fn open<P: AsRef<Path>>(&self, path: P) -> Option<File>
+    fn open<P: AsRef<Path>>(&self, path: P) -> Option<(File, PathBuf)>
     {
         if !self.valid { return None; }
 
@@ -82,7 +82,7 @@ impl WellKnownDir for ConfigDir {
             Some(p) => {
                 match File::open(&p) {
                     Err(e) => { error!("Error attempting to open file {:?}, err = {}", p, e); None },
-                    Ok(f) => Some(f)
+                    Ok(f) => Some((f, p))
                 }
             }
         }
@@ -90,7 +90,7 @@ impl WellKnownDir for ConfigDir {
 
     /// Opens a file in write-only mode, if the file already exists it will be truncated.
     /// Returns None if the file cannot be opened.
-    fn create<P: AsRef<Path>>(&self, path: P) -> Option<File>
+    fn create<P: AsRef<Path>>(&self, path: P) -> Option<(File, PathBuf)>
     {
         if !self.valid { return None; }
 
@@ -99,14 +99,14 @@ impl WellKnownDir for ConfigDir {
             Some(p) => {
                 match File::create(&p) {
                     Err(e) => { error!("Error attempting to create file {:?}, err = {}", p, e); None },
-                    Ok(f) => Some(f)
+                    Ok(f) => Some((f, p))
                 }
             }
         }
     }
 
     /// Opens a file with specific options, or returns None if the file cannot be opened.
-    fn open_with_options<P: AsRef<Path>>(&self, path: P, options: &OpenOptions) -> Option<File>
+    fn open_with_options<P: AsRef<Path>>(&self, path: P, options: &OpenOptions) -> Option<(File, PathBuf)>
     {
         if !self.valid { return None; }
 
@@ -115,7 +115,7 @@ impl WellKnownDir for ConfigDir {
             Some(p) => {
                 match options.open(&p) {
                     Err(e) => { error!("Error attempting to open file {:?}, err = {}", p, e); None },
-                    Ok(f) => Some(f)
+                    Ok(f) => Some((f, p))
                 }
             }
         }

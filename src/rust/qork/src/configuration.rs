@@ -35,13 +35,13 @@ impl Configuration {
 
         let mut cfg = Configuration::default();
 
-        if let Some(mut f) = cd.open(CONFIG_FILE) {
+        if let Some((mut f, p)) = cd.open(CONFIG_FILE) {
             cfg = {
                 let mut contents = String::new();
                 f.read_to_string(&mut contents)
                     .map_err(|err| err.to_string())
                     .map(|num_bytes_read| {
-                        info!("Read {} lines ({} bytes) from {:?}", contents.lines().count(), num_bytes_read,  CONFIG_FILE);
+                        info!("Read {} lines ({} bytes) from {:?}", contents.lines().count(), num_bytes_read,  p);
                         contents
                     })
                 .and_then(|contents| {
