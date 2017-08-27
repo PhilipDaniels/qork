@@ -7,7 +7,7 @@ use std::path::Path;
 use std::slice::{Iter};
 use tempfile::{tempfile, NamedTempFile};
 
-use file;
+use fs;
 
 /// A simple MRU-list data structure. Create a list of the appropriate
 /// maximum size (which can be changed later) then use `insert` to add new

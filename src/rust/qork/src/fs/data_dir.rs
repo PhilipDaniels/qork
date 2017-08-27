@@ -1,48 +1,24 @@
 use std::fs::{File, OpenOptions};
 use std::path::{Path, PathBuf};
 use xdg::BaseDirectories;
+use fs::BaseDir;
 
-pub struct ConfigDir {
-    xdg: BaseDirectories,
-    valid: bool
-}
-
+/// Based on the XDG Base Directory Specification.
+/// DataDir is a wrapper for "There is a single base directory relative to which user-specific data files should be written.
+/// This directory is defined by the environment variable $XDG_DATA_HOME. ". DataDir is implemented as
+/// a wrapper around the xdg *data* functions.
+///
+/// The data stored within this directory is the type of data which is not configuration but
+/// which needs to persist from invocation to invocation - MRU Lists, session state etc.
 pub struct DataDir {
     xdg: BaseDirectories,
     valid: bool
 }
 
-pub trait WellKnownDir {
-    // TODO: xdg:  create_{config,data,cache,runtime}_directory  - creates dirs under the XDG dir structure
-    // TODO: xdg:  list_{config,data,cache,runtime}_files_[once] - lists files under the XDG dir structure
-
-    /// Gets the root directory.
-    /// xdg equiv: get_{config,data,cache}_home
-    fn home(&self) -> PathBuf;
-
-    /// Gets a filepath within the root directory, creating leading directories. Logs and returns None if an error occurs.
-    /// xdg equiv: place_{config,data,cache,runtime}_file -> ioResult<PathBuf>
-    fn get_proposed_path<P: AsRef<Path>>(&self, path: P) -> Option<PathBuf>;
-
-    /// Get the path of an existing file, or return None if the file does not exist or the path refers to a directory.
-    /// xdg equiv: find_{config,data,cache,runtime}_file -> Option<PathBuf>
-    fn get_existing_path<P: AsRef<Path>>(&self, path: P) -> Option<PathBuf>;
-
-    /// Opens a file in read-only mode, or returns None if the file cannot be opened.
-    fn open<P: AsRef<Path>>(&self, path: P) -> Option<(File, PathBuf)>;
-
-    /// Opens a file in write-only mode, if the file already exists it will be truncated.
-    /// Returns None if the file cannot be opened.
-    fn create<P: AsRef<Path>>(&self, path: P) -> Option<(File, PathBuf)>;
-
-    /// Opens a file with specific options, or returns None if the file cannot be opened.
-    fn open_with_options<P: AsRef<Path>>(&self, path: P, options: &OpenOptions) -> Option<(File, PathBuf)>;
-}
-
-impl WellKnownDir for ConfigDir {
+impl BaseDir for DataDir {
     /// Gets the root directory.
     fn home(&self) -> PathBuf {
-        self.xdg.get_config_home()
+        self.xdg.get_data_home()
     }
 
     /// Gets a filepath within the root directory, creating leading directories. Logs and returns None if an error occurs.
@@ -50,7 +26,7 @@ impl WellKnownDir for ConfigDir {
     {
         if !self.valid { return None; }
 
-        match self.xdg.place_config_file(&path) {
+        match self.xdg.place_data_file(&path) {
             Err(e) => { error!("Error attempting to place file {:?}, err = {}. Returning None.", &path.as_ref(), e); None },
             Ok(p) => Some(p)
         }
@@ -62,7 +38,7 @@ impl WellKnownDir for ConfigDir {
     {
         if !self.valid { return None; }
 
-        self.xdg.find_config_file(path)
+        self.xdg.find_data_file(path)
             .and_then(|p| if p.is_dir() {
                 error!("The path {:?} is a directory, expected a file. Returning None.", p);
                 None
@@ -122,23 +98,23 @@ impl WellKnownDir for ConfigDir {
     }
 }
 
-impl ConfigDir {
-    pub fn new(xdg: BaseDirectories, load_config: bool) -> ConfigDir {
+impl DataDir {
+    pub fn new(xdg: BaseDirectories, load_config: bool) -> DataDir {
         let mut valid = load_config;
         if !load_config {
-            info!("Loading and saving of user configuration is disabled by command line option.");
+            info!("Loading and saving of user data is disabled by command line option.");
         } else {
-            let home = xdg.get_config_home();
+            let home = xdg.get_data_home();
             if !home.is_dir() {
                 // Print to stderr, because this scenario means logging probably did not get configured.
                 // Likewise, logging will not be configured if the directory does not exist, so there is no point
                 // logging anything in that scenario.
-                eprintln!("The root configuration directory {:?} is not a directory. No config will be loaded.", home);
+                eprintln!("The root data directory {:?} is not a directory. No data will be loaded or saved.", home);
                 valid = false;
             }
         }
 
-        ConfigDir {
+        DataDir {
             xdg, valid
         }
     }

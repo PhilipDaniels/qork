@@ -19,12 +19,11 @@ extern crate xdg;
 
 mod command;
 mod command_line_arguments;
-mod config_dir;
 mod configuration;
+mod fs;
 mod context;
 mod datetime;
 mod execution_timer;
-mod file;
 mod mru_list;
 mod program_info;
 mod system_info;
@@ -34,8 +33,8 @@ use std::io::{stdin};
 use xdg::BaseDirectories;
 
 use command::Command;
-use config_dir::{ConfigDir, WellKnownDir};
 use configuration::Configuration;
+use fs::{ConfigDir, BaseDir};
 use context::Context;
 use execution_timer::ExecutionTimer;
 use program_info::ProgramInfo;

@@ -1,5 +1,5 @@
-use config_dir::ConfigDir;
 use configuration::Configuration;
+use fs::{ConfigDir};
 use program_info::ProgramInfo;
 use runtime_data::RuntimeData;
 use system_info::SystemInfo;

@@ -7,7 +7,7 @@ use xdg::BaseDirectories;
 
 use configuration::Configuration;
 use execution_timer::ExecutionTimer;
-use file;
+use fs;
 use mru_list::MRUList;
 
 /// Represents the persistent runtime data of the system. This is things like MRU lists

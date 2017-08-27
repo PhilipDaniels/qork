@@ -1,11 +1,7 @@
-use std::fs::File;
-use std::io::{Read};
+use std::io::prelude::*;
 use toml;
-use xdg::BaseDirectories;
-
-use context::Context;
-use config_dir::{ConfigDir, WellKnownDir};
 use execution_timer::ExecutionTimer;
+use fs::{BaseDir, ConfigDir};
 
 // Stores the configuration. Will be read from config.toml. Any values not
 // present in the file will be defaulted using the 'default' method below.
