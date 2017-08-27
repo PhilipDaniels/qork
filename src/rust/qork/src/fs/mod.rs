@@ -10,10 +10,12 @@ use execution_timer::ExecutionTimer;
 mod config_dir;
 mod data_dir;
 mod base_dir;
+mod runtime_dir;
 
 pub use fs::base_dir::BaseDir;
 pub use fs::config_dir::ConfigDir;
 pub use fs::data_dir::DataDir;
+pub use fs::runtime_dir::RuntimeDir;
 
 pub fn load_to_vector(filename: &Path) -> Result<Vec<String>, String> {
     File::open(filename)
@@ -52,4 +54,3 @@ pub fn save_from_vector(filename: &Path, data: Vec<String>) -> Result<usize, Str
 
 // TODO: load_file_as_string
 // TODO: filename that does not exist.
-
