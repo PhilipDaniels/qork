@@ -1,13 +1,8 @@
-use std::fs::File;
 use std::path::PathBuf;
-use std::io::{self, Read, BufReader};
-use std::io::prelude::*;
-use toml;
 use xdg::BaseDirectories;
 
 use configuration::Configuration;
 use execution_timer::ExecutionTimer;
-use fs;
 use mru_list::MRUList;
 
 /// Represents the persistent runtime data of the system. This is things like MRU lists
@@ -81,14 +76,14 @@ impl RuntimeData {
                 Ok(mru) => { rd.mru = mru;
                     info!("Loaded {} items into the MRU List from {:?}", rd.mru.iter().count(), filename);
                 }
-                Err(e) => { }
+                Err(_) => { }
             };
         }
 
         rd
     }
 
-    pub fn save(&mut self, config: &Configuration, xdg: &BaseDirectories) {
+    pub fn save(&mut self, xdg: &BaseDirectories) {
         let _timer = ExecutionTimer::with_start_message("RuntimeData::save");
 
         if self.mru.is_changed() {
@@ -98,7 +93,7 @@ impl RuntimeData {
             if let Some(filename) = path {
                 match self.mru.save(filename.as_path()) {
                     Ok(num_bytes) => { info!("Wrote {} bytes to {:?}", num_bytes, filename); },
-                    Err(e) => { warn!("Could not save MRU List to {:?}", filename); }
+                    Err(e) => { warn!("Could not save MRU List to {:?}, error = {:?}", filename, e); }
                 }
             }
         }

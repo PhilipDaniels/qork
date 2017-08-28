@@ -1,13 +1,10 @@
 use std::cmp;
 use std::fs::File;
-use std::io::{BufReader, BufWriter, Read, Write, Seek, SeekFrom};
+use std::io::{BufReader, BufWriter, Read, Write};
 use std::io::prelude::*;
 use std::ops::{Index};
 use std::path::Path;
 use std::slice::{Iter};
-use tempfile::{tempfile, NamedTempFile};
-
-use fs;
 
 /// A simple MRU-list data structure. Create a list of the appropriate
 /// maximum size (which can be changed later) then use `insert` to add new
@@ -119,9 +116,10 @@ impl MRUList {
             };
         }
 
-        f.flush();
-
-        Ok(byte_count)
+        match f.flush() {
+            Ok(_) => Ok(byte_count),
+            Err(e) => { return Err(e.to_string()); }
+        }
     }
 
     pub fn save(&mut self, filename: &Path) -> Result<usize, String> {
@@ -140,7 +138,7 @@ impl MRUList {
     }
 
     pub fn read<T:Read>(max_mru_items: usize, src: &mut T) -> Result<MRUList, String> {
-        let mut rdr = BufReader::new(src);
+        let rdr = BufReader::new(src);
         let data = rdr.lines().take(max_mru_items + 1).map(|l| l.unwrap()).collect::<Vec<String>>();
         let mut mru = MRUList::from_slice(max_mru_items, &data);
         mru.is_changed = data.len() > max_mru_items;

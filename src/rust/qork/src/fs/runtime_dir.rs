@@ -1,4 +1,3 @@
-use std::fs::{File, OpenOptions};
 use std::path::{Path, PathBuf};
 use xdg::BaseDirectories;
 use fs::BaseDir;
@@ -55,7 +54,7 @@ impl BaseDir for RuntimeDir {
 
 impl RuntimeDir {
     pub fn new(xdg: BaseDirectories) -> RuntimeDir {
-        let mut is_valid = xdg.has_runtime_directory();
+        let is_valid = xdg.has_runtime_directory();
 
         RuntimeDir {
             xdg, is_valid

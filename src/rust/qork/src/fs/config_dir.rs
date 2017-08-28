@@ -1,4 +1,3 @@
-use std::fs::{File, OpenOptions};
 use std::path::{Path, PathBuf};
 use xdg::BaseDirectories;
 use fs::BaseDir;

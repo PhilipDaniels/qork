@@ -1,5 +1,5 @@
 #![allow(dead_code)]
-#![allow(warnings)]
+//#![allow(warnings)]
 
 extern crate chrono;
 extern crate clap;
@@ -34,7 +34,7 @@ use xdg::BaseDirectories;
 
 use command::Command;
 use configuration::Configuration;
-use fs::{ConfigDir, BaseDir};
+use fs::{ConfigDir};
 use context::Context;
 use execution_timer::ExecutionTimer;
 use program_info::ProgramInfo;
@@ -42,17 +42,6 @@ use runtime_data::RuntimeData;
 
 // This produces various constants about the build environment which can be referred to using ::PKG_... syntax.
 include!(concat!(env!("OUT_DIR"), "/built.rs"));
-
-fn do_stuff() {
-    let pi = ProgramInfo::new();
-    let xdg = BaseDirectories::with_profile(::PKG_NAME, pi.parsed_args().xdg_profile()).unwrap();
-    let cdir = ConfigDir::new(xdg.clone(), pi.parsed_args().load_config());
-    info!("home() = {:?}", cdir.home());
-
-    let mut p = cdir.create("foo.txt");//.unwrap();
-    // info!("p = {:?}", p);
-    // writeln!(p, "Hello file");
-}
 
 fn main() {
     std::env::set_var("IN_QORK", "1");
