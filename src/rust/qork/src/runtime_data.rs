@@ -1,4 +1,3 @@
-use std::path::PathBuf;
 use fs::{DataDir, BaseDir};
 
 use configuration::Configuration;
@@ -40,18 +39,12 @@ impl RuntimeData {
 
         info!("Loading runtime data from data_directory {:?}", data_dir.home());
 
-        match data_dir.get_existing_path(MRU_FILE) {
-            Some(path) => {
-                match MRUList::load(config.max_mru_items(), &path)
-                {
-                    Ok(mru) => { rd.mru = mru;
-                        info!("Loaded {} items into the MRU List from {:?}", rd.mru.iter().count(), path);
-                    }
-                    Err(_) => { }
-                };
-            },
-            None => {}
-        }
+        data_dir.get_existing_path(MRU_FILE)
+            .map(|path| MRUList::load(config.max_mru_items(), &path)
+                .map(|mru| {
+                    rd.mru = mru;
+                    info!("Loaded {} items into the MRU List from {:?}", rd.mru.iter().count(), path);
+                }));
 
         rd
     }
@@ -59,14 +52,10 @@ impl RuntimeData {
     pub fn save(&mut self, data_dir: &DataDir) {
         let _timer = ExecutionTimer::with_start_message("RuntimeData::save");
 
-        match data_dir.get_proposed_path(MRU_FILE) {
-            Some(path) => {
-                match self.mru.save(&path) {
-                    Ok(num_bytes) => { info!("Wrote {} bytes to {:?}", num_bytes, &path); },
-                    Err(e) => { warn!("Could not save MRU List to {:?}, error = {:?}", &path, e); }
-                }
-            },
-            None => {}
+        if self.mru.is_changed() {
+            data_dir.get_proposed_path(MRU_FILE)
+                .map(|path| self.mru.save(&path)
+                    .map(|num_bytes| info!("Wrote {} bytes to {:?}", num_bytes, &path)));
         }
     }
 
@@ -74,6 +63,3 @@ impl RuntimeData {
         &mut self.mru
     }
 }
-
-
-

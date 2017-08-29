@@ -66,7 +66,7 @@ fn main() {
 
     run_event_loop(&context, &mut runtime_data);
 
-    //runtime_data.save(context.configuration(), context.xdg());
+    runtime_data.save(&data_dir);
 }
 
 fn configure_logging(xdg: &BaseDirectories) {
