@@ -34,7 +34,7 @@ use xdg::BaseDirectories;
 
 use command::Command;
 use configuration::Configuration;
-use fs::{ConfigDir};
+use fs::{ConfigDir, DataDir};
 use context::Context;
 use execution_timer::ExecutionTimer;
 use program_info::ProgramInfo;
@@ -57,8 +57,9 @@ fn main() {
     info!("{:?}", pi);
 
     let config_dir = ConfigDir::new(xdg.clone(), pi.parsed_args().load_config());
+    let data_dir = DataDir::new(xdg.clone(), pi.parsed_args().load_config());
     let config = Configuration::load_user_configuration(&config_dir);
-    let mut runtime_data = RuntimeData::load(&config, &xdg);
+    let mut runtime_data = RuntimeData::load(&config, &data_dir);
 
     let context = Context::new(pi, config_dir, config);
     info!("{:?}", context.system_info());

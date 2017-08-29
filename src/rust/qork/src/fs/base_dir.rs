@@ -1,9 +1,20 @@
 use std::fs::{File, OpenOptions};
 use std::path::{Path, PathBuf};
 
+/*
+Variable            fn                  Default                 Example with Profile
+========            ==                  =======                 ====================
+XDG_CONFIG_HOME     config_dir()        $HOME/.config           $HOME/.config/qork/default/
+XDG_DATA_HOME       data_dir()          $HOME/.local/share      $HOME/.local/share/qork/default/mru.toml
+XDG_CACHE_HOME      cache_dir()         $HOME/.cache
+XDG_RUNTIME_DIR     runtime_dir()       ???
+*/
+
 pub trait BaseDir {
     // TODO: xdg:  create_{config,data,cache,runtime}_directory  - creates dirs under the XDG dir structure
     // TODO: xdg:  list_{config,data,cache,runtime}_files_[once] - lists files under the XDG dir structure
+    // TODO: Perhaps add the ability to specify the XDG folders via a command line option. The point
+    //       would be to support portable operation.
 
     /// Checks whether the directory object is valid. If it is not valid,
     /// then all method calls will be no-ops.

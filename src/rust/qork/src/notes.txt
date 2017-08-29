@@ -7,7 +7,6 @@ you will get confusing compiler errors about lifetimes (because you moved an obj
 Next
 ====
 * Create a UserInfo struct.
-* --create-config-dir : creates a skeleton configuration directory - need to define it!
 * Consider removing hostname and replacing with the more widely applicable nix crate.
   This would be good for getting the user info, but is not a solution for Windows.
 
@@ -22,19 +21,6 @@ that wrap things like the sysinf crate?
 * In ProgramInfo, we have now get everything from http://www.gnu.org/software/emacs/manual/html_node/elisp/User-Identification.html
 * We also effectively have got http://www.gnu.org/software/emacs/manual/html_node/elisp/System-Environment.html#System-Environment
 * Ability to get a filename that does not exist (or is highly unlikely to)
-
-
-QorkDirs design
-===============
-* Inits using XDG and a profile.
-* We want to support portable operation with the minimal of fuss.
-
-Variable            fn                  Default                 Example with Profile
-========            ==                  =======                 ====================
-XDG_CONFIG_HOME     config_dir()        $HOME/.config           $HOME/.config/qork/default/
-XDG_DATA_HOME       data_dir()          $HOME/.local/share      $HOME/.local/share/qork/default/mru.toml
-XDG_CACHE_HOME      cache_dir()         $HOME/.cache
-XDG_RUNTIME_DIR     runtime_dir()       ???
 
 
 Program Structure

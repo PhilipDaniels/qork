@@ -1,5 +1,5 @@
 use std::path::PathBuf;
-use xdg::BaseDirectories;
+use fs::{DataDir, BaseDir};
 
 use configuration::Configuration;
 use execution_timer::ExecutionTimer;
@@ -33,69 +33,40 @@ impl RuntimeData {
         }
     }
 
-    fn place_file(xdg: &BaseDirectories, filename: &str) -> Option<PathBuf> {
-        let path = xdg.place_data_file(filename);
-        if path.is_err() {
-            warn!("Could not locate runtime data file {}  in xdg directory structure", filename);
-            return None;
-        }
-
-        let path = path.unwrap();
-
-        if path.exists() && !path.is_file() {
-            warn!("The runtime data file {:?} is not a file", path);
-            return None;
-        }
-
-        Some(path)
-    }
-
-    pub fn load(config: &Configuration, xdg: &BaseDirectories) -> RuntimeData {
+    pub fn load(config: &Configuration, data_dir: &DataDir) -> RuntimeData {
         let _timer = ExecutionTimer::with_start_message("RuntimeData::load");
 
         let mut rd = RuntimeData::new(&config);
 
-        let dir = xdg.get_data_home();
-        if !dir.exists() {
-            warn!("The data_directory does not exist, no runtime data will be loaded, data_directory: {:?}", dir);
-            return rd;
-        }
+        info!("Loading runtime data from data_directory {:?}", data_dir.home());
 
-        if !dir.is_dir() {
-            warn!("The data_directory is a file, not a directory, no runtime data will be loaded, data_directory: {:?}", dir);
-            return rd;
-        }
-
-        info!("Loading runtime data from data_directory {:?}", dir);
-
-
-        let path = RuntimeData::place_file(&xdg, MRU_FILE);
-        if let Some(filename) = path {
-            match MRUList::load(config.max_mru_items(), &filename)
-            {
-                Ok(mru) => { rd.mru = mru;
-                    info!("Loaded {} items into the MRU List from {:?}", rd.mru.iter().count(), filename);
-                }
-                Err(_) => { }
-            };
+        match data_dir.get_existing_path(MRU_FILE) {
+            Some(path) => {
+                match MRUList::load(config.max_mru_items(), &path)
+                {
+                    Ok(mru) => { rd.mru = mru;
+                        info!("Loaded {} items into the MRU List from {:?}", rd.mru.iter().count(), path);
+                    }
+                    Err(_) => { }
+                };
+            },
+            None => {}
         }
 
         rd
     }
 
-    pub fn save(&mut self, xdg: &BaseDirectories) {
+    pub fn save(&mut self, data_dir: &DataDir) {
         let _timer = ExecutionTimer::with_start_message("RuntimeData::save");
 
-        if self.mru.is_changed() {
-            let path = RuntimeData::place_file(&xdg, MRU_FILE);
-            info!("MRU is changed, path = {:?}", path);
-
-            if let Some(filename) = path {
-                match self.mru.save(filename.as_path()) {
-                    Ok(num_bytes) => { info!("Wrote {} bytes to {:?}", num_bytes, filename); },
-                    Err(e) => { warn!("Could not save MRU List to {:?}, error = {:?}", filename, e); }
+        match data_dir.get_proposed_path(MRU_FILE) {
+            Some(path) => {
+                match self.mru.save(&path) {
+                    Ok(num_bytes) => { info!("Wrote {} bytes to {:?}", num_bytes, &path); },
+                    Err(e) => { warn!("Could not save MRU List to {:?}, error = {:?}", &path, e); }
                 }
-            }
+            },
+            None => {}
         }
     }
 
