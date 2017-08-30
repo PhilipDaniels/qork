@@ -1,6 +1,6 @@
 [root]
 name = "qork"
-version = "0.1.0"
+version = "0.1.2"
 dependencies = [
  "built 0.1.0 (git+https://github.com/lukaslueg/built)",
  "chrono 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
