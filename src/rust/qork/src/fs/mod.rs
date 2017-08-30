@@ -1,7 +1,7 @@
-use std::fs::{File};
-use std::path::{Path};
+use std::fs::File;
 use std::io::{BufReader, BufWriter};
 use std::io::prelude::*;
+use std::path::Path;
 
 mod config_dir;
 mod data_dir;
@@ -22,8 +22,8 @@ pub fn load_to_vector(filename: &Path) -> Result<Vec<String>, String> {
 
             for line in f.lines() {
                 match line {
-                    Ok(line) => { v.push(line) },
-                    Err(e) => return Err(e.to_string())
+                    Ok(line) => v.push(line),
+                    Err(e) => return Err(e.to_string()),
                 }
             }
 
@@ -40,13 +40,13 @@ pub fn save_from_vector(filename: &Path, data: Vec<String>) -> Result<usize, Str
             for line in data {
                 let bytes = line.as_bytes();
                 match f.write(bytes) {
-                    Ok(_) => { },
-                    Err(e) => return Err(e.to_string())
+                    Ok(_) => {}
+                    Err(e) => return Err(e.to_string()),
                 }
 
                 match f.write(b"\n") {
-                    Ok(_) => { },
-                    Err(e) => return Err(e.to_string())
+                    Ok(_) => {}
+                    Err(e) => return Err(e.to_string()),
                 }
 
                 byte_count += bytes.len() + 1;
