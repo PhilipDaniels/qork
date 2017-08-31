@@ -21,7 +21,7 @@ users = "0.5.3"
 xdg = "2.1.0"
 
 [build-dependencies]
-built = { git = "https://github.com/lukaslueg/built", branch = "master", features = ["serialized_git"] }
+built = "0.2.0"
 
 [profile.release]
 lto = true

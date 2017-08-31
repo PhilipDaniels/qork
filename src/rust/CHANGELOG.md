@@ -32,6 +32,9 @@ semver yet.
   Those structs are reasonably well written (for a newbie).
 * Created this Changelog and `loc.txt`.
 
+### Changed
+* The `Built` crate now comes from crates.io again, not the git master.
+
 ## 2017-07-31 0.1.1 (250 lines of Rust)
 ### Added
 * My first `Drop` struct - `ExecutionTimer`.
