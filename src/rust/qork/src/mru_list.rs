@@ -7,6 +7,8 @@ use std::path::Path;
 use std::slice::{Iter};
 use tempfile::NamedTempFile;
 
+use fs;
+
 /// A simple MRU-list data structure. Create a list of the appropriate
 /// maximum size (which can be changed later) then use `insert` to add new
 /// items. New items are always added at the front of the list. Adding
@@ -227,7 +229,8 @@ mod tests {
 
     #[test]
     fn load_for_file_that_does_not_exist_returns_error() {
-        let result = MRUList::load(0, Path::new("/i/definitely/do/not/exist"));
+        let p = fs::filename_that_does_not_exist();
+        let result = MRUList::load(0, &p);
         assert!(result.is_err());
     }
 
