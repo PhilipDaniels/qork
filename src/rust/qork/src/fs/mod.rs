@@ -101,6 +101,5 @@ mod tests {
         let p = filename_that_does_not_exist();
         assert!(!p.exists());
         assert!(p.starts_with(temp_dir()));
-        println!("{}", p.to_str().unwrap());
     }
 }

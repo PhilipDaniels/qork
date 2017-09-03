@@ -180,7 +180,7 @@ mod tests {
     fn write_for_empty_list_writes_no_data() {
         let mut v = Vec::<u8>::new();
         let mut mru = MRUList::new(0);
-        mru.write(&mut v);
+        mru.write(&mut v).unwrap();
 
         assert!(v.is_empty());
     }
@@ -206,7 +206,7 @@ mod tests {
 
         file.seek(SeekFrom::Start(0)).unwrap();
         let mut output = String::new();
-        file.read_to_string(&mut output);
+        file.read_to_string(&mut output).unwrap();
         assert_eq!(output, SIMPLE_MRU_AS_STRING);
         assert_eq!(output.len(), cnt);
     }
@@ -221,7 +221,7 @@ mod tests {
 
         file.seek(SeekFrom::Start(0)).unwrap();
         let mut output = String::new();
-        file.read_to_string(&mut output);
+        file.read_to_string(&mut output).unwrap();
         assert_eq!(output.len(), 0);
     }
 
@@ -293,7 +293,7 @@ mod tests {
     #[test]
     fn new_from_slice_for_empty_slice_creates_list() {
         let src = Vec::<String>::new();
-        let mut mru = MRUList::from_slice(20, &src);
+        let mru = MRUList::from_slice(20, &src);
 
         assert_eq!(mru.max_items, 20);
         assert_eq!(mru.len(), 0);
@@ -303,7 +303,7 @@ mod tests {
     #[test]
     fn new_from_slice_for_slice_with_one_item_creates_list_with_one_item() {
         let src = ["a"];
-        let mut mru = MRUList::from_slice(20, &src);
+        let mru = MRUList::from_slice(20, &src);
 
         assert_eq!(mru.max_items, 20);
         assert_eq!(mru.len(), 1);
@@ -314,7 +314,7 @@ mod tests {
     #[test]
     fn new_from_slice_for_non_empty_slice_creates_list_with_items_in_same_order() {
         let src = ["a", "b", "c"];
-        let mut mru = MRUList::from_slice(20, &src);
+        let mru = MRUList::from_slice(20, &src);
 
         assert_eq!(mru.max_items, 20);
         assert_eq!(mru.len(), 3);
@@ -327,7 +327,7 @@ mod tests {
     #[test]
     fn new_from_slice_for_zero_max_items_and_empty_slice_takes_no_items() {
         let src = Vec::<String>::new();
-        let mut mru = MRUList::from_slice(0, &src);
+        let mru = MRUList::from_slice(0, &src);
 
         assert_eq!(mru.max_items, 0);
         assert_eq!(mru.len(), 0);
@@ -337,7 +337,7 @@ mod tests {
     #[test]
     fn new_from_slice_for_zero_max_items_takes_no_items() {
         let src = ["a", "b", "c"];
-        let mut mru = MRUList::from_slice(0, &src);
+        let mru = MRUList::from_slice(0, &src);
 
         assert_eq!(mru.max_items, 0);
         assert_eq!(mru.len(), 0);
@@ -347,7 +347,7 @@ mod tests {
     #[test]
     fn new_from_slice_for_max_items_less_than_slice_length_takes_only_requested_items() {
         let src = ["a", "b", "c"];
-        let mut mru = MRUList::from_slice(2, &src);
+        let mru = MRUList::from_slice(2, &src);
 
         assert_eq!(mru.max_items, 2);
         assert_eq!(mru.len(), 2);
@@ -362,7 +362,7 @@ mod tests {
         // it was a new technique to me. It duplicates another test, and hence
         // mainly checks that things compile.
         let src = ["a".to_owned(), "b".to_owned(), "c".to_owned()];
-        let mut mru = MRUList::from_slice(2, &src);
+        let mru = MRUList::from_slice(2, &src);
 
         assert_eq!(mru.max_items, 2);
         assert_eq!(mru.len(), 2);
@@ -373,10 +373,10 @@ mod tests {
 
     #[test]
     fn is_empty_for_empty_list_returns_true() {
-        let mut mru = MRUList::new(0);
+        let mru = MRUList::new(0);
         assert!(mru.is_empty());
 
-        let mut mru = MRUList::new(1);
+        let mru = MRUList::new(1);
         assert!(mru.is_empty());
     }
 
@@ -559,11 +559,11 @@ mod tests {
 
     #[test]
     fn iter_for_empty_list_returns_zero_items() {
-        let mut mru = MRUList::new(0);
+        let mru = MRUList::new(0);
         let mut iter = mru.iter();
         assert_eq!(iter.next(), None);
 
-        let mut mru = MRUList::new(1);
+        let mru = MRUList::new(1);
         let mut iter = mru.iter();
         assert_eq!(iter.next(), None);
     }
