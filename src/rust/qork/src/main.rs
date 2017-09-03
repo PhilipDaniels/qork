@@ -28,7 +28,7 @@ mod execution_timer;
 mod mru_list;
 mod program_info;
 mod system_info;
-mod runtime_data;
+mod persistent_state;
 
 use std::io::{stdin};
 use xdg::BaseDirectories;
@@ -39,7 +39,7 @@ use fs::{ConfigDir, DataDir};
 use context::Context;
 use execution_timer::ExecutionTimer;
 use program_info::ProgramInfo;
-use runtime_data::RuntimeData;
+use persistent_state::PersistentState;
 
 // This produces various constants about the build environment which can be referred to using ::PKG_... syntax.
 include!(concat!(env!("OUT_DIR"), "/built.rs"));
@@ -60,14 +60,14 @@ fn main() {
     let config_dir = ConfigDir::new(xdg.clone(), pi.parsed_args().load_config());
     let data_dir = DataDir::new(xdg.clone(), pi.parsed_args().load_config());
     let config = Configuration::load_user_configuration(&config_dir);
-    let mut runtime_data = RuntimeData::load(&config, &data_dir);
+    let mut persistent_state = PersistentState::load(&config, &data_dir);
 
     let context = Context::new(pi, config_dir, config);
     info!("{:?}", context.system_info());
 
-    run_event_loop(&context, &mut runtime_data);
+    run_event_loop(&context, &mut persistent_state);
 
-    runtime_data.save(&data_dir);
+    persistent_state.save(&data_dir);
 }
 
 fn configure_logging(xdg: &BaseDirectories) {
@@ -93,7 +93,7 @@ fn log_build_info() {
         );
 }
 
-fn run_event_loop(context: &Context, runtime_data: &mut RuntimeData) {
+fn run_event_loop(context: &Context, persistent_state: &mut PersistentState) {
     use std::io::BufRead;
 
     let stdin = stdin();
@@ -112,20 +112,20 @@ fn run_event_loop(context: &Context, runtime_data: &mut RuntimeData) {
             }
         };
 
-        let done = despatch_command(context, runtime_data, cmd);
+        let done = despatch_command(context, persistent_state, cmd);
         if done {
             break;
         }
     }
 }
 
-fn despatch_command(context: &Context, runtime_data: &mut RuntimeData, command: Command) -> bool {
+fn despatch_command(context: &Context, persistent_state: &mut PersistentState, command: Command) -> bool {
     match command {
         Command::NoOp => { println!("Doing nothing"); }
         Command::Quit => { println!("Quitting"); return true; }
         Command::OpenFile{filename} => {
             println!("Opening file {}", filename);
-            runtime_data.mru().insert(filename);
+            persistent_state.mru().insert(filename);
         }
     }
 

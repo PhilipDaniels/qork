@@ -16,26 +16,26 @@ struct DataItem<T> {
     data: T
 }
 
-pub struct RuntimeData {
+pub struct PersistentState {
     mru: MRUList,
     mru2: DataItem<MRUList>
 }
 
 const MRU_FILE : &'static str = "mru.toml";
 
-impl RuntimeData {
-    /// Constructs a new RuntimeData object based on the default configuration.
-    pub fn new(config: &Configuration) -> RuntimeData {
-        RuntimeData {
+impl PersistentState {
+    /// Constructs a new PersistentState object based on the default configuration.
+    pub fn new(config: &Configuration) -> PersistentState {
+        PersistentState {
             mru: MRUList::new(config.max_mru_items()),
             mru2: DataItem { filename: "mru.toml", data: MRUList::new(config.max_mru_items()) }
         }
     }
 
-    pub fn load(config: &Configuration, data_dir: &DataDir) -> RuntimeData {
-        let _timer = ExecutionTimer::with_start_message("RuntimeData::load");
+    pub fn load(config: &Configuration, data_dir: &DataDir) -> PersistentState {
+        let _timer = ExecutionTimer::with_start_message("PersistentState::load");
 
-        let mut rd = RuntimeData::new(&config);
+        let mut rd = PersistentState::new(&config);
 
         info!("Loading runtime data from data_directory {:?}", data_dir.home());
 
@@ -50,7 +50,7 @@ impl RuntimeData {
     }
 
     pub fn save(&mut self, data_dir: &DataDir) {
-        let _timer = ExecutionTimer::with_start_message("RuntimeData::save");
+        let _timer = ExecutionTimer::with_start_message("PersistentState::save");
 
         if self.mru.is_changed() {
             data_dir.get_proposed_path(MRU_FILE)
