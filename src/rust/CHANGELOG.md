@@ -20,6 +20,8 @@ semver yet.
 ### Fixed
 ### Security
 
+## 2017-09-30 - 0.1.3 (xxxx lines of Rust)
+
 
 ## 2017-08-31 - 0.1.2 (1169 lines of Rust)
 ### Added

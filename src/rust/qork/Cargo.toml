@@ -1,6 +1,6 @@
 [package]
 name = "qork"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["Philip Daniels <Philip.Daniels1971@gmail.com>"]
 build = "build.rs"
 description = "A fast, extensible text editor written in Rust and Python"
