@@ -83,14 +83,14 @@ impl ProgramInfo {
 
 impl fmt::Debug for ProgramInfo {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let p = match &self.path {
-            &Some(ref pb) => pb.to_str().unwrap_or("unknown"),
-            &None => "unknown"
+        let p = match self.path {
+            Some(ref pb) => pb.to_str().unwrap_or("unknown"),
+            None => "unknown"
         };
 
-        let mdate = match &self.modified_date() {
-            &Some(t) => t.format("%Y-%m-%d %H:%M:%S%.3f UTC").to_string(),
-            &None => String::from("unknown")
+        let mdate = match self.modified_date() {
+            Some(t) => t.format("%Y-%m-%d %H:%M:%S%.3f UTC").to_string(),
+            None => String::from("unknown")
         };
 
         write!(f, "ProgramInfo {{ path: \"{}\", size: {}, modified_date: \"{}\", pid: {}, parent_pid: {}, uid: {}, uid_name: {:?}, \

@@ -13,7 +13,7 @@ use std::slice::{Iter};
 /// of the list. The list keeps track of whether its contents have changed,
 /// to allow users to only persist the list if it actually changes.
 ///
-/// The MRUList is not intended to be a high-performance data
+/// The `MRUList` is not intended to be a high-performance data
 /// structure, it is intended for managing small numbers of items such as
 /// might appear in an editor's MRU menu.
 pub struct MRUList {
@@ -107,7 +107,7 @@ impl MRUList {
         let mut f = BufWriter::new(dest);
         let mut byte_count = 0;
 
-        for v in self.data.iter() {
+        for v in &self.data {
             let s = format!("{}\n", v);
             byte_count += s.len();
             match write!(&mut f, "{}", s) {
@@ -118,7 +118,7 @@ impl MRUList {
 
         match f.flush() {
             Ok(_) => Ok(byte_count),
-            Err(e) => { return Err(e.to_string()); }
+            Err(e) => Err(e.to_string())
         }
     }
 

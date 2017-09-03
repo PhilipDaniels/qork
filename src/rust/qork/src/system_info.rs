@@ -10,7 +10,7 @@ pub struct SystemInfo {
 impl SystemInfo {
     pub fn new() -> SystemInfo {
         SystemInfo {
-            hostname: hostname::get_hostname().unwrap_or(String::new()),
+            hostname: hostname::get_hostname().unwrap_or_default()
         }
     }
 

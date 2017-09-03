@@ -9,16 +9,8 @@ use mru_list::MRUList;
 /// Therefore, it excludes things like buffer collections. Things that are virtually
 /// always used are non-lazy, while things that are used less frequently are wrapped
 /// by a Lazy<T>.
-
-/// TODO: PersistentData or SessionData.
-struct DataItem<T> {
-    filename: &'static str,
-    data: T
-}
-
 pub struct PersistentState {
-    mru: MRUList,
-    mru2: DataItem<MRUList>
+    mru: MRUList
 }
 
 const MRU_FILE : &'static str = "mru.toml";
@@ -27,15 +19,14 @@ impl PersistentState {
     /// Constructs a new PersistentState object based on the default configuration.
     pub fn new(config: &Configuration) -> PersistentState {
         PersistentState {
-            mru: MRUList::new(config.max_mru_items()),
-            mru2: DataItem { filename: "mru.toml", data: MRUList::new(config.max_mru_items()) }
+            mru: MRUList::new(config.max_mru_items())
         }
     }
 
     pub fn load(config: &Configuration, data_dir: &DataDir) -> PersistentState {
         let _timer = ExecutionTimer::with_start_message("PersistentState::load");
 
-        let mut rd = PersistentState::new(&config);
+        let mut rd = PersistentState::new(config);
 
         info!("Loading runtime data from data_directory {:?}", data_dir.home());
 

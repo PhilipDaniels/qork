@@ -3,10 +3,9 @@ use std::path::{Path, PathBuf};
 use xdg::BaseDirectories;
 
 /// Based on the XDG Base Directory Specification.
-/// DataDir is a wrapper for "There is a single base directory relative to which user-specific data files should be
-/// written.
-/// This directory is defined by the environment variable $XDG_DATA_HOME. ". DataDir is implemented as
-/// a wrapper around the xdg *data* functions.
+/// `DataDir` is a wrapper for "There is a single base directory relative to which user-specific
+/// data files should be written. This directory is defined by the environment variable `$XDG_DATA_HOME`.".
+/// `DataDir` is implemented as a wrapper around the xdg *data* functions.
 ///
 /// The data stored within this directory is the type of data which is not configuration but
 /// which needs to persist from invocation to invocation - MRU Lists, session state etc.

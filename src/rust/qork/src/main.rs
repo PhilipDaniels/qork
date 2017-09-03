@@ -71,17 +71,10 @@ fn main() {
 }
 
 fn configure_logging(xdg: &BaseDirectories) {
-    let path = xdg.place_config_file("logging.toml");
-
-    match path {
-        Ok(p) => {
-            if p.exists() {
-                log4rs::init_file(&p, Default::default()).unwrap();
-                info!("Logging initialized using file at {:?}", &p);
-            }
-        },
-        Err(_) => {
-            // Do nothing, not sure there is anything we can do.
+    if let Ok(path) = xdg.place_config_file("logging.toml") {
+        if path.exists() {
+            log4rs::init_file(&path, Default::default()).unwrap();
+            info!("Logging initialized using file at {:?}", &path);
         }
     }
 }

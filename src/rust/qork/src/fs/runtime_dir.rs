@@ -3,11 +3,10 @@ use std::path::{Path, PathBuf};
 use xdg::BaseDirectories;
 
 /// Based on the XDG Base Directory Specification.
-/// RuntimeDir is a wrapper for "There is a single base directory relative to which user-specific runtime files and
-/// other file objects should be placed.
-/// This directory is defined by the environment variable $XDG_RUNTIME_DIR. ".
-/// RuntimeDir is implemented as
-/// a wrapper around the xdg *runtime* functions.
+/// `RuntimeDir` is a wrapper for "There is a single base directory relative to which user-specific
+/// runtime files and other file objects should be placed. This directory is defined by the
+/// environment variable `$XDG_RUNTIME_DIR`.". `RuntimeDir` is implemented as a wrapper around the
+/// xdg *runtime* functions.
 ///
 /// This directory is where things such as temporary pipes and sockets will be
 /// stored.

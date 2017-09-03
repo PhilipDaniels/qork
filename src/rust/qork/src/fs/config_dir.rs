@@ -3,10 +3,9 @@ use std::path::{Path, PathBuf};
 use xdg::BaseDirectories;
 
 /// Based on the XDG Base Directory Specification.
-/// ConfigDir is a wrapper for "There is a single base directory relative to which user-specific configuration files
-/// should be written.
-/// This directory is defined by the environment variable $XDG_CONFIG_HOME.". ConfigDir is implemented as
-/// a wrapper around the xdg *config* functions.
+/// `ConfigDir` is a wrapper for "There is a single base directory relative to which user-specific
+/// configuration files should be written. This directory is defined by the environment variable
+/// `$XDG_CONFIG_HOME`.". `ConfigDir` is implemented as a wrapper around the xdg *config* functions.
 ///
 /// The data stored within this directory is configuration data, such as settings and flags.
 /// It typically does not change during an invocation of Qork.
