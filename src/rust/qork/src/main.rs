@@ -19,7 +19,7 @@ extern crate users;
 extern crate xdg;
 extern crate xi_rope;
 
-mod command;
+mod commands;
 mod command_line_arguments;
 mod configuration;
 mod fs;
@@ -34,7 +34,7 @@ mod persistent_state;
 use std::io::{stdin};
 use xdg::BaseDirectories;
 
-use command::Command;
+use commands::{handle_command, parse_command};
 use configuration::Configuration;
 use fs::{ConfigDir, DataDir};
 use context::Context;
@@ -92,38 +92,9 @@ fn run_event_loop(context: &Context) {
     let stdin = stdin();
     for line in stdin.lock().lines() {
         let l = line.unwrap();
-
-        let cmd = {
-            if l == "q" {
-                Command::Quit
-            }
-            else if l.starts_with("o ") {
-                Command::OpenFile{ filename: l.chars().skip(2).collect() }
-            }
-            else {
-                Command::NoOp
-            }
-        };
-
-        let done = despatch_command(context, cmd);
-        if done {
+        let cmd = parse_command(&l);
+        if handle_command(context, cmd) {
             break;
         }
     }
 }
-
-fn despatch_command(context: &Context, command: Command) -> bool {
-    match command {
-        Command::NoOp => { println!("Doing nothing"); }
-        Command::Quit => { println!("Quitting"); return true; }
-        Command::OpenFile{filename} => {
-            println!("Opening file {}", filename);
-            context.state().mru().insert(filename);
-        }
-    }
-
-    false
-}
-
-
-// https://github.com/mkozachek/Rust-Events/blob/master/src/lib.rs
