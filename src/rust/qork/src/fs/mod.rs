@@ -4,6 +4,7 @@ use std::io::{BufReader, BufWriter};
 use std::io::prelude::*;
 use std::path::{Path, PathBuf};
 use rand::{thread_rng, Rng};
+use execution_timer::ExecutionTimer;
 
 mod config_dir;
 mod data_dir;
@@ -15,7 +16,20 @@ pub use fs::config_dir::ConfigDir;
 pub use fs::data_dir::DataDir;
 pub use fs::runtime_dir::RuntimeDir;
 
-// TODO: load_file_as_string
+
+pub fn load_to_string(filename: &Path) -> Result<String, String> {
+    let _timer = ExecutionTimer::with_start_message("fs::load_to_string");
+
+    File::open(&filename)
+        .map_err(|err| err.to_string())
+        .and_then(|mut f| {
+            let mut s = String::new();
+            match f.read_to_string(&mut s) {
+                Ok(bytes) => { info!("Loaded {} bytes from {:?}", bytes, filename); Ok(s) },
+                Err(e) => Err(e.to_string())
+            }
+        })
+}
 
 pub fn load_to_vector(filename: &Path) -> Result<Vec<String>, String> {
     File::open(filename)
