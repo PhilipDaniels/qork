@@ -62,11 +62,11 @@ fn main() {
     let data_dir = DataDir::new(xdg.clone(), pi.parsed_args().load_config());
     let config = Configuration::load_user_configuration(&config_dir);
     let persistent_state = PersistentState::load(&config, &data_dir);
-
     let context = Context::new(pi, config_dir, config, persistent_state);
     info!("{:?}", context.system_info());
 
     run_event_loop(&context);
+
     context.state().save(&data_dir);
 }
 
