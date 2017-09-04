@@ -17,6 +17,7 @@ extern crate tempfile;
 extern crate toml;
 extern crate users;
 extern crate xdg;
+extern crate xi_rope;
 
 mod command;
 mod command_line_arguments;

@@ -23,6 +23,7 @@ semver yet.
 ## 2017-09-30 - 0.1.3 (xxxx lines of Rust)
 ### Added
 * First use of interior mutability, `RefCell` in Context to hold PersistentState.
+* Added `xi-rope` crate.
 
 ## 2017-08-31 - 0.1.2 (1169 lines of Rust)
 ### Added

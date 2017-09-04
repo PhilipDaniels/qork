@@ -20,6 +20,7 @@ tempfile = "2.1.6"
 toml = "0.4"
 users = "0.5.3"
 xdg = "2.1.0"
+xi-rope = "0.2.0"
 
 [build-dependencies]
 built = "0.2.0"
