@@ -1,5 +1,7 @@
+use std::cell::{RefCell, RefMut};
 use configuration::Configuration;
-use fs::{ConfigDir};
+use fs::ConfigDir;
+use persistent_state::PersistentState;
 use program_info::ProgramInfo;
 use system_info::SystemInfo;
 
@@ -8,16 +10,18 @@ pub struct Context {
     system_info: SystemInfo,
     program_info: ProgramInfo,
     config_dir: ConfigDir,
-    configuration: Configuration
+    configuration: Configuration,
+    state: RefCell<PersistentState>
 }
 
 impl Context {
-    pub fn new(pi: ProgramInfo, config_dir: ConfigDir, config: Configuration) -> Context {
+    pub fn new(pi: ProgramInfo, config_dir: ConfigDir, config: Configuration, state: PersistentState) -> Context {
         Context {
             system_info: SystemInfo::new(),
             program_info: pi,
             config_dir: config_dir,
             configuration: config,
+            state: RefCell::new(state)
         }
     }
 
@@ -35,5 +39,9 @@ impl Context {
 
     pub fn configuration(&self) -> &Configuration {
         &self.configuration
+    }
+
+    pub fn state(&self) -> RefMut<PersistentState> {
+        self.state.borrow_mut()
     }
 }

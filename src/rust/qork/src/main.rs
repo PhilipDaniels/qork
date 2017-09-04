@@ -60,14 +60,13 @@ fn main() {
     let config_dir = ConfigDir::new(xdg.clone(), pi.parsed_args().load_config());
     let data_dir = DataDir::new(xdg.clone(), pi.parsed_args().load_config());
     let config = Configuration::load_user_configuration(&config_dir);
-    let mut persistent_state = PersistentState::load(&config, &data_dir);
+    let persistent_state = PersistentState::load(&config, &data_dir);
 
-    let context = Context::new(pi, config_dir, config);
+    let context = Context::new(pi, config_dir, config, persistent_state);
     info!("{:?}", context.system_info());
 
-    run_event_loop(&context, &mut persistent_state);
-
-    persistent_state.save(&data_dir);
+    run_event_loop(&context);
+    context.state().save(&data_dir);
 }
 
 fn configure_logging(xdg: &BaseDirectories) {
@@ -86,7 +85,7 @@ fn log_build_info() {
         );
 }
 
-fn run_event_loop(context: &Context, persistent_state: &mut PersistentState) {
+fn run_event_loop(context: &Context) {
     use std::io::BufRead;
 
     let stdin = stdin();
@@ -105,20 +104,20 @@ fn run_event_loop(context: &Context, persistent_state: &mut PersistentState) {
             }
         };
 
-        let done = despatch_command(context, persistent_state, cmd);
+        let done = despatch_command(context, cmd);
         if done {
             break;
         }
     }
 }
 
-fn despatch_command(context: &Context, persistent_state: &mut PersistentState, command: Command) -> bool {
+fn despatch_command(context: &Context, command: Command) -> bool {
     match command {
         Command::NoOp => { println!("Doing nothing"); }
         Command::Quit => { println!("Quitting"); return true; }
         Command::OpenFile{filename} => {
             println!("Opening file {}", filename);
-            persistent_state.mru().insert(filename);
+            context.state().mru().insert(filename);
         }
     }
 
