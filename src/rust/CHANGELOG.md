@@ -24,6 +24,8 @@ semver yet.
 ### Added
 * First use of interior mutability, `RefCell` in Context to hold PersistentState.
 * Added `xi-rope` crate.
+* Added `shellexpand` and wrote my first closure, for use as a private local function.
+* Started the `Buffer` class.
 
 ## 2017-08-31 - 0.1.2 (1169 lines of Rust)
 ### Added

@@ -13,6 +13,7 @@ extern crate rand;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
+extern crate shellexpand;
 extern crate tempfile;
 extern crate toml;
 extern crate users;
@@ -31,6 +32,7 @@ mod mru_list;
 mod program_info;
 mod system_info;
 mod persistent_state;
+mod utils;
 
 use std::io::{stdin};
 use xdg::BaseDirectories;
