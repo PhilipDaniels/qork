@@ -2,9 +2,9 @@ use std::cmp;
 use std::fs::File;
 use std::io::{BufReader, BufWriter, Read, Write};
 use std::io::prelude::*;
-use std::ops::{Index};
+use std::ops::Index;
 use std::path::Path;
-use std::slice::{Iter};
+use std::slice::Iter;
 
 /// A simple MRU-list data structure. Create a list of the appropriate
 /// maximum size (which can be changed later) then use `insert` to add new

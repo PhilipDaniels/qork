@@ -1,5 +1,6 @@
 use std::cell::{RefCell, RefMut};
 use configuration::Configuration;
+use buffer::BufferCollection;
 use fs::ConfigDir;
 use persistent_state::PersistentState;
 use program_info::ProgramInfo;
@@ -11,7 +12,8 @@ pub struct Context {
     program_info: ProgramInfo,
     config_dir: ConfigDir,
     configuration: Configuration,
-    state: RefCell<PersistentState>
+    state: RefCell<PersistentState>,
+    buffers: RefCell<BufferCollection>
 }
 
 impl Context {
@@ -21,7 +23,8 @@ impl Context {
             program_info: pi,
             config_dir: config_dir,
             configuration: config,
-            state: RefCell::new(state)
+            state: RefCell::new(state),
+            buffers: RefCell::new(BufferCollection::new())
         }
     }
 
@@ -44,4 +47,9 @@ impl Context {
     pub fn state(&self) -> RefMut<PersistentState> {
         self.state.borrow_mut()
     }
+
+    pub fn buffers(&self) -> RefMut<BufferCollection> {
+        self.buffers.borrow_mut()
+    }
 }
+
