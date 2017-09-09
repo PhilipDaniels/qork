@@ -103,7 +103,7 @@ impl MRUList {
         self.data.iter()
     }
 
-    pub fn write<T:Write>(&mut self, dest: &mut T) -> Result<usize, String> {
+    pub fn write<T: Write>(&mut self, dest: &mut T) -> Result<usize, String> {
         let mut f = BufWriter::new(dest);
         let mut byte_count = 0;
 
@@ -122,7 +122,7 @@ impl MRUList {
         }
     }
 
-    pub fn save(&mut self, filename: &Path) -> Result<usize, String> {
+    pub fn save<P: AsRef<Path>>(&mut self, filename: P) -> Result<usize, String> {
         if self.is_changed {
             return File::create(filename)
                 .map_err(|err| err.to_string())
@@ -145,7 +145,7 @@ impl MRUList {
         Ok(mru)
     }
 
-    pub fn load(max_mru_items: usize, filename: &Path) -> Result<MRUList, String> {
+    pub fn load<P: AsRef<Path>>(max_mru_items: usize, filename: P) -> Result<MRUList, String> {
         File::open(filename)
             .map_err(|err| err.to_string())
             .and_then(|mut f| { MRUList::read(max_mru_items, &mut f) })
@@ -165,7 +165,7 @@ impl Index<usize> for MRUList {
 mod tests {
     use super::*;
     use tempfile::NamedTempFile;
-    use std::io::{SeekFrom};
+    use std::io::SeekFrom;
     use fs;
 
     const SIMPLE_MRU_AS_STRING : &'static str = "c\nb\na\n";
