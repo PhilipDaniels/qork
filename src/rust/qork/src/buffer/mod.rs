@@ -1,6 +1,7 @@
 use fs;
 use std::path::{Path, PathBuf};
 use std::slice::Iter;
+use std::iter::Iterator;
 use xi_rope::Rope;
 
 /// A `Buffer` represents the in-process data structures of an open file. This includes the buffer
@@ -12,7 +13,8 @@ pub struct Buffer {
     /// If this Buffer corresponds to a file, the name of the file.
     filename: Option<PathBuf>,
     /// The data in the buffer, expressed as a Rope structure.
-    data: Rope
+    data: Rope,
+    pub is_changed: bool
     // created_time_utc: Tm
     // last_accessed_time_utc: Tm
     // is_changed: bool
@@ -24,7 +26,8 @@ impl Buffer {
     pub fn new_empty_buffer() -> Buffer {
         Buffer {
             filename: None,
-            data: Rope::from("")
+            data: Rope::from(""),
+            is_changed: false
         }
     }
 
@@ -33,7 +36,8 @@ impl Buffer {
             Ok(contents) => {
                 Some(Buffer {
                     filename: Some(PathBuf::from(filename)),
-                    data: Rope::from(contents)
+                    data: Rope::from(contents),
+                    is_changed: false
                 })
             },
             Err(e) => { warn!("{}", e); None }
@@ -72,8 +76,16 @@ impl BufferCollection {
         self.buffers.push(buffer)
     }
 
-    pub fn find_by_filename(&mut self, filename: &str) -> &mut Buffer {
-        &mut self.buffers[0]
+    pub fn find_by_filename(&mut self, _filename: &Path) -> Option<&mut Buffer> {
+        // for b in self.buffers.iter_mut() {
+        //     if let Some(ref f) = b.filename {
+        //         if *f == filename {
+        //             return Some(b)
+        //         }
+        //     }
+        // }
+
+        None
     }
 }
 
