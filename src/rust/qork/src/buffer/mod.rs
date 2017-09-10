@@ -1,6 +1,7 @@
 use fs;
 use std::path::{Path, PathBuf};
 use std::slice::Iter;
+use std::ops::{Index, IndexMut};
 use std::iter::Iterator;
 use xi_rope::Rope;
 
@@ -18,12 +19,14 @@ pub struct Buffer {
     // created_time_utc: Tm
     // last_accessed_time_utc: Tm
     // is_changed: bool
-    // default_title: String   title to be used when there is only 1 view on a buffer. The filename or Untitled<1>
+    // default_title: String   title to be used when there is only 1 view on a buffer. The filename
+    //                         or Untitled<1>
     // TODO: Need title allocation function
 }
 
 impl Buffer {
-    pub fn new_empty_buffer() -> Buffer {
+    /// Creates a new empty buffer.
+    pub fn new() -> Buffer {
         Buffer {
             filename: None,
             data: Rope::from(""),
@@ -76,7 +79,7 @@ impl BufferCollection {
         self.buffers.push(buffer)
     }
 
-    pub fn find_by_filename(&mut self, _filename: &Path) -> Option<&mut Buffer> {
+    pub fn find_by_filename<P: AsRef<Path>>(&self, _filename: P) -> Option<&mut Buffer> {
         // for b in self.buffers.iter_mut() {
         //     if let Some(ref f) = b.filename {
         //         if *f == filename {
@@ -89,10 +92,37 @@ impl BufferCollection {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use tempfile::NamedTempFile;
-    use std::io::{SeekFrom};
+impl Index<usize> for BufferCollection {
+    type Output = Buffer;
 
+    fn index(&self, index: usize) -> &Buffer {
+        &self.buffers[index]
+    }
+}
+
+impl IndexMut<usize> for BufferCollection {
+    fn index_mut<'a>(&'a mut self, index: usize) -> &'a mut Buffer {
+        &mut self.buffers[index]
+    }
+}
+
+#[cfg(test)]
+mod buffer_tests {
+    use super::*;
+}
+
+#[cfg(test)]
+mod buffer_collection_tests {
+    use super::*;
+
+    #[test]
+    fn add_works() {
+        let mut bc = BufferCollection::new();
+        let mut b = Buffer::new();
+        b.filename = Some(PathBuf::from("a"));
+        bc.add(b);
+
+        let b2 = &bc[0];
+        assert_eq!(b2.filename, Some(PathBuf::from("a")));
+    }
 }

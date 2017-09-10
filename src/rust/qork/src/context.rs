@@ -1,4 +1,4 @@
-use std::cell::{RefCell, RefMut};
+use std::cell::{RefCell, RefMut, Ref};
 use configuration::Configuration;
 use buffer::BufferCollection;
 use fs::ConfigDir;
@@ -48,8 +48,8 @@ impl Context {
         self.state.borrow_mut()
     }
 
-    pub fn buffers(&self) -> RefMut<BufferCollection> {
-        self.buffers.borrow_mut()
+    pub fn buffers(&self) -> Ref<BufferCollection> {
+        self.buffers.borrow()
     }
 }
 
