@@ -12,7 +12,7 @@ use xi_rope::Rope;
 /// several different `Windows` simultaneously.
 pub struct Buffer {
     /// If this Buffer corresponds to a file, the name of the file.
-    filename: Option<PathBuf>,
+    pub filename: Option<PathBuf>,
     /// The data in the buffer, expressed as a Rope structure.
     data: Rope,
     pub is_changed: bool
@@ -79,16 +79,37 @@ impl BufferCollection {
         self.buffers.push(buffer)
     }
 
-    pub fn find_by_filename<P: AsRef<Path>>(&self, _filename: P) -> Option<&mut Buffer> {
-        // for b in self.buffers.iter_mut() {
-        //     if let Some(ref f) = b.filename {
-        //         if *f == filename {
-        //             return Some(b)
-        //         }
-        //     }
-        // }
+    pub fn find_by_filename(&mut self, filename: &PathBuf) -> Option<&mut Buffer> {
+        let pb = Some(filename.clone());
+
+        for b in self.buffers.iter_mut() {
+            if b.filename == pb {
+                return Some(b);
+            }
+        }
+
+        //let x = self.buffers.iter().filter_map(|b| b.filename == Some(pb) );
+
+            //.filter(|b| b.filename == Some(pb)).take(1).nth(0);
+
+        //let x = self.buffers.iter()
+        //    .filter(|b| b.filename == Some(pb)).take(1).nth(0);
 
         None
+
+        // for b in self.buffers.iter_mut() {
+        //     if b.filename.is_some() {
+
+        //     }
+        //     // if let Some(fn) = b.filename {
+
+        //     // }
+        //     // .unwrap_or_default() == _filename.as_ref() {
+        //     //     return Some(b);
+        //     // }
+        // }
+
+        // None
     }
 }
 

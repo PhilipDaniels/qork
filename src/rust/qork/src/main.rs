@@ -34,9 +34,11 @@ mod system_info;
 mod persistent_state;
 mod utils;
 
+use std::path::PathBuf;
 use std::io::{stdin};
 use xdg::BaseDirectories;
 
+use buffer::{Buffer, BufferCollection};
 use commands::{handle_command, parse_command};
 use configuration::Configuration;
 use fs::{ConfigDir, DataDir};
@@ -48,8 +50,31 @@ use persistent_state::PersistentState;
 // This produces various constants about the build environment which can be referred to using ::PKG_... syntax.
 include!(concat!(env!("OUT_DIR"), "/built.rs"));
 
+fn dobufs() {
+    // With this mut, rust complains on buffers.add() below: "cannot borrow as mutable because it
+    // is already borrowed as immutable", which occurs in the call to find_by_filename. If I remove
+    // the mut, rust complains "cannot borrow immutable local variable buffers as mutable", again
+    // on the call to add().
+    let mut buffers = BufferCollection::new();
+    let filename = String::from("~/foo.txt");
+    let pb = PathBuf::from(&filename);
+
+    if let Some(buffer) = buffers.find_by_filename(&pb) {
+        info!("Buffer for {} already exists.", &filename);
+        return;
+    }
+
+    info!("Buffer for {} does not exist, creating new buffer.", &filename);
+    let mut b = Buffer::new();
+    b.filename = Some(PathBuf::from(&filename));
+    buffers.add(b);
+}
+
+
 fn main() {
     std::env::set_var("IN_QORK", "1");
+
+    //dobufs();
 
     // Configure logging as early as possible (because, obviously, we want to log in the rest of the initialization process).
     let pi = ProgramInfo::new();
