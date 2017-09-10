@@ -2,7 +2,6 @@ use fs;
 use std::path::{Path, PathBuf};
 use std::slice::Iter;
 use std::ops::{Index, IndexMut};
-use std::iter::Iterator;
 use xi_rope::Rope;
 
 /// A `Buffer` represents the in-process data structures of an open file. This includes the buffer
@@ -79,37 +78,19 @@ impl BufferCollection {
         self.buffers.push(buffer)
     }
 
-    pub fn find_by_filename(&mut self, filename: &PathBuf) -> Option<&mut Buffer> {
-        let pb = Some(filename.clone());
+    pub fn find_by_filename<P : AsRef<Path>>(&mut self, filename: P) -> Option<&mut Buffer> {
+        let pb = Some(filename.as_ref().to_path_buf());
 
-        for b in self.buffers.iter_mut() {
-            if b.filename == pb {
-                return Some(b);
-            }
-        }
-
-        //let x = self.buffers.iter().filter_map(|b| b.filename == Some(pb) );
-
-            //.filter(|b| b.filename == Some(pb)).take(1).nth(0);
-
-        //let x = self.buffers.iter()
-        //    .filter(|b| b.filename == Some(pb)).take(1).nth(0);
-
-        None
+        let result = self.buffers.iter_mut().find(|&ref x| x.filename == pb);
+        result
 
         // for b in self.buffers.iter_mut() {
-        //     if b.filename.is_some() {
-
+        //     if b.filename == pb {
+        //         return Some(b);
         //     }
-        //     // if let Some(fn) = b.filename {
-
-        //     // }
-        //     // .unwrap_or_default() == _filename.as_ref() {
-        //     //     return Some(b);
-        //     // }
         // }
 
-        // None
+        //None
     }
 }
 
