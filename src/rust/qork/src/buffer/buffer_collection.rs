@@ -3,8 +3,11 @@ use std::slice::Iter;
 use std::ops::{Index, IndexMut};
 use super::Buffer;
 
-/// Manages the collection of open buffers.
-/// If a buffer is backed by a file, a second buffer on that file cannot be created.
+/// Creates, manages and deletes all the buffers in Qork, maintaining the various invariants that
+/// we expect from the buffers. Firstly, if a buffer is backed by a file, a second buffer on that
+/// file cannot be created. Secondly, all buffers have unique identity.
+///
+/// Note that a Buffer is very different from a BufferView.
 pub struct BufferCollection {
     buffers: Vec<Buffer>
 }
@@ -14,6 +17,21 @@ impl BufferCollection {
         BufferCollection {
             buffers: Vec::new()
         }
+    }
+
+    /// Creates and returns a new empty buffer.
+    pub fn new_empty_buffer(&mut self) -> Buffer {
+        let mut b = Buffer::new();
+        self.buffers.push(b);
+        Buffer::new()
+    }
+
+    /// Creates a buffer from a filename. If there is already a Buffer for the file it is returned,
+    /// else the file is opened and loaded if it exists, else if the file does not exist then a
+    /// new buffer is created with that filename, but no loading is done (the Buffer is considered
+    /// to be backed by a file that does not exist yet, it will be created when you save it.)
+    pub fn open_file(&mut self) -> Buffer {
+        Buffer::new()
     }
 
     pub fn len(&self) -> usize {

@@ -73,7 +73,15 @@ impl Buffer {
             },
             Err(e) => { warn!("{}", e); None }
         }
+    }
 
+    pub fn set_changed(&mut self) {
+        self.is_changed = true;
+        self.last_changed_time_utc = now_utc();
+    }
+
+    pub fn set_accessed(&mut self) {
+        self.last_accessed_time_utc = now_utc();
     }
 }
 
