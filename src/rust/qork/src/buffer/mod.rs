@@ -79,8 +79,7 @@ impl BufferCollection {
     }
 
     pub fn find_by_filename<P : AsRef<Path>>(&mut self, filename: P) -> Option<&mut Buffer> {
-        let pb = Some(filename.as_ref().to_path_buf());
-        self.buffers.iter_mut().find(|&ref x| x.filename == pb)
+        self.buffers.iter_mut().find(|b| b.filename.as_ref().map_or(false, |f| f == filename.as_ref()))
     }
 }
 
