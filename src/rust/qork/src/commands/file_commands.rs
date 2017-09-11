@@ -14,8 +14,11 @@ pub fn handle_open_file(context: &Context, filename: String) {
     }
 
     info!("Buffer for {} does not exist, creating new buffer.", &filename);
-    let mut b = Buffer::new();
-    b.filename = Some(PathBuf::from(&filename));
-    context.state().mru().insert(filename);
-    bc.add(b);
+    match Buffer::open_file(&filename) {
+        Some(buffer) => {
+            bc.add(buffer);
+            context.state().mru().insert(filename);
+        },
+        None => {}
+    }
 }
