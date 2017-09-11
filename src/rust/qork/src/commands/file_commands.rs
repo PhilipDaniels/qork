@@ -1,8 +1,6 @@
-use std::path::PathBuf;
-use context::Context;
 use buffer::Buffer;
+use context::Context;
 use utils;
-
 
 pub fn handle_open_file(context: &Context, filename: String) {
     let filename = utils::expand_variables(&filename).to_string();
