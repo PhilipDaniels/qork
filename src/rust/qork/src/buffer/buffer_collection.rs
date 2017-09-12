@@ -1,6 +1,9 @@
 use std::path::Path;
 use std::slice::Iter;
 use std::ops::{Index, IndexMut};
+use time::now_utc;
+use xi_rope::Rope;
+
 use super::Buffer;
 
 /// Creates, manages and deletes all the buffers in Qork, maintaining the various invariants that
@@ -9,23 +12,46 @@ use super::Buffer;
 ///
 /// Note that a Buffer is very different from a BufferView.
 pub struct BufferCollection {
+    next_buffer_id: i64,
     buffers: Vec<Buffer>
 }
 
 impl BufferCollection {
+    fn next_buffer_id(&mut self) -> i64 {
+        // No point being clever. No practical scenario in which these will need to be reused.
+        let i = self.next_buffer_id;
+        self.next_buffer_id += 1;
+        i
+    }
+
     pub fn new() -> BufferCollection {
         BufferCollection {
+            next_buffer_id: 0,
             buffers: Vec::new()
         }
     }
 
     /// Creates and returns a new empty buffer.
-    pub fn new_empty_buffer(&mut self) -> Buffer {
-        let mut b = Buffer::new();
+    pub fn new_empty_buffer(&mut self) -> &mut Buffer {
+        let now = now_utc();
+
+        let b = Buffer {
+            id: self.next_buffer_id(),
+            filename: None,
+            title: String::default(),
+            data: Rope::from(""),
+            is_changed: false,
+            created_time_utc: now,
+            last_accessed_time_utc: now,
+            last_changed_time_utc: now
+        };
+
+        let i = self.buffers.len();
         self.buffers.push(b);
-        Buffer::new()
+        &mut self.buffers[i]
     }
 
+    /*
     /// Creates a buffer from a filename. If there is already a Buffer for the file it is returned,
     /// else the file is opened and loaded if it exists, else if the file does not exist then a
     /// new buffer is created with that filename, but no loading is done (the Buffer is considered
@@ -33,8 +59,9 @@ impl BufferCollection {
     pub fn open_file(&mut self) -> Buffer {
         Buffer::new()
     }
+    */
 
-    pub fn len(&self) -> usize {
+    pub fn len(&mut self) -> usize {
         self.buffers.len()
     }
 
@@ -72,7 +99,9 @@ impl IndexMut<usize> for BufferCollection {
 #[cfg(test)]
 mod buffer_collection_tests {
     use super::*;
+    use std::path::PathBuf;
 
+    /*
     #[test]
     fn add_works() {
         let mut bc = BufferCollection::new();
@@ -82,5 +111,48 @@ mod buffer_collection_tests {
 
         let b2 = &bc[0];
         assert_eq!(b2.filename, Some(PathBuf::from("a")));
+    }
+    */
+
+    #[test]
+    fn new_empty_buffer_adds_and_returns_buffer() {
+        let now = now_utc();
+        let mut bc = BufferCollection::new();
+        let b1 = Buffer::new();
+        let b2 = Buffer::new();
+        bc.add(b1);
+        bc.add(b2);
+
+        // let b1 = bc.new_empty_buffer();
+        // let b2 = bc.new_empty_buffer();
+        // let i = bc.len();
+        // assert_eq!(0, b1.id);
+        // assert_eq!(1, i);
+
+        // let b1 = Buffer {
+        //     id: 2,
+        //     filename: None,
+        //     title: String::default(),
+        //     data: Rope::from(""),
+        //     is_changed: false,
+        //     created_time_utc: now,
+        //     last_accessed_time_utc: now,
+        //     last_changed_time_utc: now
+        // };
+
+        // let b2 = Buffer {
+        //     id: 2,
+        //     filename: None,
+        //     title: String::default(),
+        //     data: Rope::from(""),
+        //     is_changed: false,
+        //     created_time_utc: now,
+        //     last_accessed_time_utc: now,
+        //     last_changed_time_utc: now
+        // };
+
+
+        //let b2 = &bc[0];
+        //assert_eq!(b1, b2);
     }
 }
