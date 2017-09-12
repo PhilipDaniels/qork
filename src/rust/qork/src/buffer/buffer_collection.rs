@@ -12,20 +12,20 @@ use super::Buffer;
 ///
 /// Note that a Buffer is very different from a BufferView.
 pub struct BufferCollection {
-    next_buffer_id: i64,
+    last_buffer_id: i64,
     buffers: Vec<Buffer>
 }
 
 impl BufferCollection {
-    fn next_buffer_id(&mut self) -> i64 {
+    fn new_buffer_id(&mut self) -> i64 {
         // No point being clever. No practical scenario in which these will need to be reused.
-        self.next_buffer_id += 1;
-        self.next_buffer_id
+        self.last_buffer_id += 1;
+        self.last_buffer_id
     }
 
     pub fn new() -> BufferCollection {
         BufferCollection {
-            next_buffer_id: -1,
+            last_buffer_id: -1,
             buffers: Vec::new()
         }
     }
@@ -35,7 +35,7 @@ impl BufferCollection {
         let now = now_utc();
 
         let b = Buffer {
-            id: self.next_buffer_id(),
+            id: self.new_buffer_id(),
             filename: None,
             title: String::default(),
             data: Rope::from(""),
