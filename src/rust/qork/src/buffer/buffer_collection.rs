@@ -19,14 +19,13 @@ pub struct BufferCollection {
 impl BufferCollection {
     fn next_buffer_id(&mut self) -> i64 {
         // No point being clever. No practical scenario in which these will need to be reused.
-        let i = self.next_buffer_id;
         self.next_buffer_id += 1;
-        i
+        self.next_buffer_id
     }
 
     pub fn new() -> BufferCollection {
         BufferCollection {
-            next_buffer_id: 0,
+            next_buffer_id: -1,
             buffers: Vec::new()
         }
     }
