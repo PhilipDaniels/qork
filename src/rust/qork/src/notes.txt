@@ -56,3 +56,48 @@ Formatting of SystemTime is really difficult! Need to bring in chrono
 and then Google for the special magic function to convert a SystemTime
 into a DateTime.
 
+Non-lexical lifetimes is far too easy to run into. I was stumped for days and eventually had to
+ask on the rust-lang forums.
+
+
+Rc
+==
+Single-threaded reference counting pointer.
+Rc<T> = shared ownership of a value of type T, allocated on the heap.
+calling clone() gives you a new pointer to the same value. When the last Rc pointer is dropped,
+the value is also dropped.
+
+Rc<T> automatically deferences to T so you can call T's methods on an Rc<T>.
+
+The T value cannot be mutated.
+Not thread-safe (use std::sync::Arc instead).
+
+Cell & RefCell
+==============
+Cell: A mutable memory location.
+RefCell: A mutable memory location with dynamically checked borrow rules.
+
+There is no deref so you cannot call T's methods on RefCell<T>.
+
+Values of Cell<T> and RefCell<T> may be mutated through shared references (i.e. &T) rather than
+just through unique references (&mut T).
+
+They are used for 'interior mutability'.
+
+Cell<T> moves values in and out.
+
+RefCell<T> uses Rust lifetimes to implement 'dynamic borrowing', where one can claim temporary,
+exclusive mutable access to the inner value. This is checked at runtime (it is a runtime version
+of the borrow checker). If you try to borrow a value that is already mutably borrowed, a panic
+occurs.
+
+RefCell is single threaded: use RwLock<T> or Mutex<T> for shared mutability in a multi-threaded
+situation.
+
+Key methods:
+    borrow(&self) -> Ref<T>
+        Creates an immutable borrow, which lasts until the Ref<T> exits scope.
+        Panics if the T is currently mutably borrowed.
+    borrow_mut(&self) -> RefMut<T>
+        Creates an mutable borrow, which lasts until the Ref<T> exits scope.
+        Panics if the T is currently borrowed, either mutably or immutably.

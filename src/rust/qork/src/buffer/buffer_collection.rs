@@ -12,42 +12,14 @@ use super::Buffer;
 ///
 /// Note that a Buffer is very different from a BufferView.
 pub struct BufferCollection {
-    last_buffer_id: i64,
     buffers: Vec<Buffer>
 }
 
 impl BufferCollection {
-    fn new_buffer_id(&mut self) -> i64 {
-        // No point being clever. No practical scenario in which these will need to be reused.
-        self.last_buffer_id += 1;
-        self.last_buffer_id
-    }
-
     pub fn new() -> BufferCollection {
         BufferCollection {
-            last_buffer_id: -1,
             buffers: Vec::new()
         }
-    }
-
-    /// Creates and returns a new empty buffer.
-    pub fn new_empty_buffer(&mut self) -> &mut Buffer {
-        let now = now_utc();
-
-        let b = Buffer {
-            id: self.new_buffer_id(),
-            filename: None,
-            title: String::default(),
-            data: Rope::from(""),
-            is_changed: false,
-            created_time_utc: now,
-            last_accessed_time_utc: now,
-            last_changed_time_utc: now
-        };
-
-        let i = self.buffers.len();
-        self.buffers.push(b);
-        &mut self.buffers[i]
     }
 
     /*
@@ -117,13 +89,14 @@ mod buffer_collection_tests {
     fn new_empty_buffer_adds_and_returns_buffer() {
         let now = now_utc();
         let mut bc = BufferCollection::new();
-        let b1 = Buffer::new();
-        let b2 = Buffer::new();
-        bc.add(b1);
-        bc.add(b2);
 
-        // let b1 = bc.new_empty_buffer();
-        // let b2 = bc.new_empty_buffer();
+        // let b1 = Buffer::new();
+        // let b2 = Buffer::new();
+        // bc.add(b1);
+        // bc.add(b2);
+
+        let b1 = bc.new_empty_buffer();
+        b2 = bc.new_empty_buffer();
         // let i = bc.len();
         // assert_eq!(0, b1.id);
         // assert_eq!(1, i);
