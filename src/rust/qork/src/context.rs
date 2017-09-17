@@ -1,7 +1,7 @@
-use std::cell::{RefCell, RefMut, Ref};
+use std::cell::{RefCell, RefMut};
 use std::rc::Rc;
 use configuration::Configuration;
-use buffer::BufferCollection;
+use buffer::{BufferCollection, BufferFactory};
 use fs::ConfigDir;
 use persistent_state::PersistentState;
 use program_info::ProgramInfo;
@@ -14,6 +14,7 @@ pub struct Context {
     config_dir: ConfigDir,
     configuration: Configuration,
     state: RefCell<PersistentState>,
+    buffer_factory: RefCell<BufferFactory>,
     buffers: Rc<RefCell<BufferCollection>>
 }
 
@@ -25,6 +26,7 @@ impl Context {
             config_dir: config_dir,
             configuration: config,
             state: RefCell::new(state),
+            buffer_factory: RefCell::new(BufferFactory::new()),
             buffers: Rc::new(RefCell::new(BufferCollection::new()))
         }
     }
@@ -47,6 +49,10 @@ impl Context {
 
     pub fn state(&self) -> RefMut<PersistentState> {
         self.state.borrow_mut()
+    }
+
+    pub fn buffer_factory(&self) -> RefMut<BufferFactory> {
+        self.buffer_factory.borrow_mut()
     }
 
     pub fn buffers(&self) -> RefMut<BufferCollection> {

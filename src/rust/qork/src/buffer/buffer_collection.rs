@@ -1,8 +1,6 @@
 use std::path::Path;
 use std::slice::Iter;
 use std::ops::{Index, IndexMut};
-use time::now_utc;
-use xi_rope::Rope;
 
 use super::Buffer;
 

@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 use std::fmt;
 use time::{Tm, now_utc};
 use xi_rope::Rope;

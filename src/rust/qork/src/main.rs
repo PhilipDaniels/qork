@@ -4,17 +4,17 @@
 extern crate chrono;
 extern crate clap;
 extern crate hostname;
-extern crate lazy_init;
+//extern crate lazy_init;
 extern crate libc;
 #[macro_use]
 extern crate log;
 extern crate log4rs;
 extern crate rand;
-extern crate serde;
+//extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 extern crate shellexpand;
-extern crate tempfile;
+//extern crate tempfile;
 extern crate time;
 extern crate toml;
 extern crate users;

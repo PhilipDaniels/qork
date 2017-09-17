@@ -1,10 +1,7 @@
-use buffer::BufferFactory;
 use context::Context;
 use utils;
 
 pub fn handle_open_file(context: &Context, filename: String) {
-    let mut fac = BufferFactory::new();
-
     let filename = utils::expand_variables(&filename).to_string();
 
     let mut bc = context.buffers();
@@ -14,6 +11,7 @@ pub fn handle_open_file(context: &Context, filename: String) {
     }
 
     info!("Buffer for {} does not exist, creating new buffer.", &filename);
+    let mut fac = context.buffer_factory();
     match fac.open_file(&filename) {
         Some(buffer) => {
             bc.add(buffer);
