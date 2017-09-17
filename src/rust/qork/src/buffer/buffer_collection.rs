@@ -20,16 +20,6 @@ impl BufferCollection {
         }
     }
 
-    /*
-    /// Creates a buffer from a filename. If there is already a Buffer for the file it is returned,
-    /// else the file is opened and loaded if it exists, else if the file does not exist then a
-    /// new buffer is created with that filename, but no loading is done (the Buffer is considered
-    /// to be backed by a file that does not exist yet, it will be created when you save it.)
-    pub fn open_file(&mut self) -> Buffer {
-        Buffer::new()
-    }
-    */
-
     pub fn len(&mut self) -> usize {
         self.buffers.len()
     }
@@ -83,6 +73,7 @@ mod buffer_collection_tests {
     }
     */
 
+    /*
     #[test]
     fn new_empty_buffer_adds_and_returns_buffer() {
         let now = now_utc();
@@ -125,4 +116,5 @@ mod buffer_collection_tests {
         //let b2 = &bc[0];
         //assert_eq!(b1, b2);
     }
+    */
 }

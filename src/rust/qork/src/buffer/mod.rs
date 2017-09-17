@@ -37,6 +37,10 @@ pub struct Buffer {
 }
 
 impl Buffer {
+    pub fn id(&self) -> u64 {
+        self.id
+    }
+
     pub fn set_changed(&mut self) {
         self.is_changed = true;
         self.last_changed_time_utc = now_utc();
@@ -85,15 +89,14 @@ impl fmt::Display for Buffer {
 #[cfg(test)]
 mod buffer_tests {
     use super::*;
+    use time::now_utc;
 
-    /*
     #[test]
     fn set_changed_sets_changed_flag_and_changed_time() {
-        let mut b = Buffer::new();
+        let mut fac = BufferFactory::new();
+        let mut b = fac.new_empty_buffer();
         b.set_changed();
         assert!(b.is_changed());
         assert!(b.last_changed_time_utc() > b.created_time_utc());
     }
-    */
 }
-

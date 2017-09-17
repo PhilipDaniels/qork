@@ -14,7 +14,8 @@ extern crate rand;
 #[macro_use]
 extern crate serde_derive;
 extern crate shellexpand;
-//extern crate tempfile;
+#[cfg(test)]
+extern crate tempfile;
 extern crate time;
 extern crate toml;
 extern crate users;

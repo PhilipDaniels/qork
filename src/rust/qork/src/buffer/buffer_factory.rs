@@ -53,3 +53,16 @@ impl BufferFactory {
         }
     }
 }
+
+#[cfg(test)]
+mod buffer_tests {
+    use super::*;
+
+    #[test]
+    fn new_empty_buffer_increments_buffer_id() {
+        let mut fac = BufferFactory::new();
+        let b1 = fac.new_empty_buffer();
+        let b2 = fac.new_empty_buffer();
+        assert!(b2.id == b1.id + 1);
+    }
+}
