@@ -30,6 +30,10 @@ impl BufferFactory {
         }
     }
 
+    /// Creates a buffer from a filename. If there is already a Buffer for the file it is returned,
+    /// else the file is opened and loaded if it exists, else if the file does not exist then a
+    /// new buffer is created with that filename, but no loading is done (the Buffer is considered
+    /// to be backed by a file that does not exist yet, it will be created when you save it.)
     pub fn open_file<P: AsRef<Path>>(&mut self, filename: P) -> Option<Buffer> {
         let filename = filename.as_ref();
         let now = now_utc();

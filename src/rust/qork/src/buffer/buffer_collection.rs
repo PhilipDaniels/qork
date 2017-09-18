@@ -1,6 +1,8 @@
-use std::path::Path;
-use std::slice::Iter;
+use std::collections::HashMap;
+use std::collections::hash_map::Keys;
+use std::cell::{RefCell, RefMut};
 use std::ops::{Index, IndexMut};
+use std::path::Path;
 
 use super::Buffer;
 
@@ -10,13 +12,13 @@ use super::Buffer;
 ///
 /// Note that a Buffer is very different from a BufferView.
 pub struct BufferCollection {
-    buffers: Vec<Buffer>
+    buffers: HashMap<u64, RefCell<Buffer>>
 }
 
 impl BufferCollection {
     pub fn new() -> BufferCollection {
         BufferCollection {
-            buffers: Vec::new()
+            buffers: HashMap::with_capacity(20)
         }
     }
 
@@ -28,30 +30,29 @@ impl BufferCollection {
         self.buffers.is_empty()
     }
 
-    pub fn iter(&self) -> Iter<Buffer> {
-        self.buffers.iter()
+    pub fn get(&self, buffer_id: u64) -> Option<&RefCell<Buffer>> {
+         self.buffers.get(&buffer_id)
     }
 
-    pub fn add(&mut self, buffer: Buffer) {
-        self.buffers.push(buffer)
+    pub fn iter<'a>(&'a self) -> Keys<u64, RefCell<Buffer>> {
+         let x = self.buffers.keys();
+         x
     }
 
-    pub fn find_by_filename<P : AsRef<Path>>(&mut self, filename: P) -> Option<&mut Buffer> {
-        self.buffers.iter_mut().find(|b| b.filename.as_ref().map_or(false, |f| f == filename.as_ref()))
+    pub fn insert(&mut self, buffer: Buffer) {
+        self.buffers.insert(buffer.id(), RefCell::new(buffer));
     }
-}
 
-impl Index<usize> for BufferCollection {
-    type Output = Buffer;
-
-    fn index(&self, index: usize) -> &Buffer {
-        &self.buffers[index]
+    pub fn find_by_filename<P : AsRef<Path>>(&mut self, filename: P) -> Option<&RefCell<Buffer>> {
+        self.buffers.values().find(|refcell| refcell.borrow().filename.as_ref().map_or(false, |f| f == filename.as_ref()))
     }
 }
 
-impl IndexMut<usize> for BufferCollection {
-    fn index_mut<'a>(&'a mut self, index: usize) -> &'a mut Buffer {
-        &mut self.buffers[index]
+impl Index<u64> for BufferCollection {
+    type Output = RefCell<Buffer>;
+
+    fn index(&self, buffer_id: u64) -> &RefCell<Buffer> {
+        &self.buffers[&buffer_id]
     }
 }
 

@@ -14,7 +14,7 @@ pub fn handle_open_file(context: &Context, filename: String) {
     let mut fac = context.buffer_factory();
     match fac.open_file(&filename) {
         Some(buffer) => {
-            bc.add(buffer);
+            bc.insert(buffer);
             context.state().mru().insert(filename);
         },
         None => {}
