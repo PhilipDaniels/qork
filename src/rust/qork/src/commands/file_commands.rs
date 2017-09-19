@@ -12,11 +12,7 @@ pub fn handle_open_file(context: &Context, filename: String) {
 
     info!("Buffer for {} does not exist, creating new buffer.", &filename);
     let mut fac = context.buffer_factory();
-    match fac.open_file(&filename) {
-        Some(buffer) => {
-            bc.insert(buffer);
-            context.state().mru().insert(filename);
-        },
-        None => {}
-    }
+    let b = fac.open_file(&filename);
+    bc.insert(b);
+    context.state().mru().insert(filename);
 }
