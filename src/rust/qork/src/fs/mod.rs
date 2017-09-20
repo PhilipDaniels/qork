@@ -4,7 +4,6 @@ use std::io::{BufReader, BufWriter};
 use std::io::prelude::*;
 use std::path::{Path, PathBuf};
 use rand::{thread_rng, Rng};
-use execution_timer::ExecutionTimer;
 
 mod config_dir;
 mod data_dir;
@@ -18,7 +17,7 @@ pub use fs::runtime_dir::RuntimeDir;
 
 
 pub fn load_to_string(filename: &Path) -> Result<String, String> {
-    let _timer = ExecutionTimer::with_start_message("fs::load_to_string");
+    let _timer = timer!("fs::load_to_string");
 
     File::open(&filename)
         .map_err(|err| err.to_string())

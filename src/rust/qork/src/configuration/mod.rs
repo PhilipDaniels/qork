@@ -1,6 +1,5 @@
 use std::io::prelude::*;
 use toml;
-use execution_timer::ExecutionTimer;
 use fs::{BaseDir, ConfigDir};
 
 // Stores the configuration. Will be read from config.toml. Any values not
@@ -27,7 +26,7 @@ impl Configuration {
     }
 
     pub fn load_user_configuration(cd: &ConfigDir) -> Configuration {
-        let _timer = ExecutionTimer::with_start_message("load_user_configuration");
+        let _timer = timer!("load_user_configuration");
 
         let mut cfg = Configuration::default();
 

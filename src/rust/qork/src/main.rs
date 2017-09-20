@@ -22,6 +22,7 @@ extern crate users;
 extern crate xdg;
 extern crate xi_rope;
 
+#[macro_use] mod execution_timer;
 mod buffer;
 mod commands;
 mod command_line_arguments;
@@ -29,7 +30,6 @@ mod configuration;
 mod fs;
 mod context;
 mod datetime;
-mod execution_timer;
 mod mru_list;
 mod program_info;
 mod system_info;
@@ -43,7 +43,6 @@ use commands::{handle_command, parse_command};
 use configuration::Configuration;
 use fs::{ConfigDir, DataDir};
 use context::Context;
-use execution_timer::ExecutionTimer;
 use program_info::ProgramInfo;
 use persistent_state::PersistentState;
 
@@ -59,7 +58,7 @@ fn main() {
     let xdg = BaseDirectories::with_profile(::PKG_NAME, pi.parsed_args().xdg_profile()).unwrap();
     configure_logging(&xdg);
 
-    let _timer = ExecutionTimer::with_start_message("main.main");
+    let _timer = timer!("main.main");
     log_build_info();
     info!("{:?}", pi.parsed_args());
     info!("{:?}", pi);

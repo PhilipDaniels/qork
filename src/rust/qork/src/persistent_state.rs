@@ -1,7 +1,5 @@
 use fs::{DataDir, BaseDir};
-
 use configuration::Configuration;
-use execution_timer::ExecutionTimer;
 use mru_list::MRUList;
 
 /// Represents the persistent runtime data of the system. This is things like MRU lists
@@ -24,7 +22,7 @@ impl PersistentState {
     }
 
     pub fn load(config: &Configuration, data_dir: &DataDir) -> PersistentState {
-        let _timer = ExecutionTimer::with_start_message("PersistentState::load");
+        let _timer = timer!("PersistentState::load");
 
         let mut rd = PersistentState::new(config);
 
@@ -41,7 +39,7 @@ impl PersistentState {
     }
 
     pub fn save(&mut self, data_dir: &DataDir) {
-        let _timer = ExecutionTimer::with_start_message("PersistentState::save");
+        let _timer = timer!("PersistentState::save");
 
         if self.mru.is_changed() {
             data_dir.get_proposed_path(MRU_FILE)

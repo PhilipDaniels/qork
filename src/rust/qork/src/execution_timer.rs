@@ -33,3 +33,18 @@ impl<'a> Drop for ExecutionTimer<'a> {
 		debug!("Execution Completed, Name={}, MilliSecs={:.3}", self.name, msecs);
 	}
 }
+
+#[macro_use]
+mod macros {
+    /// Creates a timer that logs a starting and completed message.
+    #[macro_export]
+    macro_rules! timer {
+        ($str:expr) => { ::execution_timer::ExecutionTimer::with_start_message($str) }
+    }
+
+    /// Creates a quiet timer that does not log a starting message, only a completed one.
+    #[macro_export]
+    macro_rules! quiet_timer {
+        ($str:expr) => { ::execution_timer::ExecutionTimer::new($str) }
+    }
+}

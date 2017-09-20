@@ -23,6 +23,8 @@ semver yet.
 ## 2017-09-30 - 0.1.3 (xxxx lines of Rust)
 ### Added
 * First use of interior mutability, `RefCell` in Context to hold PersistentState.
+* First use of `AsRef`.
+* First macros written for the `ExecutionTimer` struct.
 * Added `xi-rope` crate.
 * Added `shellexpand` and wrote my first closure, for use as a private local function.
 * Started the `Buffer` class.
