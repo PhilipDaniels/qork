@@ -1,35 +1,11 @@
-use std::borrow::{Cow, Borrow};
+use std::borrow::Cow;
 use std::env;
-use std::fs::canonicalize;
-use std::path::{Path, PathBuf};
 use shellexpand::full_with_context_no_errors;
 
 /// Expands a leading tilde and environment variables in the `input` string.
 pub fn expand_variables<S: AsRef<str> + ?Sized>(input: &S) -> Cow<str> {
     let get_env_var = |input: &str| { env::var(input).ok() };
     full_with_context_no_errors(input, env::home_dir, get_env_var)
-}
-
-/// There is a problem: canonicalize does not do what we want. It only
-/// works if the file actually exists! Look at the source code and see
-/// https://blogs.msdn.microsoft.com/jeremykuhne/2016/04/21/path-normalization/
-/// We could implement our own algorithm based on those guidelines, but I can't
-/// be bothered right now.
-
-
-/// Expands a filename by first expanding environment variables and then
-/// canonicalizing it.
-pub fn expand_filename<S: AsRef<Path> + ?Sized>(input: &S) -> String {
-    let t1 = input.as_ref().to_string_lossy().into_owned();
-    let t2 = expand_variables(&t1).into_owned();
-    t2
-}
-
-pub fn expand_filename2<S: AsRef<str> + ?Sized>(input: &S) -> PathBuf {
-    //let t1 = input.as_ref().to_string_lossy().into_owned();
-    let t2 = expand_variables(input).into_owned();
-    let t2 = canonicalize(t2);
-    t2.unwrap()
 }
 
 // Note that cargo runs tests in parallel, so there is a danger of tests interfering with each
@@ -95,12 +71,5 @@ mod tests {
         env::remove_var("NO_CHANCE_OF_ME_REALLY_EXISTING");
         let result = expand_variables("/Documents/$NO_CHANCE_OF_ME_REALLY_EXISTING");
         assert_eq!(result, "/Documents/$NO_CHANCE_OF_ME_REALLY_EXISTING");
-    }
-
-    #[test]
-    fn expand_filename_expands_and_canonicalizes() {
-        env::set_var("HOME", HOME_VAL);
-        let result = expand_filename2("~/Documents/foo/..///a.txt");
-        assert_eq!(result, PathBuf::from(format!("{}/Documents/a.txt", HOME_VAL)));
     }
 }
