@@ -1,7 +1,6 @@
 #![allow(dead_code)]
 //#![allow(warnings)]
 
-extern crate chrono;
 extern crate clap;
 extern crate hostname;
 //extern crate lazy_init;
@@ -36,7 +35,7 @@ mod system_info;
 mod persistent_state;
 mod utils;
 
-use std::io::{stdin};
+use std::io::stdin;
 use xdg::BaseDirectories;
 
 use commands::{handle_command, parse_command};

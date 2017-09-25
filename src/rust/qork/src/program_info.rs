@@ -2,15 +2,15 @@ use std;
 use std::fmt;
 use std::fs::Metadata;
 use std::path::PathBuf;
+use std::time::SystemTime;
 
-use chrono::prelude::*;
 use libc;
 use libc::{pid_t};
 use users;
 use users::{uid_t, gid_t};
 
 use command_line_arguments::CommandLineArguments;
-use datetime::*;
+use datetime::{format_system_time_as_utc};
 
 /// Information about the program we are running (qork.exe), the invocation.
 /// This information is initialized at program startup. It is never refreshed,
@@ -76,8 +76,8 @@ impl ProgramInfo {
         self.meta_data.as_ref().map(|m| m.len())
     }
 
-    pub fn modified_date(&self) -> Option<DateTime<Utc>> {
-         self.meta_data.as_ref().map(|m| m.modified().ok()).map(|m| system_time_to_date_time(m.unwrap()))
+    pub fn modified_date(&self) -> Option<SystemTime> {
+        self.meta_data().as_ref().and_then(|md| md.modified().ok())
     }
 }
 
@@ -88,10 +88,7 @@ impl fmt::Debug for ProgramInfo {
             None => "unknown"
         };
 
-        let mdate = match self.modified_date() {
-            Some(t) => t.format("%Y-%m-%d %H:%M:%S%.3f UTC").to_string(),
-            None => String::from("unknown")
-        };
+        let mdate = self.modified_date().map_or(String::from("unknown"), |d| format_system_time_as_utc(&d));
 
         write!(f, "ProgramInfo {{ path: \"{}\", size: {}, modified_date: \"{}\", pid: {}, parent_pid: {}, uid: {}, uid_name: {:?}, \
         effective_uid: {}, effective_uid_name: {:?} gid: {}, gid_name: {:?}, effective_gid: {}, effective_gid_name: {:?} }}",
