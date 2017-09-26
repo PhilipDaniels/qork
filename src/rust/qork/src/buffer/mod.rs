@@ -41,6 +41,10 @@ impl Buffer {
         self.id
     }
 
+    pub fn filename(&self) -> &Option<PathBuf> {
+        &self.filename
+    }
+
     pub fn set_changed(&mut self) {
         self.is_changed = true;
         self.last_changed_time_utc = now_utc();

@@ -21,7 +21,7 @@ pub fn handle_save_buffer(context: &Context, buffer_id: u64) {
     match context.buffers().get(buffer_id) {
         Some(rc) => {
             let buffer = rc.borrow_mut();
-            info!("Saving buffer with id of {}", buffer.id());
+            info!("Saving buffer with id of {} and filename of {:?}", buffer.id(), buffer.filename());
         },
         None => { warn!("No buffer with an id of {} exists", buffer_id) }
     }
