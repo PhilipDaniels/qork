@@ -12,18 +12,33 @@ use super::Buffer;
 ///
 /// Note that a Buffer is very different from a BufferView.
 pub struct BufferCollection {
+    current_buffer: u64,
     buffers: HashMap<u64, RefCell<Buffer>>
 }
 
 impl BufferCollection {
     pub fn new() -> BufferCollection {
         BufferCollection {
+            current_buffer: 0,
             buffers: HashMap::with_capacity(20)
         }
     }
 
     pub fn len(&self) -> usize {
         self.buffers.len()
+    }
+
+    pub fn current_buffer(&self) -> u64 {
+        self.current_buffer
+    }
+
+    pub fn set_current_buffer(&mut self, buffer_id: u64) -> bool {
+        if self.buffers.contains_key(&buffer_id) {
+            self.current_buffer = buffer_id;
+            return true;
+        } else {
+            return false;
+        }
     }
 
     pub fn is_empty(&self) -> bool {
