@@ -4,7 +4,7 @@ use std::cell::RefCell;
 use std::ops::Index;
 use std::path::Path;
 
-use super::Buffer;
+use super::{Buffer, BufferId};
 
 /// Creates, manages and deletes all the buffers in Qork, maintaining the various invariants that
 /// we expect from the buffers. Firstly, if a buffer is backed by a file, a second buffer on that
@@ -12,14 +12,14 @@ use super::Buffer;
 ///
 /// Note that a Buffer is very different from a BufferView.
 pub struct BufferCollection {
-    current_buffer: u64,
-    buffers: HashMap<u64, RefCell<Buffer>>
+    current_buffer: BufferId,
+    buffers: HashMap<BufferId, RefCell<Buffer>>
 }
 
 impl BufferCollection {
     pub fn new() -> BufferCollection {
         BufferCollection {
-            current_buffer: 0,
+            current_buffer: -1,
             buffers: HashMap::with_capacity(20)
         }
     }
@@ -28,11 +28,11 @@ impl BufferCollection {
         self.buffers.len()
     }
 
-    pub fn current_buffer(&self) -> u64 {
+    pub fn current_buffer(&self) -> BufferId {
         self.current_buffer
     }
 
-    pub fn set_current_buffer(&mut self, buffer_id: u64) -> bool {
+    pub fn set_current_buffer(&mut self, buffer_id: BufferId) -> bool {
         if self.buffers.contains_key(&buffer_id) {
             self.current_buffer = buffer_id;
             return true;
@@ -45,11 +45,11 @@ impl BufferCollection {
         self.buffers.is_empty()
     }
 
-    pub fn get(&self, buffer_id: u64) -> Option<&RefCell<Buffer>> {
+    pub fn get(&self, buffer_id: BufferId) -> Option<&RefCell<Buffer>> {
          self.buffers.get(&buffer_id)
     }
 
-    pub fn keys(&self) -> Keys<u64, RefCell<Buffer>> {
+    pub fn keys(&self) -> Keys<BufferId, RefCell<Buffer>> {
          self.buffers.keys()
     }
 
@@ -57,7 +57,7 @@ impl BufferCollection {
         self.buffers.insert(buffer.id(), RefCell::new(buffer));
     }
 
-    pub fn remove(&mut self, buffer_id: u64) -> Option<RefCell<Buffer>> {
+    pub fn remove(&mut self, buffer_id: BufferId) -> Option<RefCell<Buffer>> {
         self.buffers.remove(&buffer_id)
     }
 
@@ -66,10 +66,10 @@ impl BufferCollection {
     }
 }
 
-impl Index<u64> for BufferCollection {
+impl Index<BufferId> for BufferCollection {
     type Output = RefCell<Buffer>;
 
-    fn index(&self, buffer_id: u64) -> &RefCell<Buffer> {
+    fn index(&self, buffer_id: BufferId) -> &RefCell<Buffer> {
         &self.buffers[&buffer_id]
     }
 }

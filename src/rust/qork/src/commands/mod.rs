@@ -1,5 +1,6 @@
 mod file_commands;
 
+use buffer::BufferId;
 use context::Context;
 use commands::file_commands::*;
 
@@ -8,8 +9,8 @@ pub enum Command {
     NoOp,
     Quit,
     OpenFile { filename: String },
-    SaveBuffer { buffer_id: u64 },
-    SetCurrentBuffer { buffer_id: u64 }
+    SaveBuffer { buffer_id: BufferId },
+    SetCurrentBuffer { buffer_id: BufferId }
 }
 
 fn get_arg(line: &str) -> String {
@@ -25,12 +26,12 @@ pub fn parse_command(line: &str) -> Command {
     }
     else if line.starts_with("s ") {
         let arg = get_arg(line);
-        let id: u64 = arg.parse().unwrap();
+        let id: BufferId = arg.parse().unwrap();
         Command::SaveBuffer{ buffer_id: id }
     }
     else if line.starts_with("c ") {
         let arg = get_arg(line);
-        let id: u64 = arg.parse().unwrap();
+        let id: BufferId = arg.parse().unwrap();
         Command::SetCurrentBuffer{ buffer_id: id }
     }
     else {

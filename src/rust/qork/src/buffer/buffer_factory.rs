@@ -2,10 +2,10 @@ use fs;
 use std::path::{Path, PathBuf};
 use time::now_utc;
 use xi_rope::Rope;
-use super::Buffer;
+use super::{Buffer, BufferId};
 
 pub struct BufferFactory {
-    next_buffer_id: u64
+    next_buffer_id: BufferId
 }
 
 impl BufferFactory {
@@ -13,7 +13,7 @@ impl BufferFactory {
         BufferFactory { next_buffer_id: 0 }
     }
 
-    fn empty_buffer(id: u64) -> Buffer {
+    fn empty_buffer(id: BufferId) -> Buffer {
         let now = now_utc();
 
         Buffer {

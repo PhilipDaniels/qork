@@ -9,13 +9,15 @@ mod buffer_factory;
 pub use buffer::buffer_collection::BufferCollection;
 pub use buffer::buffer_factory::BufferFactory;
 
+pub type BufferId = i64;
+
 /// A `Buffer` represents the in-process data structures of an open file. This includes the buffer
 /// contents and certain tracking information to support editing operations. It does not include
 /// things to do with display: a file can be opened in a `Buffer` without being currently displayed,
 /// in fact it need never be displayed at all. On the other hand, a `Buffer` may be displayed in
 /// several different `Windows` simultaneously.
 pub struct Buffer {
-    id: u64,
+    id: BufferId,
 
     /// If this Buffer corresponds to a file, the name of the file.
     filename: Option<PathBuf>,
@@ -37,7 +39,7 @@ pub struct Buffer {
 }
 
 impl Buffer {
-    pub fn id(&self) -> u64 {
+    pub fn id(&self) -> BufferId {
         self.id
     }
 
