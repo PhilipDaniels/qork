@@ -20,7 +20,10 @@ semver yet.
 ### Fixed
 ### Security
 
-## 2017-09-30 - 0.1.3 (xxxx lines of Rust)
+## 2017-10-31 - 0.1.4 (xxx lines of Rust)
+### Added
+
+## 2017-09-30 - 0.1.3 (1618 lines of Rust)
 ### Added
 * First use of interior mutability, `RefCell` in Context to hold PersistentState.
 * First use of `AsRef`.
@@ -28,6 +31,9 @@ semver yet.
 * Added `xi-rope` crate.
 * Added `shellexpand` and wrote my first closure, for use as a private local function.
 * Started the `Buffer` class.
+
+### Removed
+* Removed the `chrono` crate and used `Tm` etc. myself.
 
 ## 2017-08-31 - 0.1.2 (1169 lines of Rust)
 ### Added
