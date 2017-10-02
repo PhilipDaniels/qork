@@ -64,6 +64,27 @@ impl BufferCollection {
     pub fn find_by_filename<P : AsRef<Path>>(&mut self, filename: P) -> Option<&RefCell<Buffer>> {
         self.buffers.values().find(|refcell| refcell.borrow().filename.as_ref().map_or(false, |f| f == filename.as_ref()))
     }
+
+    // Needs a buffer factory passed in. Check to see if the file is already open. If it is, return
+    // the id of the first buffer rather than creating a new one.
+    pub fn open_file() {}
+    // Saves a buffer, but only if it already has a filename. Set changed to false.
+    pub fn save_buffer() {}
+    // Saves a buffer to a specific filename. Might need to allocate a new title. Can change
+    // the filename that a buffer is saved to. Set changed to false.
+    pub fn save_buffer_as() {}
+    // Not sure we need this, it is really just remove disguised.
+    pub fn close_buffer() {}
+
+    // We also need a filename pre-processor better than just expand_variables.
+    // It should be able to deal with relative names, trying to find a file relative to the
+    // current buffer's directory (for working in projects), or failing that, to the cwd.
+
+    // Title algorithm. We need the ability to uniqueify buffer names. Once a suffix number is
+    // assigned it is never changed. They can be reused, or even not used (we only allocate them
+    // for our convenience, and they do not need to go up monotonically like buffer ids do).
+    // For new buffers not backed by a file "new", then "new<1>" etc.
+    // For buffers backed by a file, the leaf filename, then <1> etc.
 }
 
 impl Index<BufferId> for BufferCollection {
