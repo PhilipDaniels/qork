@@ -80,11 +80,29 @@ impl BufferCollection {
     // It should be able to deal with relative names, trying to find a file relative to the
     // current buffer's directory (for working in projects), or failing that, to the cwd.
 
-    // Title algorithm. We need the ability to uniqueify buffer names. Once a suffix number is
-    // assigned it is never changed. They can be reused, or even not used (we only allocate them
-    // for our convenience, and they do not need to go up monotonically like buffer ids do).
-    // For new buffers not backed by a file "new", then "new<1>" etc.
-    // For buffers backed by a file, the leaf filename, then <1> etc.
+
+    /// Title algorithm. We need the ability to uniqueify buffer names. Once a suffix number is
+    /// assigned it is never changed. They can be reused, or even not used (we only allocate them
+    /// for our convenience, and they do not need to go up monotonically like buffer ids do).
+    /// For new buffers not backed by a file "new", then "new 1 " etc.
+    /// For buffers backed by a file, the leaf filename, then '1' etc.
+    fn get_unique_title(&self, proposed: &str) -> String {
+        //let matching_buffers : Vec<_> = self.buffers.values().filter(
+        //    |refcell| refcell.borrow().title == proposed).collect();
+
+        let prefix = String::from(proposed) + " ";
+        let matching_buffers = self.buffers.values()
+            .filter(|refcell| refcell.borrow().title == proposed || refcell.borrow().title.starts_with(&prefix));
+
+        let cnt = matching_buffers.count();
+        if cnt == 0 {
+            return String::from(proposed);
+        } else if cnt == 1 {
+            return String::from(proposed) + " 1";
+        }
+
+        String::default()
+    }
 }
 
 impl Index<BufferId> for BufferCollection {
@@ -98,8 +116,91 @@ impl Index<BufferId> for BufferCollection {
 #[cfg(test)]
 mod buffer_collection_tests {
     use super::*;
-    use std::path::PathBuf;
     use super::super::BufferFactory;
+
+    #[test]
+    fn get_unique_title_for_empty_collection_returns_proposed() {
+        let bc = BufferCollection::new();
+        let proposed = "new";
+        let title = bc.get_unique_title(proposed);
+        assert_eq!(title, proposed);
+    }
+
+    #[test]
+    fn get_unique_title_for_collection_with_no_matching_buffer_title_returns_proposed() {
+        let mut bc = BufferCollection::new();
+        let mut fac = BufferFactory::new();
+
+        let mut b = fac.new_empty_buffer();
+        b.title = String::from("t1");
+        bc.insert(b);
+
+        let mut b = fac.new_empty_buffer();
+        b.title = String::from("t2");
+        bc.insert(b);
+
+        let proposed = "new";
+        let title = bc.get_unique_title(proposed);
+        assert_eq!(title, proposed);
+    }
+
+    #[test]
+    fn get_unique_title_for_collection_with_matching_buffer_title_returns_proposed_with_numeral_of_one() {
+        let mut bc = BufferCollection::new();
+        let mut fac = BufferFactory::new();
+
+        let mut b = fac.new_empty_buffer();
+        b.title = String::from("new");
+        bc.insert(b);
+
+        let proposed = "new";
+        let title = bc.get_unique_title(proposed);
+        assert_eq!(title, "new 1");
+    }
+
+    #[test]
+    fn get_unique_title_for_collection_with_matching_buffer_titles_in_ascending_order_returns_proposed_with_next_free_numeral() {
+        let mut bc = BufferCollection::new();
+        let mut fac = BufferFactory::new();
+
+        let mut b = fac.new_empty_buffer();
+        b.title = String::from("new");
+        bc.insert(b);
+
+        let mut b = fac.new_empty_buffer();
+        b.title = String::from("new 1");
+        bc.insert(b);
+
+        let mut b = fac.new_empty_buffer();
+        b.title = String::from("new 2");
+        bc.insert(b);
+
+        let proposed = "new";
+        let title = bc.get_unique_title(proposed);
+        assert_eq!(title, "new 3");
+    }
+
+    #[test]
+    fn get_unique_title_for_collection_with_matching_buffer_titles_with_gap_returns_proposed_with_lowest_free_numeral() {
+        let mut bc = BufferCollection::new();
+        let mut fac = BufferFactory::new();
+
+        let mut b = fac.new_empty_buffer();
+        b.title = String::from("new");
+        bc.insert(b);
+
+        let mut b = fac.new_empty_buffer();
+        b.title = String::from("new 1");
+        bc.insert(b);
+
+        let mut b = fac.new_empty_buffer();
+        b.title = String::from("new 3");
+        bc.insert(b);
+
+        let proposed = "new";
+        let title = bc.get_unique_title(proposed);
+        assert_eq!(title, "new 2");
+    }
 
     #[test]
     fn is_empty_for_empty_collection_returns_true() {
