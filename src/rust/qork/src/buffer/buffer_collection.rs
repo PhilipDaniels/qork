@@ -87,29 +87,37 @@ impl BufferCollection {
     /// For new buffers not backed by a file "new", then "new 1 " etc.
     /// For buffers backed by a file, the leaf filename, then '1' etc.
     fn get_unique_title(&self, proposed: &str) -> String {
-        let prefix = String::from(proposed) + " ";
-        let matching_buffers : Vec<String> = self.buffers.values()
-            .map(|refcell| refcell.borrow())
-            .map(|x| x.title.clone())
-            .filter(|title| *title == String::from(proposed) || title.starts_with(&prefix))
-            .collect();
+        // let prefix = String::from(proposed) + " ";
+        // let matching_buffers : Vec<String> = self.buffers.values()
+        //     .map(|refcell| refcell.borrow())
+        //     .map(|x| x.title.clone())
+        //     .filter(|title| *title == String::from(proposed) || title.starts_with(&prefix))
+        //     .collect();
 
-        let namer = |n: i32| -> String {
-            if n == 0 {
-                return String::from(proposed)
-            } else {
-                return String::from(proposed) + " " + &n.to_string()
-            }
-        };
+        let titles : Vec<_> = self.buffers.values().map(|refcell| refcell.borrow().title.clone()).collect();
 
-        let mut i = 0;
-        loop {
-            let p = namer(i);
-            if !matching_buffers.contains(&p) {
-                return p
-            } else {
-                i += 1
-            }
+        //let titles2 : Vec<_> = self.buffers.values().map(|refcell| *(refcell.borrow().title)).collect();
+
+        inner_get_unique_title(proposed, &titles)
+    }
+}
+
+fn inner_get_unique_title(proposed: &str, current_titles: &[String]) -> String {
+    let namer = |n: i32| -> String {
+        if n == 0 {
+            return String::from(proposed)
+        } else {
+            return String::from(proposed) + " " + &n.to_string()
+        }
+    };
+
+    let mut i = 0;
+    loop {
+        let p = namer(i);
+        if !current_titles.contains(&p) {
+            return p
+        } else {
+            i += 1
         }
     }
 }
