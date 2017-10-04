@@ -87,21 +87,30 @@ impl BufferCollection {
     /// For new buffers not backed by a file "new", then "new 1 " etc.
     /// For buffers backed by a file, the leaf filename, then '1' etc.
     fn get_unique_title(&self, proposed: &str) -> String {
-        //let matching_buffers : Vec<_> = self.buffers.values().filter(
-        //    |refcell| refcell.borrow().title == proposed).collect();
-
         let prefix = String::from(proposed) + " ";
-        let matching_buffers = self.buffers.values()
-            .filter(|refcell| refcell.borrow().title == proposed || refcell.borrow().title.starts_with(&prefix));
+        let matching_buffers : Vec<String> = self.buffers.values()
+            .map(|refcell| refcell.borrow())
+            .map(|x| x.title.clone())
+            .filter(|title| *title == String::from(proposed) || title.starts_with(&prefix))
+            .collect();
 
-        let cnt = matching_buffers.count();
-        if cnt == 0 {
-            return String::from(proposed);
-        } else if cnt == 1 {
-            return String::from(proposed) + " 1";
+        let namer = |n: i32| -> String {
+            if n == 0 {
+                return String::from(proposed)
+            } else {
+                return String::from(proposed) + " " + &n.to_string()
+            }
+        };
+
+        let mut i = 0;
+        loop {
+            let p = namer(i);
+            if !matching_buffers.contains(&p) {
+                return p
+            } else {
+                i += 1
+            }
         }
-
-        String::default()
     }
 }
 
