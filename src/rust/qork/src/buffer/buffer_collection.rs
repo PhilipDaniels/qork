@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::collections::hash_map::Keys;
-use std::cell::RefCell;
+use std::cell::{Ref, RefCell};
 use std::ops::Index;
 use std::path::Path;
 
@@ -80,6 +80,10 @@ impl BufferCollection {
     // It should be able to deal with relative names, trying to find a file relative to the
     // current buffer's directory (for working in projects), or failing that, to the cwd.
 
+    fn all_buffers(&self) -> Vec<Ref<Buffer>> {
+        let x : Vec<_> = self.buffers.values().map(|rcb| rcb.borrow()).collect();
+        x
+    }
 
     /// Title algorithm. We need the ability to uniqueify buffer names. Once a suffix number is
     /// assigned it is never changed. They can be reused, or even not used (we only allocate them
@@ -87,16 +91,8 @@ impl BufferCollection {
     /// For new buffers not backed by a file "new", then "new 1 " etc.
     /// For buffers backed by a file, the leaf filename, then '1' etc.
     fn get_unique_title(&self, proposed: &str) -> String {
-        // let prefix = String::from(proposed) + " ";
-        // let matching_buffers : Vec<String> = self.buffers.values()
-        //     .map(|refcell| refcell.borrow())
-        //     .map(|x| x.title.clone())
-        //     .filter(|title| *title == String::from(proposed) || title.starts_with(&prefix))
-        //     .collect();
-
-        let titles : Vec<_> = self.buffers.values().map(|refcell| refcell.borrow().title.clone()).collect();
-
-        //let titles2 : Vec<_> = self.buffers.values().map(|refcell| *(refcell.borrow().title)).collect();
+        //let titles : Vec<_> = self.buffers.values().map(|refcell| refcell.borrow().title.clone()).collect();
+        let titles : Vec<_> = self.all_buffers().iter().map(|x| x.title.clone()).collect();
 
         inner_get_unique_title(proposed, &titles)
     }
